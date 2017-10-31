@@ -36,10 +36,13 @@ class Bayes:
             raise IndexError("Test data should small than %s" % self.data_len)
         random_list = [
             numpy.random.randint(1, self.data_len) for r in range(self.num)]
-        self.test_data = [
-            (self.data_set[r], self.classify[r]) for r in random_list]
+        self.test_data = [self.data_set[r] for r in random_list]
+        self.test_classify = [self.classify[r] for r in random_list]
         self.train_data = [
-            (self.data_set[r], self.classify[r]) for r in range(self.data_len)
+            self.data_set[r] for r in range(self.data_len)
+            if r not in random_list]
+        self.train_classify = [
+            self.classify[r] for r in range(self.data_len)
             if r not in random_list]
 
     def vocab_list(self):
@@ -47,7 +50,7 @@ class Bayes:
         Get words list longer than one word
         '''
         vocab_set = set()
-        for k in self.train_data[0]:
+        for k in self.train_data:
             vocab_set = vocab_set | set(jieba.cut(k))
             self.vocab_list = [i for i in vocab_set if len(i) > 1]
 
@@ -69,7 +72,7 @@ class Bayes:
         convert all sentences to vector
         '''
         matrix_list = []
-        for i in self.train_data[0]:
+        for i in self.train_data:
             matrix_list.append(self.sentence_to_vector(i))
         return matrix_list
 
@@ -94,15 +97,23 @@ class Bayes:
             elif self.classify[i] == POLITICS:
                 politics_num += matrix_list[i]
                 politics_cal += sum(matrix_list[i])
-        sex_vector = numpy.log(sex_num/sex_cal)
-        gamble_vector = numpy.log(gamble_num/gamble_cal)
-        normal_vector = numpy.log(normal_num/normal_cal)
-        politics_vector = numpy.log(politics_num/politics_cal)
-        return sex_vector, gamble_vector, normal_vector, politics_vector
+        # self.sex_vector = numpy.log(sex_num/sex_cal)
+        # self.gamble_vector = numpy.log(gamble_num/gamble_cal)
+        # self.normal_vector = numpy.log(normal_num/normal_cal)
+        # self.politics_vector = numpy.log(politics_num/politics_cal)
+        self.sex_vector = (sex_num/sex_cal)
+        self.gamble_vector = (gamble_num/gamble_cal)
+        self.normal_vector = (normal_num/normal_cal)
+        self.politics_vector = (politics_num/politics_cal)
+        print(self.sex_vector)
+        print('-'*30)
+        print(self.gamble_vector)
+        print('-'*30)
+        print(self.normal_vector)
+        print('-'*30)
+        print(self.politics_vector)
 
-    def classify_bayes(
-            self, word_vector, sex_vector, gamble_vector,
-            normal_vector, politics_vector):
+    def classify_bayes(self, sentence_vector):
         '''
         type word_vector: list
         sex_vector: numpy matrix
@@ -110,16 +121,28 @@ class Bayes:
         normal_vector: numpy matrix
         politics_vector: numpy matrix
         '''
-        sex_percentage = (sum(sex_vector * word_vector), SEX)
-        gamble_percentage = (sum(gamble_vector * word_vector), GAMBLE)
-        normal_percentage = (sum(normal_vector * word_vector), NORMAL)
-        politics_percentage = (sum(politics_vector * word_vector), POLITICS)
+        word_vector = self.sentence_to_vector(sentence_vector)
+        sex_percentage = (sum(self.sex_vector * word_vector), SEX)
+        gamble_percentage = (sum(self.gamble_vector * word_vector), GAMBLE)
+        normal_percentage = (sum(self.normal_vector * word_vector), NORMAL)
+        politics_percentage = (
+                sum(self.politics_vector * word_vector), POLITICS)
         return max(
             sex_percentage, gamble_percentage,
             normal_percentage, politics_percentage)[1]
 
+    def error_rate(self):
+        classify_results = []
+        for i in self.test_data:
+            classify_results.append(self.classify_bayes(i))
+        return [
+            i for i, j in zip(self.test_classify, classify_results) if i != j]
+
 
 files_path = ['sex.dat', 'gamble.dat', 'normal.dat', 'politics.dat']
-bayes = Bayes(files_path)
+bayes = Bayes(files_path, 20)
 bayes.read_files()
 bayes.split_data()
+bayes.vocab_list()
+bayes.train_bayes()
+bayes.error_rate()
