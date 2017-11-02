@@ -62,6 +62,7 @@ class Bayes:
         '''
         return_vec = [0]*len(self.vocab_list)
         for i in jieba.cut(sentence):
+            print(i)
             if i in self.vocab_list:
                 return_vec[self.vocab_list.index(i)] += 1
         return return_vec
@@ -82,36 +83,26 @@ class Bayes:
         '''
         matrix_list = self.get_vocab_matrix()
         sex_num = gamble_num = numpy.ones(len(matrix_list[0]))
-        politics_num = normal_num = numpy.ones(len(matrix_list[0]))
+        normal_num = numpy.ones(len(matrix_list[0]))
+        politics_num = numpy.ones(len(matrix_list[0]))
         sex_cal = gamble_cal = normal_cal = politics_cal = 2.0
         for i in range(len(matrix_list)):
-            if self.classify[i] == SEX:
+            if self.train_classify[i] == SEX:
                 sex_num += matrix_list[i]
                 sex_cal += sum(matrix_list[i])
-            elif self.classify[i] == GAMBLE:
+            elif self.train_classify[i] == GAMBLE:
                 gamble_num += matrix_list[i]
                 gamble_cal += sum(matrix_list[i])
-            elif self.classify[i] == NORMAL:
+            elif self.train_classify[i] == NORMAL:
                 normal_num += matrix_list[i]
                 normal_cal += sum(matrix_list[i])
-            elif self.classify[i] == POLITICS:
+            elif self.train_classify[i] == POLITICS:
                 politics_num += matrix_list[i]
                 politics_cal += sum(matrix_list[i])
-        # self.sex_vector = numpy.log(sex_num/sex_cal)
-        # self.gamble_vector = numpy.log(gamble_num/gamble_cal)
-        # self.normal_vector = numpy.log(normal_num/normal_cal)
-        # self.politics_vector = numpy.log(politics_num/politics_cal)
-        self.sex_vector = (sex_num/sex_cal)
-        self.gamble_vector = (gamble_num/gamble_cal)
-        self.normal_vector = (normal_num/normal_cal)
-        self.politics_vector = (politics_num/politics_cal)
-        print(self.sex_vector)
-        print('-'*30)
-        print(self.gamble_vector)
-        print('-'*30)
-        print(self.normal_vector)
-        print('-'*30)
-        print(self.politics_vector)
+        self.sex_vector = numpy.log(sex_num/sex_cal)
+        self.gamble_vector = numpy.log(gamble_num/gamble_cal)
+        self.normal_vector = numpy.log(normal_num/normal_cal)
+        self.politics_vector = numpy.log(politics_num/politics_cal)
 
     def classify_bayes(self, sentence_vector):
         '''
@@ -122,11 +113,16 @@ class Bayes:
         politics_vector: numpy matrix
         '''
         word_vector = self.sentence_to_vector(sentence_vector)
+        print(word_vector)
         sex_percentage = (sum(self.sex_vector * word_vector), SEX)
         gamble_percentage = (sum(self.gamble_vector * word_vector), GAMBLE)
         normal_percentage = (sum(self.normal_vector * word_vector), NORMAL)
         politics_percentage = (
                 sum(self.politics_vector * word_vector), POLITICS)
+        print(sex_percentage)
+        print(gamble_percentage)
+        print(normal_percentage)
+        print(politics_percentage)
         return max(
             sex_percentage, gamble_percentage,
             normal_percentage, politics_percentage)[1]
@@ -138,11 +134,15 @@ class Bayes:
         return [
             i for i, j in zip(self.test_classify, classify_results) if i != j]
 
+    def test_one(self):
+        self.classify_bayes("极品萌妹勾引美团外卖小哥最后没忍住诱惑啪啪+最新习呆呆粉色护士全套+口爆视频")
+
 
 files_path = ['sex.dat', 'gamble.dat', 'normal.dat', 'politics.dat']
-bayes = Bayes(files_path, 20)
+bayes = Bayes(files_path, 0)
 bayes.read_files()
 bayes.split_data()
 bayes.vocab_list()
 bayes.train_bayes()
-bayes.error_rate()
+# print(bayes.error_rate())
+bayes.test_one()
