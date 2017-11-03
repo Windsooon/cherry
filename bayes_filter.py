@@ -120,7 +120,7 @@ class Bayes:
                 print('percentage_list is %s' % percentage_list)
         wrong_results = [
             i for i, j in zip(self.test_classify, classify_results) if i != j]
-        return len(wrong_results)/len(self.test_data)
+        print('error rate is %s' % str(len(wrong_results)/len(self.test_data)))
 
 
 files_path = ['sex.dat', 'gamble.dat', 'normal.dat', 'politics.dat']
@@ -129,4 +129,4 @@ bayes.read_files()
 bayes.split_data()
 bayes.vocab_list()
 bayes.get_vocab_matrix()
-print(bayes.error_rate())
+bayes.error_rate()
