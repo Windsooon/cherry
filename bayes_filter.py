@@ -10,9 +10,10 @@ POLITICS = 3
 
 class Bayes:
 
-    def __init__(self, path, num):
+    def __init__(self, path, test_num=5):
         self.path = path
-        self.num = num
+        self.files_len = len(self.path)
+        self.num = test_num
         self.data_set = []
         self.classify = []
 
@@ -21,7 +22,7 @@ class Bayes:
         type file_path: list
         get all data from local files
         '''
-        for i in range(len(self.path)):
+        for i in range(self.files_len):
             with open(self.path[i], encoding='utf-8') as f:
                 for k in f.readlines():
                     self.data_set.append(k)
@@ -62,7 +63,6 @@ class Bayes:
         '''
         return_vec = [0]*len(self.vocab_list)
         for i in jieba.cut(sentence):
-            print(i)
             if i in self.vocab_list:
                 return_vec[self.vocab_list.index(i)] += 1
         return return_vec
@@ -75,74 +75,58 @@ class Bayes:
         matrix_list = []
         for i in self.train_data:
             matrix_list.append(self.sentence_to_vector(i))
-        return matrix_list
+        self.matrix_list = matrix_list
 
-    def train_bayes(self):
+    def get_vector(self):
+        return [self.train_bayes(i) for i in range(self.files_len)]
+
+    def train_bayes(self, index):
         '''
+        type count: number of data in category
         train native bayes
         '''
-        matrix_list = self.get_vocab_matrix()
-        sex_num = gamble_num = numpy.ones(len(matrix_list[0]))
-        normal_num = numpy.ones(len(matrix_list[0]))
-        politics_num = numpy.ones(len(matrix_list[0]))
-        sex_cal = gamble_cal = normal_cal = politics_cal = 2.0
-        for i in range(len(matrix_list)):
-            if self.train_classify[i] == SEX:
-                sex_num += matrix_list[i]
-                sex_cal += sum(matrix_list[i])
-            elif self.train_classify[i] == GAMBLE:
-                gamble_num += matrix_list[i]
-                gamble_cal += sum(matrix_list[i])
-            elif self.train_classify[i] == NORMAL:
-                normal_num += matrix_list[i]
-                normal_cal += sum(matrix_list[i])
-            elif self.train_classify[i] == POLITICS:
-                politics_num += matrix_list[i]
-                politics_cal += sum(matrix_list[i])
-        self.sex_vector = numpy.log(sex_num/sex_cal)
-        self.gamble_vector = numpy.log(gamble_num/gamble_cal)
-        self.normal_vector = numpy.log(normal_num/normal_cal)
-        self.politics_vector = numpy.log(politics_num/politics_cal)
+        num = numpy.ones(len(self.matrix_list[0]))
+        cal, sentence = 2.0, 0.0
+        for i in range(len(self.train_classify)):
+            if self.train_classify[i] == index:
+                sentence += 1
+                num += self.matrix_list[i]
+                cal += sum(self.matrix_list[i])
+        return numpy.log(num/cal), sentence/len(self.train_data)
 
     def classify_bayes(self, sentence_vector):
         '''
-        type word_vector: list
-        sex_vector: numpy matrix
-        gambel_vector: numpy matrix
-        normal_vector: numpy matrix
-        politics_vector: numpy matrix
         '''
+        all_vector = self.get_vector()
         word_vector = self.sentence_to_vector(sentence_vector)
-        print(word_vector)
-        sex_percentage = (sum(self.sex_vector * word_vector), SEX)
-        gamble_percentage = (sum(self.gamble_vector * word_vector), GAMBLE)
-        normal_percentage = (sum(self.normal_vector * word_vector), NORMAL)
-        politics_percentage = (
-                sum(self.politics_vector * word_vector), POLITICS)
-        print(sex_percentage)
-        print(gamble_percentage)
-        print(normal_percentage)
-        print(politics_percentage)
-        return max(
-            sex_percentage, gamble_percentage,
-            normal_percentage, politics_percentage)[1]
+        percentage_list = [
+            sum(i[0] * word_vector) + numpy.log(i[1])
+            for i in all_vector]
+        max_val = max(percentage_list)
+        for i, j in enumerate(percentage_list):
+            if j == max_val:
+                return i, percentage_list
 
     def error_rate(self):
         classify_results = []
-        for i in self.test_data:
-            classify_results.append(self.classify_bayes(i))
-        return [
+        for i in range(len(self.test_data)):
+            test_result, percentage_list = (
+                self.classify_bayes(self.test_data[i]))
+            classify_results.append(test_result)
+            if test_result != self.test_classify[i]:
+                print(self.test_data[i])
+                print('test_result is %s' % test_result)
+                print('true is %s' % self.test_classify[i])
+                print('percentage_list is %s' % percentage_list)
+        wrong_results = [
             i for i, j in zip(self.test_classify, classify_results) if i != j]
-
-    def test_one(self):
-        self.classify_bayes("极品萌妹勾引美团外卖小哥最后没忍住诱惑啪啪+最新习呆呆粉色护士全套+口爆视频")
+        return len(wrong_results)/len(self.test_data)
 
 
 files_path = ['sex.dat', 'gamble.dat', 'normal.dat', 'politics.dat']
-bayes = Bayes(files_path, 0)
+bayes = Bayes(files_path, 30)
 bayes.read_files()
 bayes.split_data()
 bayes.vocab_list()
-bayes.train_bayes()
-# print(bayes.error_rate())
-bayes.test_one()
+bayes.get_vocab_matrix()
+print(bayes.error_rate())
