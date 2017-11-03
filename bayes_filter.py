@@ -10,37 +10,71 @@ POLITICS = 3
 
 class Bayes:
 
-    def __init__(self, path, test_num=5):
-        self.path = path
-        self.files_len = len(self.path)
-        self.num = test_num
-        self.data_set = []
-        self.classify = []
+    def __init__(self, file_path, test_num=5):
+        self.file_path = file_path
+        self.files_num = len(self.file_path)
+        self.test_num = test_num
 
     def read_files(self):
         '''
-        type file_path: list
-        get all data from local files
+        Read all sentences from file given in file_path
+
+        Set up:
+
+        self.data_list:
+            [
+                "What a lovely day",
+                "Free porn videos and sex movie",
+                "I like to gamble",
+                "I love my dog sunkist"
+            ]
+
+        self.classify: [2, 0, 1, 2]
+
+        self.data_len: 4
         '''
-        for i in range(self.files_len):
-            with open(self.path[i], encoding='utf-8') as f:
+        self.data_list = []
+        self.classify = []
+        for i in range(self.files_num):
+            with open(self.file_path[i], encoding='utf-8') as f:
                 for k in f.readlines():
-                    self.data_set.append(k)
+                    # Insert all data from files in to data_list
+                    self.data_list.append(k)
+                    # Store this sentence belongs to which category
                     self.classify.append(i)
         self.data_len = len(self.classify)
 
     def split_data(self):
         '''
-        Split data to test data and train data randomly.
+        Split data into test data and train data randomly.
+
+        Set up:
+
+        self.test_data:
+            [
+                "What a lovely day",
+                "Free porn videos and sex movie",
+            ]
+
+        self.test_classify: [2, 0]
+
+        self.train_data:
+            [
+                "I like to gamble",
+                "I love my dog sunkist"
+            ]
+
+        self.test_classify: [2, 0]
         '''
-        if self.num > self.data_len - 1:
+        if self.test_num > self.data_len - 1:
             raise IndexError("Test data should small than %s" % self.data_len)
         random_list = [
-            numpy.random.randint(1, self.data_len) for r in range(self.num)]
-        self.test_data = [self.data_set[r] for r in random_list]
+            numpy.random.randint(1, self.data_len)
+            for r in range(self.test_num)]
+        self.test_data = [self.data_list[r] for r in random_list]
         self.test_classify = [self.classify[r] for r in random_list]
         self.train_data = [
-            self.data_set[r] for r in range(self.data_len)
+            self.data_list[r] for r in range(self.data_len)
             if r not in random_list]
         self.train_classify = [
             self.classify[r] for r in range(self.data_len)
@@ -48,7 +82,17 @@ class Bayes:
 
     def vocab_list(self):
         '''
-        Get words list longer than one word
+        get a list contain all unique non stop words belongs to train_data
+
+        Set up:
+
+        self.vocab_list:
+            [
+                'What', 'lovely', 'day',
+                'Free', 'porn', 'videos',
+                'sex', 'movie', 'like',
+                'gamble', 'love', 'dog', 'sunkist'
+            ]
         '''
         vocab_set = set()
         for k in self.train_data:
@@ -78,7 +122,7 @@ class Bayes:
         self.matrix_list = matrix_list
 
     def get_vector(self):
-        return [self.train_bayes(i) for i in range(self.files_len)]
+        return [self.train_bayes(i) for i in range(self.files_num)]
 
     def train_bayes(self, index):
         '''
