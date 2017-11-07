@@ -1,4 +1,5 @@
 import jieba
+import pickle
 import random
 import numpy
 
@@ -19,17 +20,30 @@ class BayesFilter:
             self,
             test_num=TEST_DATA_NUM,
             topN=TOPN,
-            file_path=DEFAULT_FILEPATH
+            cache=False,
+            file_path=DEFAULT_FILEPATH,
             ):
-        self.file_path = file_path
-        self.files_num = len(self.file_path)
-        self._split_data(test_num)
-        if topN:
-            self._vocab_list_remove_topN(topN)
+        if cache:
+            with open('vector.cache', 'rb') as f:
+                self.vector = pickle.load(f)
+            with open('vocab.cache', 'rb') as f:
+                self.vocab_list = pickle.load(f)
         else:
-            self._vocab_list()
-        self.matrix_list = self._get_vocab_matrix()
-        self.vector = self._get_vector()
+            self.file_path = file_path
+            self.files_num = len(self.file_path)
+            self._split_data(test_num)
+            if topN:
+                self._vocab_list_remove_topN(topN)
+            else:
+                self._vocab_list()
+            # Write self.vacab_list as cache to file
+            with open('vocab.cache', 'wb') as f:
+                pickle.dump(self.vocab_list, f)
+            self.matrix_list = self._get_vocab_matrix()
+            self.vector = self._get_vector()
+            # Write self.vector as cache to file
+            with open('vector.cache', 'wb') as f:
+                pickle.dump(self.vector, f)
 
     def _read_files(self):
         '''
@@ -130,7 +144,7 @@ class BayesFilter:
 
         Set up:
 
-        self.vocab_list:
+        self._vocab_list:
             [
                 'What', 'lovely', 'day',
                 'Free', 'porn', 'videos',
