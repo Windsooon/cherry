@@ -13,7 +13,7 @@ SEX = 2
 POLITICS = 3
 
 
-class Bayes:
+class BayesFilter:
 
     def __init__(
             self,
@@ -64,6 +64,7 @@ class Bayes:
         '''
         Split data into test data and train data randomly.
 
+        type: test_num: int
         Set up:
 
         self.test_data:
@@ -99,7 +100,17 @@ class Bayes:
 
     def _vocab_list_remove_topN(self, n):
         '''
-        Remove topN occur word
+        Remove topN most occur word
+
+        Set up:
+
+        self.vocab_list:
+            [
+                'What', 'lovely', 'day',
+                'Free', 'porn', 'videos',
+                'sex', 'movie', 'like',
+                'gamble', 'love', 'dog', 'sunkist'
+            ]
         '''
         import collections
         dic = {}
@@ -134,9 +145,8 @@ class Bayes:
 
     def sentence_to_vector(self, sentence):
         '''
-        type vocab_list: list
+        Convert strings to vector depends on vocal_list
         type sentence: strings
-        convert strings to vector depends on vocal_list
         '''
         return_vec = [0]*len(self.vocab_list)
         for i in jieba.cut(sentence):
@@ -146,20 +156,24 @@ class Bayes:
 
     def _get_vocab_matrix(self):
         '''
-        convert all sentences to vector
+        Convert all sentences to vector
         '''
         return [self.sentence_to_vector(i) for i in self.train_data]
 
     def _get_vector(self):
+        '''
+        Get vector depent on different classify
+        '''
         return [self.train_bayes(i) for i in range(self.files_num)]
 
     def train_bayes(self, index):
         '''
-        type index: number of data in category
-        train native bayes
+        Train native bayes
+        type index: number of files
         '''
         num = numpy.ones(len(self.matrix_list[0]))
         cal, sentence = 2.0, 0.0
+        # TODO: Just for in one-time train_classify
         for i in range(len(self.train_classify)):
             if self.train_classify[i] == index:
                 sentence += 1
@@ -167,8 +181,10 @@ class Bayes:
                 cal += sum(self.matrix_list[i])
         return numpy.log(num/cal), sentence/len(self.train_data)
 
-    def classify_bayes(self, sentence_vector):
+    def bayes_classify(self, sentence_vector):
         '''
+        Classify sentence depend on self.vector
+        type: sentence_vector: strings
         '''
         word_vector = self.sentence_to_vector(sentence_vector)
         percentage_list = [
@@ -180,12 +196,15 @@ class Bayes:
                 return i, percentage_list
 
     def error_rate(self):
+        '''
+        Detect error rate
+        '''
         classify_results = []
         for i in range(len(self.test_data)):
             test_result, percentage_list = (
-                self.classify_bayes(self.test_data[i]))
+                self.bayes_classify(self.test_data[i]))
             classify_results.append(test_result)
-            # Uncomment below to see which sentence classify wrong.
+            # Uncomment  to see which sentence was classified wrong.
             # if test_result != self.test_classify[i]:
             #     print(self.test_data[i])
             #     print('test_result is %s' % test_result)
@@ -200,6 +219,6 @@ if __name__ == '__main__':
     a = []
     k = 20
     for i in range(k):
-        bayes = Bayes()
-        a.append(bayes.error_rate())
+        bayes_filter = BayesFilter()
+        a.append(bayes_filter.error_rate())
     print('The error rate is %s' % str(sum(a)/k*100)+'%')
