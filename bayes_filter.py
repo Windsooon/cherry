@@ -1,4 +1,5 @@
 import jieba
+import random
 import numpy
 
 
@@ -10,10 +11,19 @@ POLITICS = 3
 
 class Bayes:
 
-    def __init__(self, file_path, test_num=5):
+    def __init__(
+            self,
+            test_num=30,
+            file_path=[
+                'sex.dat', 'gamble.dat',
+                'normal.dat', 'politics.dat']
+            ):
         self.file_path = file_path
         self.files_num = len(self.file_path)
-        self.test_num = test_num
+        self.split_data(test_num)
+        self.vocab_list()
+        self.matrix_list = self.get_vocab_matrix()
+        self.vector = self.get_vector()
 
     def read_files(self):
         '''
@@ -36,7 +46,7 @@ class Bayes:
         self.data_list = []
         self.classify = []
         for i in range(self.files_num):
-            with open(self.file_path[i], encoding='utf-8') as f:
+            with open('big/' + self.file_path[i], encoding='utf-8') as f:
                 for k in f.readlines():
                     # Insert all data from files in to data_list
                     self.data_list.append(k)
@@ -44,7 +54,7 @@ class Bayes:
                     self.classify.append(i)
         self.data_len = len(self.classify)
 
-    def split_data(self):
+    def split_data(self, test_num):
         '''
         Split data into test data and train data randomly.
 
@@ -66,16 +76,17 @@ class Bayes:
 
         self.test_classify: [2, 0]
         '''
-        if self.test_num > self.data_len - 1:
+        self.read_files()
+        if test_num > self.data_len - 1:
             raise IndexError("Test data should small than %s" % self.data_len)
-        random_list = [
-            numpy.random.randint(1, self.data_len)
-            for r in range(self.test_num)]
+        random_list = random.sample(range(0, self.data_len), test_num)
+        # get test data
         self.test_data = [self.data_list[r] for r in random_list]
         self.test_classify = [self.classify[r] for r in random_list]
+        # get train data
         self.train_data = [
-            self.data_list[r] for r in range(self.data_len)
-            if r not in random_list]
+            self.data_list[r] for r in
+            range(self.data_len) if r not in random_list]
         self.train_classify = [
             self.classify[r] for r in range(self.data_len)
             if r not in random_list]
@@ -113,13 +124,9 @@ class Bayes:
 
     def get_vocab_matrix(self):
         '''
-        type file_path: list
         convert all sentences to vector
         '''
-        matrix_list = []
-        for i in self.train_data:
-            matrix_list.append(self.sentence_to_vector(i))
-        self.matrix_list = matrix_list
+        return [self.sentence_to_vector(i) for i in self.train_data]
 
     def get_vector(self):
         return [self.train_bayes(i) for i in range(self.files_num)]
@@ -141,11 +148,10 @@ class Bayes:
     def classify_bayes(self, sentence_vector):
         '''
         '''
-        all_vector = self.get_vector()
         word_vector = self.sentence_to_vector(sentence_vector)
         percentage_list = [
             sum(i[0] * word_vector) + numpy.log(i[1])
-            for i in all_vector]
+            for i in self.vector]
         max_val = max(percentage_list)
         for i, j in enumerate(percentage_list):
             if j == max_val:
@@ -157,20 +163,20 @@ class Bayes:
             test_result, percentage_list = (
                 self.classify_bayes(self.test_data[i]))
             classify_results.append(test_result)
-            if test_result != self.test_classify[i]:
-                print(self.test_data[i])
-                print('test_result is %s' % test_result)
-                print('true is %s' % self.test_classify[i])
-                print('percentage_list is %s' % percentage_list)
+            # Uncomment below to see which sentence classify wrong.
+            # if test_result != self.test_classify[i]:
+            #     print(self.test_data[i])
+            #     print('test_result is %s' % test_result)
+            #     print('true is %s' % self.test_classify[i])
+            #     print('percentage_list is %s' % percentage_list)
         wrong_results = [
             i for i, j in zip(self.test_classify, classify_results) if i != j]
-        print('error rate is %s' % str(len(wrong_results)/len(self.test_data)))
+        return len(wrong_results)/len(self.test_data)
 
 
-files_path = ['sex.dat', 'gamble.dat', 'normal.dat', 'politics.dat']
-bayes = Bayes(files_path, 30)
-bayes.read_files()
-bayes.split_data()
-bayes.vocab_list()
-bayes.get_vocab_matrix()
-bayes.error_rate()
+if __name__ == '__main__':
+    a = []
+    for i in range(10):
+        bayes = Bayes()
+        a.append(bayes.error_rate())
+    print('The error rate is %s' % str(sum(a)/10*100)+'%')
