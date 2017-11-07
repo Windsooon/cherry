@@ -14,6 +14,7 @@ class Bayes:
     def __init__(
             self,
             test_num=30,
+            topN=0,
             file_path=[
                 'sex.dat', 'gamble.dat',
                 'normal.dat', 'politics.dat']
@@ -21,11 +22,14 @@ class Bayes:
         self.file_path = file_path
         self.files_num = len(self.file_path)
         self.split_data(test_num)
-        self.vocab_list()
-        self.matrix_list = self.get_vocab_matrix()
-        self.vector = self.get_vector()
+        if topN:
+            self.vocab_list_remove_topN(topN)
+        else:
+            self.vocab_list()
+        self.matrix_list = self._get_vocab_matrix()
+        self.vector = self._get_vector()
 
-    def read_files(self):
+    def _read_files(self):
         '''
         Read all sentences from file given in file_path
 
@@ -76,7 +80,7 @@ class Bayes:
 
         self.test_classify: [2, 0]
         '''
-        self.read_files()
+        self._read_files()
         if test_num > self.data_len - 1:
             raise IndexError("Test data should small than %s" % self.data_len)
         random_list = random.sample(range(0, self.data_len), test_num)
@@ -91,9 +95,25 @@ class Bayes:
             self.classify[r] for r in range(self.data_len)
             if r not in random_list]
 
+    def vocab_list_remove_topN(self, n):
+        '''
+        Remove topN occur word
+        '''
+        import collections
+        dic = {}
+        for k in self.train_data:
+            for i in jieba.cut(k):
+                if i in dic:
+                    dic[i] += 1
+                else:
+                    dic[i] = 1
+        d = collections.Counter(dic)
+        vocab_lst = [i[0] for i in d.most_common() if len(i[0]) > 1]
+        self.vocab_list = vocab_lst[n:]
+
     def vocab_list(self):
         '''
-        get a list contain all unique non stop words belongs to train_data
+        Get a list contain all unique non stop words belongs to train_data
 
         Set up:
 
@@ -122,13 +142,13 @@ class Bayes:
                 return_vec[self.vocab_list.index(i)] += 1
         return return_vec
 
-    def get_vocab_matrix(self):
+    def _get_vocab_matrix(self):
         '''
         convert all sentences to vector
         '''
         return [self.sentence_to_vector(i) for i in self.train_data]
 
-    def get_vector(self):
+    def _get_vector(self):
         return [self.train_bayes(i) for i in range(self.files_num)]
 
     def train_bayes(self, index):
@@ -176,7 +196,8 @@ class Bayes:
 
 if __name__ == '__main__':
     a = []
-    for i in range(10):
+    k = 20
+    for i in range(k):
         bayes = Bayes()
         a.append(bayes.error_rate())
-    print('The error rate is %s' % str(sum(a)/10*100)+'%')
+    print('The error rate is %s' % str(sum(a)/k*100)+'%')
