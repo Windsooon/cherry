@@ -2,10 +2,14 @@ import jieba
 import random
 import numpy
 
-
-SEX = 0
+DEFAULT_FILEPATH = [
+    'big/normal.dat', 'big/gamble.dat',
+    'big/sex.dat', 'big/politics.dat']
+TEST_DATA_NUM = 30
+TOPN = 0
+NORMAL = 0
 GAMBLE = 1
-NORMAL = 2
+SEX = 2
 POLITICS = 3
 
 
@@ -13,19 +17,17 @@ class Bayes:
 
     def __init__(
             self,
-            test_num=30,
-            topN=0,
-            file_path=[
-                'sex.dat', 'gamble.dat',
-                'normal.dat', 'politics.dat']
+            test_num=TEST_DATA_NUM,
+            topN=TOPN,
+            file_path=DEFAULT_FILEPATH
             ):
         self.file_path = file_path
         self.files_num = len(self.file_path)
-        self.split_data(test_num)
+        self._split_data(test_num)
         if topN:
-            self.vocab_list_remove_topN(topN)
+            self._vocab_list_remove_topN(topN)
         else:
-            self.vocab_list()
+            self._vocab_list()
         self.matrix_list = self._get_vocab_matrix()
         self.vector = self._get_vector()
 
@@ -50,7 +52,7 @@ class Bayes:
         self.data_list = []
         self.classify = []
         for i in range(self.files_num):
-            with open('big/' + self.file_path[i], encoding='utf-8') as f:
+            with open(self.file_path[i], encoding='utf-8') as f:
                 for k in f.readlines():
                     # Insert all data from files in to data_list
                     self.data_list.append(k)
@@ -58,7 +60,7 @@ class Bayes:
                     self.classify.append(i)
         self.data_len = len(self.classify)
 
-    def split_data(self, test_num):
+    def _split_data(self, test_num):
         '''
         Split data into test data and train data randomly.
 
@@ -95,7 +97,7 @@ class Bayes:
             self.classify[r] for r in range(self.data_len)
             if r not in random_list]
 
-    def vocab_list_remove_topN(self, n):
+    def _vocab_list_remove_topN(self, n):
         '''
         Remove topN occur word
         '''
@@ -111,7 +113,7 @@ class Bayes:
         vocab_lst = [i[0] for i in d.most_common() if len(i[0]) > 1]
         self.vocab_list = vocab_lst[n:]
 
-    def vocab_list(self):
+    def _vocab_list(self):
         '''
         Get a list contain all unique non stop words belongs to train_data
 
@@ -153,7 +155,7 @@ class Bayes:
 
     def train_bayes(self, index):
         '''
-        type count: number of data in category
+        type index: number of data in category
         train native bayes
         '''
         num = numpy.ones(len(self.matrix_list[0]))
