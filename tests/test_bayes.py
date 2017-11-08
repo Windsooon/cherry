@@ -11,24 +11,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 class BayesTest(unittest.TestCase):
     def setUp(self):
         try:
-            os.remove(os.path.join(BASE_DIR, 'cache/vector.cache'))
-            os.remove(os.path.join(BASE_DIR, 'cache/vocab.cache'))
+            os.remove(os.path.join(BASE_DIR, 'bayes/cache/vector.cache'))
+            os.remove(os.path.join(BASE_DIR, 'bayes/cache/vocab.cache'))
         except OSError:
             pass
-
-    def test_created_cache_files(self):
-        bayes_filter.BayesFilter()
-        self.assertTrue(
-            os.path.isfile(os.path.join(BASE_DIR, 'cache/vector.cache')))
-        self.assertTrue(
-            os.path.isfile(os.path.join(BASE_DIR, 'cache/vocab.cache')))
 
     def test_did_not_create_cache_files_when_set_false(self):
         bayes_filter.BayesFilter(cache=False)
         self.assertFalse(
-            os.path.isfile(os.path.join(BASE_DIR, 'cache/vector.cache')))
+            os.path.isfile(os.path.join(BASE_DIR, 'bayes/cache/vector.cache')))
         self.assertFalse(
-            os.path.isfile(os.path.join(BASE_DIR, 'cache/vocab.cache')))
+            os.path.isfile(os.path.join(BASE_DIR, 'bayes/cache/vocab.cache')))
 
     def test_error_rate(self):
         '''
@@ -60,3 +53,14 @@ class BayesTest(unittest.TestCase):
             test_bayes_filter = bayes_filter.BayesFilter(cache=False)
             a.append(error_rate(test_bayes_filter))
         print('The error rate is %s' % "{0:.2f}".format(sum(a)/test_times*100)+'%')
+
+    def test_data_num_correct(self):
+        test_bayes = bayes_filter.BayesFilter(test_num=80, cache=False)
+        self.assertTrue(len(test_bayes.test_data), 80)
+
+    def test_created_cache_files(self):
+        bayes_filter.BayesFilter()
+        self.assertTrue(
+            os.path.isfile(os.path.join(BASE_DIR, 'bayes/cache/vector.cache')))
+        self.assertTrue(
+            os.path.isfile(os.path.join(BASE_DIR, 'bayes/cache/vocab.cache')))
