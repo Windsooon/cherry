@@ -1,12 +1,22 @@
-import jieba
+import os
 import pickle
 import random
+import jieba
 import numpy
 
-DEFAULT_FILEPATH = [
-    'bayes/data/large/normal.dat', 'bayes/data/large/gamble.dat',
-    'bayes/data/large/sex.dat', 'bayes/data/large/politics.dat']
+BASE_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'bayes')
 
+DATA_DIR = os.path.join(BASE_DIR, 'data/large/')
+
+DEFAULT_FILEPATH = [
+    os.path.join(DATA_DIR, 'normal.dat'),
+    os.path.join(DATA_DIR, 'gamble.dat'),
+    os.path.join(DATA_DIR, 'sex.dat'),
+    os.path.join(DATA_DIR, 'politics.dat')]
+
+VECTOR_CACHE = os.path.join(BASE_DIR, 'cache/vector.cache')
+VOCAB_CACHE = os.path.join(BASE_DIR, 'cache/vocab.cache')
 TEST_DATA_NUM = 30
 TOPN = 0
 NORMAL = 0
@@ -26,9 +36,9 @@ class BayesFilter:
             ):
         if cache:
             try:
-                with open('bayes/cache/vector.cache', 'rb') as f:
+                with open(VECTOR_CACHE, 'rb') as f:
                     self.vector = pickle.load(f)
-                with open('bayes/cache/vocab.cache', 'rb') as f:
+                with open(VOCAB_CACHE, 'rb') as f:
                     self.vocab_list = pickle.load(f)
             except IOError:
                 pass
@@ -43,15 +53,13 @@ class BayesFilter:
             else:
                 self._vocab_list()
             # Write self.vacab_list as cache to file
-            if cache:
-                with open('bayes/cache/vocab.cache', 'wb') as f:
-                    pickle.dump(self.vocab_list, f)
+            with open(VOCAB_CACHE, 'wb') as f:
+                pickle.dump(self.vocab_list, f)
             self.matrix_list = self._get_vocab_matrix()
             self.vector = self._get_vector()
             # Write self.vector as cache to file
-            if cache:
-                with open('bayes/cache/vector.cache', 'wb') as f:
-                    pickle.dump(self.vector, f)
+            with open(VECTOR_CACHE, 'wb') as f:
+                pickle.dump(self.vector, f)
 
     def _read_files(self):
         '''
