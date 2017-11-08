@@ -4,8 +4,8 @@ import random
 import numpy
 
 DEFAULT_FILEPATH = [
-    'big/normal.dat', 'big/gamble.dat',
-    'big/sex.dat', 'big/politics.dat']
+    'data/large/normal.dat', 'data/large/gamble.dat',
+    'data/large/sex.dat', 'data/large/politics.dat']
 TEST_DATA_NUM = 30
 TOPN = 0
 NORMAL = 0
@@ -20,15 +20,20 @@ class BayesFilter:
             self,
             test_num=TEST_DATA_NUM,
             topN=TOPN,
-            cache=False,
+            cache=True,
             file_path=DEFAULT_FILEPATH,
             ):
         if cache:
-            with open('vector.cache', 'rb') as f:
-                self.vector = pickle.load(f)
-            with open('vocab.cache', 'rb') as f:
-                self.vocab_list = pickle.load(f)
-        else:
+            try:
+                with open('cache/vector.cache', 'rb') as f:
+                    self.vector = pickle.load(f)
+                with open('cache/vocab.cache', 'rb') as f:
+                    self.vocab_list = pickle.load(f)
+            except IOError:
+                pass
+        try:
+            self.vector and self.vocab_list
+        except AttributeError:
             self.file_path = file_path
             self.files_num = len(self.file_path)
             self._split_data(test_num)
@@ -37,13 +42,15 @@ class BayesFilter:
             else:
                 self._vocab_list()
             # Write self.vacab_list as cache to file
-            with open('vocab.cache', 'wb') as f:
-                pickle.dump(self.vocab_list, f)
+            if cache:
+                with open('cache/vocab.cache', 'wb') as f:
+                    pickle.dump(self.vocab_list, f)
             self.matrix_list = self._get_vocab_matrix()
             self.vector = self._get_vector()
             # Write self.vector as cache to file
-            with open('vector.cache', 'wb') as f:
-                pickle.dump(self.vector, f)
+            if cache:
+                with open('cache/vector.cache', 'wb') as f:
+                    pickle.dump(self.vector, f)
 
     def _read_files(self):
         '''
@@ -187,7 +194,7 @@ class BayesFilter:
         '''
         num = numpy.ones(len(self.matrix_list[0]))
         cal, sentence = 2.0, 0.0
-        # TODO: Just for in one-time train_classify
+        # TODO: Just for in one-time in train_classify
         for i in range(len(self.train_classify)):
             if self.train_classify[i] == index:
                 sentence += 1
@@ -208,31 +215,3 @@ class BayesFilter:
         for i, j in enumerate(percentage_list):
             if j == max_val:
                 return i, percentage_list
-
-    def error_rate(self):
-        '''
-        Detect error rate
-        '''
-        classify_results = []
-        for i in range(len(self.test_data)):
-            test_result, percentage_list = (
-                self.bayes_classify(self.test_data[i]))
-            classify_results.append(test_result)
-            # Uncomment  to see which sentence was classified wrong.
-            # if test_result != self.test_classify[i]:
-            #     print(self.test_data[i])
-            #     print('test_result is %s' % test_result)
-            #     print('true is %s' % self.test_classify[i])
-            #     print('percentage_list is %s' % percentage_list)
-        wrong_results = [
-            i for i, j in zip(self.test_classify, classify_results) if i != j]
-        return len(wrong_results)/len(self.test_data)
-
-
-if __name__ == '__main__':
-    a = []
-    k = 20
-    for i in range(k):
-        bayes_filter = BayesFilter()
-        a.append(bayes_filter.error_rate())
-    print('The error rate is %s' % str(sum(a)/k*100)+'%')
