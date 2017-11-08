@@ -3,7 +3,7 @@ import unittest
 # import sys
 # sys.path.insert(0, '/Users/anchuang/learn/filter/')
 
-import bayes_filter
+from bayes import bayes_filter
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -34,11 +34,11 @@ class BayesTest(unittest.TestCase):
         '''
         test error rate
         '''
-        def error_rate():
+        def error_rate(instance):
             classify_results = []
-            for i in range(len(self.test_data)):
+            for i in range(len(instance.test_data)):
                 test_result, percentage_list = (
-                    self.bayes_classify(self.test_data[i]))
+                    instance.bayes_classify(instance.test_data[i]))
                 classify_results.append(test_result)
                 # Uncomment  to see which sentence was classified wrong.
                 # if test_result != self.test_classify[i]:
@@ -48,12 +48,15 @@ class BayesTest(unittest.TestCase):
                 #     print('percentage_list is %s' % percentage_list)
             wrong_results = [
                 i for i, j in
-                zip(self.test_classify, classify_results) if i != j]
-            return len(wrong_results)/len(self.test_data)
+                zip(instance.test_classify, classify_results) if i != j]
+            return len(wrong_results)/len(instance.test_data)
 
         a = []
-        k = 10
-        for i in range(k):
+        test_times = 20
+        print('\nThis may takes some time')
+        for i in range(test_times):
+            if i % 5 == 0:
+                print('Completed %s tasks, %s tasks left.' % (i, test_times-i))
             test_bayes_filter = bayes_filter.BayesFilter(cache=False)
-            a.append(test_bayes_filter.error_rate())
-        print('The error rate is %s' % "{0:.2f}".format(sum(a)/k*100)+'%')
+            a.append(error_rate(test_bayes_filter))
+        print('The error rate is %s' % "{0:.2f}".format(sum(a)/test_times*100)+'%')
