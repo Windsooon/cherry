@@ -4,8 +4,9 @@ import random
 import numpy
 
 DEFAULT_FILEPATH = [
-    'data/large/normal.dat', 'data/large/gamble.dat',
-    'data/large/sex.dat', 'data/large/politics.dat']
+    'bayes/data/large/normal.dat', 'bayes/data/large/gamble.dat',
+    'bayes/data/large/sex.dat', 'bayes/data/large/politics.dat']
+
 TEST_DATA_NUM = 30
 TOPN = 0
 NORMAL = 0
@@ -25,9 +26,9 @@ class BayesFilter:
             ):
         if cache:
             try:
-                with open('cache/vector.cache', 'rb') as f:
+                with open('bayes/cache/vector.cache', 'rb') as f:
                     self.vector = pickle.load(f)
-                with open('cache/vocab.cache', 'rb') as f:
+                with open('bayes/cache/vocab.cache', 'rb') as f:
                     self.vocab_list = pickle.load(f)
             except IOError:
                 pass
@@ -43,13 +44,13 @@ class BayesFilter:
                 self._vocab_list()
             # Write self.vacab_list as cache to file
             if cache:
-                with open('cache/vocab.cache', 'wb') as f:
+                with open('bayes/cache/vocab.cache', 'wb') as f:
                     pickle.dump(self.vocab_list, f)
             self.matrix_list = self._get_vocab_matrix()
             self.vector = self._get_vector()
             # Write self.vector as cache to file
             if cache:
-                with open('cache/vector.cache', 'wb') as f:
+                with open('bayes/cache/vector.cache', 'wb') as f:
                     pickle.dump(self.vector, f)
 
     def _read_files(self):
