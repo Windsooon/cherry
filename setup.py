@@ -19,7 +19,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='bayes_filter',
-    version='0.1.3',
+    version='0.1.6',
     description='Detect spam content using native bayes',
     long_description=long_description,
     url='https://github.com/Windsooon/Bayes-Filter',
@@ -42,7 +42,6 @@ setup(
         ],
     packages=['bayes'],
     package_data={
-        'bayes': ['data/large/*.dat', 'data/small/*.dat'],
+        'bayes': ['cache/*', 'data/large/*.dat', 'data/small/*.dat'],
     },
-    
 )
