@@ -42,6 +42,7 @@ setup(
         ],
     packages=['bayes'],
     package_data={
-        'data': ['*.dat'],
+        'bayes': ['data/large/*.dat', 'data/small/*.dat'],
     },
+    
 )
