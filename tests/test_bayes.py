@@ -5,23 +5,21 @@ import unittest
 
 from bayes import bayes_filter
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 class BayesTest(unittest.TestCase):
     def setUp(self):
         try:
-            os.remove(os.path.join(BASE_DIR, 'bayes/cache/vector.cache'))
-            os.remove(os.path.join(BASE_DIR, 'bayes/cache/vocab.cache'))
+            os.remove(os.path.join(bayes_filter.BASE_DIR, 'cache/vector.cache'))
+            os.remove(os.path.join(bayes_filter.BASE_DIR, 'cache/vocab.cache'))
         except OSError:
             pass
 
     def test_did_not_create_cache_files_when_set_false(self):
         bayes_filter.BayesFilter(cache=False)
         self.assertFalse(
-            os.path.isfile(os.path.join(BASE_DIR, 'bayes/cache/vector.cache')))
+            os.path.isfile(os.path.join(bayes_filter.BASE_DIR, 'cache/vector.cache')))
         self.assertFalse(
-            os.path.isfile(os.path.join(BASE_DIR, 'bayes/cache/vocab.cache')))
+            os.path.isfile(os.path.join(bayes_filter.BASE_DIR, 'cache/vocab.cache')))
 
     def test_error_rate(self):
         '''
@@ -61,6 +59,6 @@ class BayesTest(unittest.TestCase):
     def test_created_cache_files(self):
         bayes_filter.BayesFilter()
         self.assertTrue(
-            os.path.isfile(os.path.join(BASE_DIR, 'bayes/cache/vector.cache')))
+            os.path.isfile(os.path.join(bayes_filter.BASE_DIR, 'cache/vector.cache')))
         self.assertTrue(
-            os.path.isfile(os.path.join(BASE_DIR, 'bayes/cache/vocab.cache')))
+            os.path.isfile(os.path.join(bayes_filter.BASE_DIR, 'cache/vocab.cache')))
