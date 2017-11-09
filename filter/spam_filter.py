@@ -3,6 +3,7 @@ import pickle
 import random
 import jieba
 import numpy
+from .config import *
 
 BASE_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'filter')
@@ -19,10 +20,6 @@ VECTOR_CACHE = os.path.join(BASE_DIR, 'cache/vector.cache')
 VOCAB_CACHE = os.path.join(BASE_DIR, 'cache/vocab.cache')
 TEST_DATA_NUM = 30
 TOPN = 0
-NORMAL = 0
-GAMBLE = 1
-SEX = 2
-POLITICS = 3
 
 
 class Filter:
