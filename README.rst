@@ -16,10 +16,6 @@ Spam Filter
 :Source: https://github.com/Windsooon/Spam-Filter
 :Keywords: spam, filter, python, native, bayes
 
-`中文版本`_
-
-`English_Version`_
-
 .. _`中文版本`:
 这个项目目的是使用机器学习／人工智能来判别垃圾内容，现阶段用户输入句子会先经过分词，然后通过朴素贝叶斯模型判别成正常，色情，赌博，政治敏感四个类别。现在每个类别各使用了100个训练数据，辨别准确率大约为93%。
 
@@ -111,8 +107,8 @@ How to use:
 
 .. code-block:: python
 
-    >>> from bayes import bayes_filter
-    >>> test_bayes = bayes_filter.BayesFilter()
+    >>> from filter import spam_filter
+    >>> test_bayes = spam_filter.Filter()
     >>> test_bayes.bayes_classify('选择轮盘游戏随机赔率，高达119倍。')
     Building prefix dict from the default dictionary ...
     Loading model from cache /var/folders/md/0251yy51045d6nknpkbn6dc80000gn/T/jieba.cache
