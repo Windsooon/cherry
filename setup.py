@@ -18,11 +18,11 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='bayes_filter',
-    version='0.1.6',
-    description='Detect spam content using native bayes',
+    name='spam_filter',
+    version='0.1.8',
+    description='Detect spam content, comments',
     long_description=long_description,
-    url='https://github.com/Windsooon/Bayes-Filter',
+    url='https://github.com/Windsooon/Spam-Filter',
     author='Windson Yang',
     author_email='wiwindson@outlook.com',
     license='MIT',
@@ -40,8 +40,8 @@ setup(
         'jieba>=0.39',
         'numpy>=1.13.3', 
         ],
-    packages=['bayes'],
+    packages=['filter'],
     package_data={
-        'bayes': ['cache/*', 'data/large/*.dat', 'data/small/*.dat'],
+        'filter': ['cache/*', 'data/large/*.dat', 'data/small/*.dat'],
     },
 )

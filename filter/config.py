@@ -1,0 +1,4 @@
+NORMAL = 0
+GAMBLE = 1
+SEX = 2
+POLITICS = 3
