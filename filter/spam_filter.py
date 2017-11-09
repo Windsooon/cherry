@@ -5,7 +5,7 @@ import jieba
 import numpy
 
 BASE_DIR = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'bayes')
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'filter')
 
 DATA_DIR = os.path.join(BASE_DIR, 'data/large/')
 
@@ -25,7 +25,7 @@ SEX = 2
 POLITICS = 3
 
 
-class BayesFilter:
+class Filter:
 
     def __init__(
             self,
