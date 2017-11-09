@@ -16,9 +16,9 @@ Spam Filter
 :Source: https://github.com/Windsooon/Spam-Filter
 :Keywords: spam, filter, python, native, bayes
 
-中文版本_
+ `中文版本`_
 
-English_Version_
+ `English_Version`_
 
 .. _`中文版本`:
 这个项目目的是使用机器学习／人工智能来判别垃圾内容，现阶段用户输入句子会先经过分词，然后通过朴素贝叶斯模型判别成正常，色情，赌博，政治敏感四个类别。现在每个类别各使用了100个训练数据，正确率大约93%
