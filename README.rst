@@ -16,7 +16,7 @@ Spam Filter
 :Source: https://github.com/Windsooon/Spam-Filter
 :Keywords: spam, filter, python, native, bayes
 
-`中文版本`_
+中文版本_
 
 English_Version_
 
@@ -104,7 +104,7 @@ TO DO
 - 增加SVM分类算法
 
 
-.. _`English_Version`:
+.. _`english-version`:
 This project uses Native Bayes algorithm to detect spam content, like normal, sex, gamble, political content. We use 400 Chinese sentences to train the algorithm and the correct rate is about 93%. Right now we only support Chinese spam content classify :<
 
 How to use:
