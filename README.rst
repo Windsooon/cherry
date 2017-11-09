@@ -12,11 +12,9 @@ Spam Filter
 
 
 :Version: 4.1.0 (latentcall)
-:Web: http://celeryproject.org/
-:Download: https://pypi.python.org/pypi/celery/
-:Source: https://github.com/celery/celery/
-:Keywords: task, queue, job, async, rabbitmq, amqp, redis,
-  python, distributed, actors
+:Download: https://pypi.python.org/pypi/spam-filter/
+:Source: https://github.com/Windsooon/Spam-Filter
+:Keywords: spam, filter, python, native, bayes
 
 `中文版本`_
 
