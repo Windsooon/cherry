@@ -1,15 +1,22 @@
-Bayes Filter
+Spam Filter
 =======================
 
-.. image:: https://img.shields.io/pypi/v/bayes-filter.svg
-    :target: https://pypi.python.org/pypi/bayes-filter
+.. image:: https://img.shields.io/pypi/v/spam-filter.svg
+    :target: https://pypi.python.org/pypi/spam-filter
 
-.. image:: https://img.shields.io/pypi/l/bayes-filter.svg
-    :target: https://pypi.python.org/pypi/bayes-filter
+.. image:: https://img.shields.io/pypi/l/spam-filter.svg
+    :target: https://pypi.python.org/pypi/spam-filter
 
-.. image:: https://img.shields.io/pypi/pyversions/bayes-filter.svg
-    :target: https://pypi.python.org/pypi/bayes-filter
+.. image:: https://img.shields.io/pypi/pyversions/spam-filter.svg
+    :target: https://pypi.python.org/pypi/spam-filter
 
+
+:Version: 4.1.0 (latentcall)
+:Web: http://celeryproject.org/
+:Download: https://pypi.python.org/pypi/celery/
+:Source: https://github.com/celery/celery/
+:Keywords: task, queue, job, async, rabbitmq, amqp, redis,
+  python, distributed, actors
 
 `中文版本`_
 
@@ -53,8 +60,8 @@ English_Version_
 
 .. code-block:: python
 
-    >>> from bayes import bayes_filter
-    >>> test_bayes = bayes_filter.BayesFilter()
+    >>> from filter import spam_filter
+    >>> test_bayes = spam_filter.Filter()
     >>> test_bayes.bayes_classify('选择轮盘游戏随机赔率，高达119倍。')
     Building prefix dict from the default dictionary ...
     Loading model from cache /var/folders/md/0251yy51045d6nknpkbn6dc80000gn/T/jieba.cache
