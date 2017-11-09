@@ -11,7 +11,7 @@ Spam Filter
     :target: https://pypi.python.org/pypi/spam-filter
 
 
-:Version: 4.1.0 (latentcall)
+:Version: 0.1.6
 :Download: https://pypi.python.org/pypi/spam-filter/
 :Source: https://github.com/Windsooon/Spam-Filter
 :Keywords: spam, filter, python, native, bayes
@@ -55,7 +55,15 @@ English_Version_
 
   自己可以添加修改数据源，增加训练正确率
 
-如何使用:
+通过pip安装：
+-----------
+
+.. code-block:: bash
+
+   pip install spam-filter
+
+基本使用:
+--------
 
 .. code-block:: python
 
@@ -67,6 +75,15 @@ English_Version_
     Loading model cost 0.969 seconds.
     Prefix dict has been built succesfully.
     (1, [-52.665796469015774, -41.781387161169008, -53.513237457719043, -56.71342538342271])
+
+这里使用了内置的训练模型缓存，如果你修改了数据源的话，需要更新缓存
+
+.. code-block:: python
+
+    >>> from filter import spam_filter
+    >>> test_bayes = spam_filter.Filter(cache=False) # 缓存文件被更新
+    >>> test_bayes = spam_filter.Filter() # 将使用新数据源的缓存
+
 
 我们一开始使用了 `jieba`_ 进行分词，上面的0.969秒是分词的时间（感谢fxsjy维护如此优秀的中文分词库）。返回了一个tuple，包含bayes判断结果的类别1（所对应的是赌博），以及对应的所有类别的相对概率，现在支持的类别有四个，用户可以自行添加数据然后进行训练
 
@@ -87,7 +104,7 @@ TO DO
 - 增加SVM分类算法
 
 
-.. _`English Version`:
+.. _`English_Version`:
 This project uses Native Bayes algorithm to detect spam content, like normal, sex, gamble, political content. We use 400 Chinese sentences to train the algorithm and the correct rate is about 93%. Right now we only support Chinese spam content classify :<
 
 How to use:
