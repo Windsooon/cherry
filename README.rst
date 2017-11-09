@@ -16,12 +16,12 @@ Spam Filter
 :Source: https://github.com/Windsooon/Spam-Filter
 :Keywords: spam, filter, python, native, bayes
 
- `中文版本`_
+`中文版本`_
 
- `English_Version`_
+`English_Version`_
 
 .. _`中文版本`:
-这个项目目的是使用机器学习／人工智能来判别垃圾内容，现阶段用户输入句子会先经过分词，然后通过朴素贝叶斯模型判别成正常，色情，赌博，政治敏感四个类别。现在每个类别各使用了100个训练数据，正确率大约93%
+这个项目目的是使用机器学习／人工智能来判别垃圾内容，现阶段用户输入句子会先经过分词，然后通过朴素贝叶斯模型判别成正常，色情，赌博，政治敏感四个类别。现在每个类别各使用了100个训练数据，辨别准确率大约为93%。
 
 
 特点
@@ -31,14 +31,14 @@ Spam Filter
   内置预训练模型以及文件缓存，开箱即用。同时使用numpy库做矩阵计算，判断速度非常快
 - 准确率高
 
-  现阶段使用了400个训练数据，正确率达到93%
+  现阶段使用了400个训练数据，准确率达到93%。
   下载后可以通过运行
 
   .. code-block:: bash
 
     python -m unittest tests.test_bayes
 
-  得到测试结果
+  得到准确率测试结果
 
   .. code-block:: bash
 
