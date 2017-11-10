@@ -14,7 +14,7 @@ Spam Filter
 :Version: 0.1.8
 :Download: https://pypi.python.org/pypi/spam-filter/
 :Source: https://github.com/Windsooon/Spam-Filter
-:Support: Python3
+:Support: >=Python3.4
 :Keywords: spam, filter, python, native, bayes
 
 .. _`中文版本`:
