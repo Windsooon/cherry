@@ -1,5 +1,7 @@
 Spam Filter
 =======================
+.. imageLL:: https://api.travis-ci.org/Windsooon/Spam-Filter.png?branch=master
+    :target: https://travis-ci.org/repositories/Windsooon/Spam-Filter
 
 .. image:: https://img.shields.io/pypi/v/spam-filter.svg
     :target: https://pypi.python.org/pypi/spam-filter
