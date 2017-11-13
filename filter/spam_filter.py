@@ -64,7 +64,7 @@ class Filter:
             self.jieba = jieba
 
     def __diy_dictionary(self, file):
-        self.jieba = jieba.set_dictionary(dictionary_path=file)
+        self.jieba = jieba.load_userdict(f=file)
 
     def _read_files(self):
         '''
