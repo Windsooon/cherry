@@ -30,7 +30,12 @@ class Filter:
             topN=TOPN,
             cache=True,
             file_path=DEFAULT_FILEPATH,
-            ):
+            dictionary=None
+    ):
+        self.jieba = jieba
+        if dictionary:
+            self.jieba.load_userdict(dictionary)
+
         if cache:
             try:
                 with open(VECTOR_CACHE, 'rb') as f:
@@ -142,7 +147,7 @@ class Filter:
         import collections
         dic = {}
         for k in self.train_data:
-            for i in jieba.cut(k):
+            for i in self.jieba.cut(k):
                 if i in dic:
                     dic[i] += 1
                 else:
@@ -167,7 +172,7 @@ class Filter:
         '''
         vocab_set = set()
         for k in self.train_data:
-            vocab_set = vocab_set | set(jieba.cut(k))
+            vocab_set = vocab_set | set(self.jieba.cut(k))
             self.vocab_list = [i for i in vocab_set if len(i) > 1]
 
     def sentence_to_vector(self, sentence):
@@ -175,8 +180,8 @@ class Filter:
         Convert strings to vector depends on vocal_list
         type sentence: strings
         '''
-        return_vec = [0]*len(self.vocab_list)
-        for i in jieba.cut(sentence):
+        return_vec = [0] * len(self.vocab_list)
+        for i in self.jieba.cut(sentence):
             if i in self.vocab_list:
                 return_vec[self.vocab_list.index(i)] += 1
         return return_vec
@@ -206,7 +211,7 @@ class Filter:
                 sentence += 1
                 num += self.matrix_list[i]
                 cal += sum(self.matrix_list[i])
-        return numpy.log(num/cal), sentence/len(self.train_data)
+        return numpy.log(num / cal), sentence / len(self.train_data)
 
     def bayes_classify(self, sentence_vector):
         '''
