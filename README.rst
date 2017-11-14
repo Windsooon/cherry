@@ -1,5 +1,7 @@
 Spam Filter
 =======================
+.. imageLL:: https://api.travis-ci.org/Windsooon/Spam-Filter.png?branch=master
+    :target: https://travis-ci.org/repositories/Windsooon/Spam-Filter
 
 .. image:: https://img.shields.io/pypi/v/spam-filter.svg
     :target: https://pypi.python.org/pypi/spam-filter
@@ -14,7 +16,7 @@ Spam Filter
 :Version: 0.1.8
 :Download: https://pypi.python.org/pypi/spam-filter/
 :Source: https://github.com/Windsooon/Spam-Filter
-:Support: Python3
+:Support: >=Python3.4
 :Keywords: spam, filter, python, native, bayes
 
 .. _`中文版本`:
@@ -90,7 +92,7 @@ Spam Filter
 - POLITICE = 3
 
 
-TO DO
+未来功能
 -----
 
 - 添加英文句子分类功能
