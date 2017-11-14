@@ -32,11 +32,9 @@ class Filter:
             file_path=DEFAULT_FILEPATH,
             dictionary=None
     ):
-
+        self.jieba = jieba
         if dictionary:
-            self.jieba = self.__diy_dictionary(file=dictionary)
-        else:
-            self.jieba = jieba
+            self.jieba = self.jieba.load_userdict(dictionary)
 
         if cache:
             try:
@@ -66,7 +64,7 @@ class Filter:
                 pickle.dump(self.vector, f)
 
     def __diy_dictionary(self, file):
-        return jieba.load_userdict(file)
+        self.jieba = jieba.load_userdict(file)
 
     def _read_files(self):
         '''
