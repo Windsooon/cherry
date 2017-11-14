@@ -32,6 +32,12 @@ class Filter:
             file_path=DEFAULT_FILEPATH,
             dictionary=None
     ):
+
+        if dictionary:
+            self.jieba = self.__diy_dictionary(file=dictionary)
+        else:
+            self.jieba = jieba
+
         if cache:
             try:
                 with open(VECTOR_CACHE, 'rb') as f:
@@ -58,10 +64,6 @@ class Filter:
             # Write self.vector as cache to file
             with open(VECTOR_CACHE, 'wb') as f:
                 pickle.dump(self.vector, f)
-        if dictionary:
-            self.jieba = self.__diy_dictionary(file=dictionary)
-        else:
-            self.jieba = jieba
 
     def __diy_dictionary(self, file):
         return jieba.load_userdict(file)
