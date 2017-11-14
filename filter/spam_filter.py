@@ -34,7 +34,7 @@ class Filter:
     ):
         self.jieba = jieba
         if dictionary:
-            self.jieba = self.jieba.load_userdict(dictionary)
+            self.jieba.load_userdict(dictionary)
 
         if cache:
             try:
@@ -62,9 +62,6 @@ class Filter:
             # Write self.vector as cache to file
             with open(VECTOR_CACHE, 'wb') as f:
                 pickle.dump(self.vector, f)
-
-    def __diy_dictionary(self, file):
-        self.jieba = jieba.load_userdict(file)
 
     def _read_files(self):
         '''
