@@ -1,27 +1,25 @@
 import os
 import unittest
-# import sys
-# sys.path.insert(0, '/Users/anchuang/learn/filter/')
 
-from filter import spam_filter
+from classify import bayes
 
 
 class BayesTest(unittest.TestCase):
     def setUp(self):
         try:
-            os.remove(os.path.join(spam_filter.BASE_DIR, 'cache/vector.cache'))
-            os.remove(os.path.join(spam_filter.BASE_DIR, 'cache/vocab.cache'))
+            os.remove(os.path.join(bayes.BASE_DIR, 'cache/vector.cache'))
+            os.remove(os.path.join(bayes.BASE_DIR, 'cache/vocab.cache'))
         except OSError:
             pass
 
     def test_did_not_create_cache_files_when_set_false(self):
-        spam_filter.Filter(cache=False)
+        bayes.Classify(cache=False)
         self.assertTrue(
             os.path.isfile(
-                os.path.join(spam_filter.BASE_DIR, 'cache/vector.cache')))
+                os.path.join(bayes.BASE_DIR, 'cache/vector.cache')))
         self.assertTrue(
             os.path.isfile(
-                os.path.join(spam_filter.BASE_DIR, 'cache/vocab.cache')))
+                os.path.join(bayes.BASE_DIR, 'cache/vocab.cache')))
 
     def test_error_rate(self):
         '''
@@ -50,19 +48,19 @@ class BayesTest(unittest.TestCase):
         for i in range(test_times):
             if i % 5 == 0:
                 print('Completed %s tasks, %s tasks left.' % (i, test_times-i))
-            test_spam_filter = spam_filter.Filter(cache=False)
-            a.append(error_rate(test_spam_filter))
+            test_bayes = bayes.Classify(cache=False)
+            a.append(error_rate(test_bayes))
         print('The error rate is %s' % "{0:.2f}".format(sum(a)/test_times*100)+'%')
 
     def test_data_num_correct(self):
-        test_bayes = spam_filter.Filter(test_num=80, cache=False)
+        test_bayes = bayes.Classify(test_num=80, cache=False)
         self.assertTrue(len(test_bayes.test_data), 80)
 
     def test_created_cache_files(self):
-        spam_filter.Filter()
+        bayes.Classify()
         self.assertTrue(
             os.path.isfile(
-                os.path.join(spam_filter.BASE_DIR, 'cache/vector.cache')))
+                os.path.join(bayes.BASE_DIR, 'cache/vector.cache')))
         self.assertTrue(
             os.path.isfile(
-                os.path.join(spam_filter.BASE_DIR, 'cache/vocab.cache')))
+                os.path.join(bayes.BASE_DIR, 'cache/vocab.cache')))

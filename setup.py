@@ -18,11 +18,11 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='spam_filter',
+    name='cherry',
     version='0.1.8',
-    description='Detect spam content, comments',
+    description='classify data set',
     long_description=long_description,
-    url='https://github.com/Windsooon/Spam-Filter',
+    url='https://github.com/Sunkist-Cherry/cherry',
     author='Windson Yang',
     author_email='wiwindson@outlook.com',
     license='MIT',
@@ -35,7 +35,7 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
     ],
-    keywords='Native Bayes spam content filter',
+    keywords='data classify content filter',
     install_requires=[
         'jieba>=0.39',
         'numpy>=1.13.3', 
