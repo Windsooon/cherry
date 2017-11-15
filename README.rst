@@ -1,26 +1,28 @@
-Spam Filter
+cherry
 =======================
-.. imageLL:: https://api.travis-ci.org/Windsooon/Spam-Filter.png?branch=master
-    :target: https://travis-ci.org/repositories/Windsooon/Spam-Filter
+.. image:: https://api.travis-ci.org/Sunkist-Cherry/cherry.png?branch=master
+    :target: https://travis-ci.org/repositories/Sunkist-Cherry/cherry
 
-.. image:: https://img.shields.io/pypi/v/spam-filter.svg
-    :target: https://pypi.python.org/pypi/spam-filter
+.. image:: https://img.shields.io/pypi/v/cherry.svg
+    :target: https://pypi.python.org/pypi/cherry
 
-.. image:: https://img.shields.io/pypi/l/spam-filter.svg
-    :target: https://pypi.python.org/pypi/spam-filter
+.. image:: https://img.shields.io/pypi/l/cherry.svg
+    :target: https://pypi.python.org/pypi/cherry
 
-.. image:: https://img.shields.io/pypi/pyversions/spam-filter.svg
-    :target: https://pypi.python.org/pypi/spam-filter
+.. image:: https://img.shields.io/pypi/pyversions/cherry.svg
+    :target: https://pypi.python.org/pypi/cherry
 
 
 :Version: 0.1.8
-:Download: https://pypi.python.org/pypi/spam-filter/
-:Source: https://github.com/Windsooon/Spam-Filter
+:Download: https://pypi.python.org/pypi/cherry/
+:Source: https://github.com/Sunkist-Cherry/cherry
 :Support: >=Python3.4
 :Keywords: spam, filter, python, native, bayes
 
 .. _`中文版本`:
-这个项目目的是使用机器学习／人工智能来判别垃圾内容，现阶段用户输入句子会先经过分词，然后通过朴素贝叶斯模型判别成正常，色情，赌博，政治敏感四个类别。现在每个类别各使用了100个训练数据，辨别准确率大约为93%。（数据內容请勿分發，传阅，出售，出租给他人）
+这个项目目的是使用机器学习／人工智能来进行数据分类
+
+例子1中的应用是判别垃圾内容，现阶段用户输入句子会先经过分词，然后通过朴素贝叶斯模型判别成正常，色情，赌博，政治敏感四个类别。现在每个类别各使用了100个训练数据，辨别准确率大约为93%。（数据內容请勿分發，传阅，出售，出租给他人）
 
 特点
 ----
@@ -57,7 +59,7 @@ Spam Filter
 
 .. code-block:: bash
 
-   pip install spam-filter
+   pip install cherry
 
 基本使用:
 --------
