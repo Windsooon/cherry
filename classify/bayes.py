@@ -6,7 +6,7 @@ import numpy
 from .config import *
 
 BASE_DIR = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'filter')
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'classify')
 
 DATA_DIR = os.path.join(BASE_DIR, 'data/large/')
 
@@ -22,7 +22,7 @@ TEST_DATA_NUM = 30
 TOPN = 0
 
 
-class Filter:
+class Classify:
 
     def __init__(
             self,
