@@ -66,8 +66,8 @@ cherry
 
 .. code-block:: python
 
-    >>> from filter import spam_filter
-    >>> test_bayes = spam_filter.Filter()
+    >>> from classify import bayes
+    >>> test_bayes = bayes.Classify()
     >>> test_bayes.bayes_classify('选择轮盘游戏随机赔率，高达119倍。')
     Building prefix dict from the default dictionary ...
     Loading model from cache /var/folders/md/0251yy51045d6nknpkbn6dc80000gn/T/jieba.cache
@@ -79,9 +79,9 @@ cherry
 
 .. code-block:: python
 
-    >>> from filter import spam_filter
-    >>> test_bayes = spam_filter.Filter(cache=False) # 缓存文件被更新
-    >>> test_bayes = spam_filter.Filter() # 将使用新数据源的缓存
+    >>> from classify import bayes
+    >>> test_bayes = bayes.Filter(cache=False) # 缓存文件被更新
+    >>> test_bayes = bayes.Filter() # 将使用新数据源的缓存
 
 
 我们一开始使用了 `jieba`_ 进行分词，上面的0.969秒是分词的时间（感谢fxsjy维护如此优秀的中文分词库）。返回了一个tuple，包含bayes判断结果的类别1（所对应的是赌博），以及对应的所有类别的相对概率，现在支持的类别有四个，用户可以自行添加数据然后进行训练
@@ -111,8 +111,8 @@ How to use:
 
 .. code-block:: python
 
-    >>> from filter import spam_filter
-    >>> test_bayes = spam_filter.Filter()
+    >>> from classify import bayes
+    >>> test_bayes = bayes.Classify()
     >>> test_bayes.bayes_classify('选择轮盘游戏随机赔率，高达119倍。')
     Building prefix dict from the default dictionary ...
     Loading model from cache /var/folders/md/0251yy51045d6nknpkbn6dc80000gn/T/jieba.cache
