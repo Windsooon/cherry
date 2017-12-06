@@ -7,6 +7,9 @@ from classify import bayes
 
 class BayesTest(unittest.TestCase):
     def setUp(self):
+        pass
+
+    def test_create_cache_files_after_first_set(self):
         try:
             dir = os.path.join(bayes.BASE_DIR, 'cache')
             shutil.rmtree(dir + '/Chinese')
@@ -16,14 +19,6 @@ class BayesTest(unittest.TestCase):
         else:
             os.makedirs(dir + '/Chinese')
             os.makedirs(dir + '/English')
-
-    def test_create_cache_files_after_first_set(self):
-        self.assertFalse(
-            os.path.isfile(
-                os.path.join(bayes.BASE_DIR, 'cache/Chinese/vector.cache')))
-        self.assertFalse(
-            os.path.isfile(
-                os.path.join(bayes.BASE_DIR, 'cache/Chinese/vocab.cache')))
         bayes.Classify(cache=False)
         self.assertTrue(
             os.path.isfile(
@@ -36,7 +31,6 @@ class BayesTest(unittest.TestCase):
         test_bayes = bayes.Classify(test_num=80, cache=False)
         self.assertTrue(len(test_bayes.test_data), 80)
 
-        
     def test_error_rate(self):
         '''
         test error rate
