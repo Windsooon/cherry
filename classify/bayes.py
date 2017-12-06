@@ -7,9 +7,6 @@ from .config import *
 
 BASE_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'classify')
-
-
-
 TEST_DATA_NUM = 30
 TOPN = 0
 
@@ -23,6 +20,7 @@ class Classify:
             topN=TOPN,
             cache=True,
             ):
+
         self.vector_cache = os.path.join(BASE_DIR, 'cache/' + lan + '/vector.cache')
         self.vocab_cache = os.path.join(BASE_DIR, 'cache/' + lan + '/vocab.cache')
         if cache:
