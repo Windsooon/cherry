@@ -19,7 +19,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='cherry',
-    version='0.1.8',
+    version='0.2.0',
     description='classify data set',
     long_description=long_description,
     url='https://github.com/Sunkist-Cherry/cherry',
@@ -40,8 +40,8 @@ setup(
         'jieba>=0.39',
         'numpy>=1.13.3', 
         ],
-    packages=['filter'],
+    packages=['classify'],
     package_data={
-        'filter': ['cache/*', 'data/large/*.dat', 'data/small/*.dat'],
+        'classify': ['cache/*', 'data/large/*.dat', 'data/small/*.dat'],
     },
 )
