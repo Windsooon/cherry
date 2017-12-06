@@ -8,16 +8,8 @@ from .config import *
 BASE_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'classify')
 
-DATA_DIR = os.path.join(BASE_DIR, 'data/large/')
 
-DEFAULT_FILEPATH = [
-    os.path.join(DATA_DIR, 'normal.dat'),
-    os.path.join(DATA_DIR, 'gamble.dat'),
-    os.path.join(DATA_DIR, 'sex.dat'),
-    os.path.join(DATA_DIR, 'politics.dat')]
 
-VECTOR_CACHE = os.path.join(BASE_DIR, 'cache/vector.cache')
-VOCAB_CACHE = os.path.join(BASE_DIR, 'cache/vocab.cache')
 TEST_DATA_NUM = 30
 TOPN = 0
 
@@ -26,37 +18,46 @@ class Classify:
 
     def __init__(
             self,
+            lan='Chinese',
             test_num=TEST_DATA_NUM,
             topN=TOPN,
             cache=True,
-            file_path=DEFAULT_FILEPATH,
             ):
+        self.vector_cache = os.path.join(BASE_DIR, 'cache/' + lan + '/vector.cache')
+        self.vocab_cache = os.path.join(BASE_DIR, 'cache/' + lan + '/vocab.cache')
         if cache:
-            try:
-                with open(VECTOR_CACHE, 'rb') as f:
-                    self.vector = pickle.load(f)
-                with open(VOCAB_CACHE, 'rb') as f:
-                    self.vocab_list = pickle.load(f)
-            except IOError:
-                pass
-        try:
-            self.vector and self.vocab_list
-        except AttributeError:
-            self.file_path = file_path
+            self._load_cache()
+        else:
+            self.file_path = self._get_default_path_dir(lan)
             self.files_num = len(self.file_path)
             self._split_data(test_num)
             if topN:
                 self._vocab_list_remove_topN(topN)
             else:
                 self._vocab_list()
-            # Write self.vacab_list as cache to file
-            with open(VOCAB_CACHE, 'wb') as f:
-                pickle.dump(self.vocab_list, f)
             self.matrix_list = self._get_vocab_matrix()
             self.vector = self._get_vector()
-            # Write self.vector as cache to file
-            with open(VECTOR_CACHE, 'wb') as f:
-                pickle.dump(self.vector, f)
+            # Write self.vacab_list as cache to file
+            self._write_cache()
+
+    def _load_cache(self):
+        try:
+            with open(self.vector_cache, 'rb') as f:
+                self.vector = pickle.load(f)
+            with open(self.vocab_cache, 'rb') as f:
+                self.vocab_list = pickle.load(f)
+        except IOError:
+                raise IOError("Can't find cache files")
+
+    def _write_cache(self):
+        with open(self.vector_cache, 'wb') as f:
+            pickle.dump(self.vocab_list, f)
+        with open(self.vocab_cache, 'wb') as f:
+            pickle.dump(self.vector, f)
+    
+    def _get_default_path_dir(self, lan):
+        data_dir = os.path.join(BASE_DIR, 'data/' + lan + '/large/')
+        return [data_dir + x for x in os.listdir(data_dir)]
 
     def _read_files(self):
         '''
@@ -108,7 +109,7 @@ class Classify:
                 "I love my dog sunkist"
             ]
 
-        self.test_classify: [2, 0]
+        self.train_classify: [2, 0]
         '''
         self._read_files()
         if test_num > self.data_len - 1:
