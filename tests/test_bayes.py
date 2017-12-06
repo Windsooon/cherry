@@ -1,4 +1,5 @@
 import os
+import shutil   
 import unittest
 
 from classify import bayes
@@ -6,21 +7,32 @@ from classify import bayes
 
 class BayesTest(unittest.TestCase):
     def setUp(self):
-        try:
-            os.remove(os.path.join(bayes.BASE_DIR, 'cache/vector.cache'))
-            os.remove(os.path.join(bayes.BASE_DIR, 'cache/vocab.cache'))
-        except OSError:
-            pass
+        dir = os.path.join(bayes.BASE_DIR, 'cache')
+        shutil.rmtree(dir + '/Chinese')
+        shutil.rmtree(dir + '/English')
+        os.makedirs(dir + '/Chinese')
+        os.makedirs(dir + '/English')
 
-    def test_did_not_create_cache_files_when_set_false(self):
+    def test_create_cache_files_after_first_set(self):
+        self.assertFalse(
+            os.path.isfile(
+                os.path.join(bayes.BASE_DIR, 'cache/Chinese/vector.cache')))
+        self.assertFalse(
+            os.path.isfile(
+                os.path.join(bayes.BASE_DIR, 'cache/Chinese/vocab.cache')))
         bayes.Classify(cache=False)
         self.assertTrue(
             os.path.isfile(
-                os.path.join(bayes.BASE_DIR, 'cache/vector.cache')))
+                os.path.join(bayes.BASE_DIR, 'cache/Chinese/vector.cache')))
         self.assertTrue(
             os.path.isfile(
-                os.path.join(bayes.BASE_DIR, 'cache/vocab.cache')))
+                os.path.join(bayes.BASE_DIR, 'cache/Chinese/vocab.cache')))
 
+    def test_data_num_correct(self):
+        test_bayes = bayes.Classify(test_num=80, cache=False)
+        self.assertTrue(len(test_bayes.test_data), 80)
+
+        
     def test_error_rate(self):
         '''
         test error rate
@@ -52,15 +64,3 @@ class BayesTest(unittest.TestCase):
             a.append(error_rate(test_bayes))
         print('The error rate is %s' % "{0:.2f}".format(sum(a)/test_times*100)+'%')
 
-    def test_data_num_correct(self):
-        test_bayes = bayes.Classify(test_num=80, cache=False)
-        self.assertTrue(len(test_bayes.test_data), 80)
-
-    def test_created_cache_files(self):
-        bayes.Classify()
-        self.assertTrue(
-            os.path.isfile(
-                os.path.join(bayes.BASE_DIR, 'cache/vector.cache')))
-        self.assertTrue(
-            os.path.isfile(
-                os.path.join(bayes.BASE_DIR, 'cache/vocab.cache')))
