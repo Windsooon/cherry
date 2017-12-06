@@ -7,11 +7,15 @@ from classify import bayes
 
 class BayesTest(unittest.TestCase):
     def setUp(self):
-        dir = os.path.join(bayes.BASE_DIR, 'cache')
-        shutil.rmtree(dir + '/Chinese')
-        shutil.rmtree(dir + '/English')
-        os.makedirs(dir + '/Chinese')
-        os.makedirs(dir + '/English')
+        try:
+            dir = os.path.join(bayes.BASE_DIR, 'cache')
+            shutil.rmtree(dir + '/Chinese')
+            shutil.rmtree(dir + '/English')
+        except IOError:
+            pass
+        else:
+            os.makedirs(dir + '/Chinese')
+            os.makedirs(dir + '/English')
 
     def test_create_cache_files_after_first_set(self):
         self.assertFalse(
