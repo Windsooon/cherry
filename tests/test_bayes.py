@@ -27,6 +27,11 @@ class BayesTest(unittest.TestCase):
             os.path.isfile(
                 os.path.join(bayes.BASE_DIR, 'cache/Chinese/vocab.cache')))
 
+    def test_classify_work(self):
+        test_bayes = bayes.Classify()
+        res = test_bayes.bayes_classify('选择轮盘游戏随机赔率，高达119倍。')
+        self.assertEqual(res[0], 1)
+
     def test_data_num_correct(self):
         test_bayes = bayes.Classify(test_num=80, cache=False)
         self.assertTrue(len(test_bayes.test_data), 80)
@@ -41,7 +46,7 @@ class BayesTest(unittest.TestCase):
                 test_result, percentage_list = (
                     instance.bayes_classify(instance.test_data[i]))
                 classify_results.append(test_result)
-                # Uncomment  to see which sentence was classified wrong.
+                # Uncomment to see which sentence was classified wrong.
                 # if test_result != self.test_classify[i]:
                 #     print(self.test_data[i])
                 #     print('test_result is %s' % test_result)
