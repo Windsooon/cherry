@@ -2,7 +2,7 @@ import os
 import pickle
 import random
 import jieba
-import numpy
+import numpy as np
 from .config import *
 
 BASE_DIR = os.path.join(
@@ -29,28 +29,29 @@ class Classify:
             self.file_path = self._get_default_path_dir(lan)
             self.files_num = len(self.file_path)
             self._split_data(test_num)
+            # topN wouldn't work with cache
             if topN:
                 self._vocab_list_remove_topN(topN)
             else:
                 self._vocab_list()
             self.matrix_list = self._get_vocab_matrix()
             self.vector = self._get_vector()
-            # Write self.vacab_list as cache to file
+            # Write self.vacab_list and self.vector as cache to file
             self._write_cache()
 
     def _load_cache(self):
         try:
-            with open(self.vector_cache, 'rb') as f:
-                self.vector = pickle.load(f)
             with open(self.vocab_cache, 'rb') as f:
                 self.vocab_list = pickle.load(f)
+            with open(self.vector_cache, 'rb') as f:
+                self.vector = pickle.load(f)
         except IOError:
                 raise IOError("Can't find cache files")
 
     def _write_cache(self):
-        with open(self.vector_cache, 'wb') as f:
-            pickle.dump(self.vocab_list, f)
         with open(self.vocab_cache, 'wb') as f:
+            pickle.dump(self.vocab_list, f)
+        with open(self.vector_cache, 'wb') as f:
             pickle.dump(self.vector, f)
     
     def _get_default_path_dir(self, lan):
@@ -169,7 +170,7 @@ class Classify:
             vocab_set = vocab_set | set(jieba.cut(k))
             self.vocab_list = [i for i in vocab_set if len(i) > 1]
 
-    def sentence_to_vector(self, sentence):
+    def _sentence_to_vector(self, sentence):
         '''
         Convert strings to vector depends on vocal_list
         type sentence: strings
@@ -184,7 +185,7 @@ class Classify:
         '''
         Convert all sentences to vector
         '''
-        return [self.sentence_to_vector(i) for i in self.train_data]
+        return [self._sentence_to_vector(i) for i in self.train_data]
 
     def _get_vector(self):
         '''
@@ -197,7 +198,7 @@ class Classify:
         Train native bayes
         type index: number of files
         '''
-        num = numpy.ones(len(self.matrix_list[0]))
+        num = np.ones(len(self.matrix_list[0]))
         cal, sentence = 2.0, 0.0
         # TODO: Just for in one-time in train_classify
         for i in range(len(self.train_classify)):
@@ -205,18 +206,23 @@ class Classify:
                 sentence += 1
                 num += self.matrix_list[i]
                 cal += sum(self.matrix_list[i])
-        return numpy.log(num/cal), sentence/len(self.train_data)
+        return np.log(num/cal), sentence/len(self.train_data)
 
-    def bayes_classify(self, sentence_vector):
+    def _softmax(self, lst):
+        '''
+        Compute softmax values for each sets of scores in x.
+        '''
+        return np.exp(lst) / float(sum(np.exp(lst)))
+
+    def bayes_classify(self, sentence):
         '''
         Classify sentence depend on self.vector
-        type: sentence_vector: strings
+        type: strings: strings
         '''
-        word_vector = self.sentence_to_vector(sentence_vector)
+        word_vector = self._sentence_to_vector(sentence)
         percentage_list = [
-            sum(i[0] * word_vector) + numpy.log(i[1])
-            for i in self.vector]
+            sum(i[0] * word_vector) + np.log(i[1]) for i in self.vector]
         max_val = max(percentage_list)
         for i, j in enumerate(percentage_list):
             if j == max_val:
-                return i, percentage_list
+                return i, self._softmax(percentage_list)
