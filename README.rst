@@ -80,8 +80,8 @@ cherry
 .. code-block:: python
 
     >>> from classify import bayes
-    >>> test_bayes = bayes.Filter(cache=False) # 缓存文件被更新
-    >>> test_bayes = bayes.Filter() # 将使用新数据源的缓存
+    >>> test_bayes = bayes.Classify(cache=False) # 缓存文件被更新
+    >>> test_bayes = bayes.Classify() # 将使用新数据源的缓存
 
 
 我们一开始使用了 `jieba`_ 进行分词，上面的0.969秒是分词的时间（感谢fxsjy维护如此优秀的中文分词库）。返回了一个tuple，包含bayes判断结果的类别1（所对应的是赌博），以及对应的所有类别的相对概率，现在支持的类别有四个，用户可以自行添加数据然后进行训练
