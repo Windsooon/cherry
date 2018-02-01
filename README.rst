@@ -31,7 +31,7 @@ cherry
   内置预训练模型以及文件缓存，开箱即用。同时使用numpy库做矩阵计算，判断速度非常快
 - 准确率高
 
-  现阶段使用了400个训练数据，准确率达到93.6%。下载后可以通过运行
+  现阶段使用了400个训练数据，准确率达到93.5%。下载后可以通过运行
 
   .. code-block:: bash
 
@@ -46,7 +46,7 @@ cherry
     Completed 5 tasks, 15 tasks left.
     Completed 10 tasks, 10 tasks left.
     Completed 15 tasks, 5 tasks left.
-    The error rate is 6.83%
+    The error rate is 6.42%
      
     测试20次，每次从数据集随机取出20个数据作为测试数据，剩下的作为训练数据。然后计算平均错误率
 
@@ -78,12 +78,19 @@ cherry
             ('gamble.dat', 0.16622423300308523), ('normal.dat', 0.45184431202182884), ('politics.dat', 0.20543346471119367), ('sex.dat', 0.17649799026389221)
         ], 
         [
-            ('发表声明', 1.4632451832569382), ('12', 0.076950822137048291), ('维持', 3.5426867249367744), ('经济', 4.1229218000749324), ('继续', 1.7757620767067532), ('活动', 1.750927255708719), ('结束', 0.36463289458882819), ('以来', -0.14619272917716231), ('保持', -1.3093435389828434), ('增长', 1.4632451832569382), ('2017', 1.4632451832569382), ('市场', 1.9864933270214866), ('美国', 5.8843422794122686), ('当天', 1.5810282189133229)
+            ('发表声明', 1.4632451832569382), ('12', 0.076950822137048291),
+            ('维持', 3.5426867249367744), ('经济', 4.1229218000749324),
+            ('继续', 1.7757620767067532), ('活动', 1.750927255708719),
+            ('结束', 0.36463289458882819), ('以来', -0.14619272917716231),
+            ('保持', -1.3093435389828434), ('增长', 1.4632451832569382),
+            ('2017', 1.4632451832569382), ('市场', 1.9864933270214866),
+            ('美国', 5.8843422794122686), ('当天', 1.5810282189133229)
         ]
     )
-返回的是一个tuple，里面包含了两个列表，第一个列表包含的是各个类别的概率，如果要获取最高概率的类别可以用sorted函数
+结果返回的是一个tuple，里面包含了两个列表，第一个列表包含的是各个类别的概率，如果要获取最高概率的类别可以用sorted函数
 
 .. code-block:: python
+
     percentage_list, word_list = test_bayes.bayes_classify('美联储当天结束货币政策例会后发表声明说，自2017年12月以来，美国就业市场和经济活动继续保持稳健增长，失业率继续维持在低水平。')
     result = sorted(
         percentage_list, key=lambda x: x[1], reverse=True)[0][0]
@@ -91,7 +98,7 @@ cherry
 第二个列表包含了输入句子中所有被分词的词语对应最高概率分类的概率，在这个例子里，这个列表中包含的是每个词语对句子被判断为normal.dat的影响度，可以看到，经济，美国，维持这三个词语的值最大，对句子的影响也最大。
     
     
-这里使用了内置的训练模型缓存，如果你修改了数据源的话，需要更新缓存
+默认使用内置的训练模型缓存，如果你修改了数据源的话，需要更新缓存
 
 .. code-block:: python
 
@@ -116,7 +123,7 @@ cherry
 
 
 .. _`english-version`:
-This project uses Native Bayes algorithm to detect spam content, like normal, sex, gamble, political content. We use 400 Chinese sentences to train the algorithm and the correct rate is about 93.6%. Right now we only support Chinese spam content classify :<
+This project uses Native Bayes algorithm to detect spam content, like normal, sex, gamble, political content. We use 400 Chinese sentences to train the algorithm and the correct rate is about 93.5%. Right now we only support Chinese spam content classify :<
 
 How to use:
 
