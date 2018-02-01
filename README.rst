@@ -68,14 +68,18 @@ cherry
 
     >>> from classify import bayes
     >>> test_bayes = bayes.Classify()
-    >>> test_bayes.bayes_classify('美联储当天结束货币政策例会后发表声明说，自2017年12月以来，美国就业市场和经济活动继续保持稳健增长，失业率继续维持在低水平。')
+    >>> test_bayes.bayes_classify(
+        '美联储当天结束货币政策例会后发表声明说，
+        自2017年12月以来，美国就业市场和经济活动
+        继续保持稳健增长，失业率继续维持在低水平。')
     Building prefix dict from the default dictionary ...
     Loading model from cache /var/folders/md/0251yy51045d6nknpkbn6dc80000gn/T/jieba.cache
     Loading model cost 1.172 seconds.
     Prefix dict has been built succesfully.
     (
         [
-            ('gamble.dat', 0.16622423300308523), ('normal.dat', 0.45184431202182884), ('politics.dat', 0.20543346471119367), ('sex.dat', 0.17649799026389221)
+            ('gamble.dat', 0.16622423300308523), ('normal.dat', 0.45184431202182884),
+            ('politics.dat', 0.20543346471119367), ('sex.dat', 0.17649799026389221)
         ], 
         [
             ('发表声明', 1.4632451832569382), ('12', 0.076950822137048291),
@@ -91,7 +95,10 @@ cherry
 
 .. code-block:: python
 
-    percentage_list, word_list = test_bayes.bayes_classify('美联储当天结束货币政策例会后发表声明说，自2017年12月以来，美国就业市场和经济活动继续保持稳健增长，失业率继续维持在低水平。')
+    percentage_list, word_list = test_bayes.bayes_classify(
+        '美联储当天结束货币政策例会后发表声明说，
+        自2017年12月以来，美国就业市场和经济活动继续保持稳健增长，
+        失业率继续维持在低水平。')
     result = sorted(
         percentage_list, key=lambda x: x[1], reverse=True)[0][0]
 
@@ -104,7 +111,10 @@ cherry
 
     >>> from classify import bayes
     >>> test_bayes = bayes.Classify(cache=False) # 缓存文件被更新
-    >>> test_bayes = bayes.Classify('美联储当天结束货币政策例会后发表声明说，自2017年12月以来，美国就业市场和经济活动继续保持稳健增长，失业率继续维持在低水平。') # 将使用新数据源的缓存
+    >>> test_bayes = bayes.Classify(
+        '美联储当天结束货币政策例会后发表声明说，自2017年12月以来，
+        美国就业市场和经济活动继续保持稳健增长，
+        失业率继续维持在低水平。') # 将使用新数据源的缓存
 
 
 我们使用了 `jieba`_ 进行分词，上面的1.172秒是分词的时间（感谢fxsjy维护如此优秀的中文分词库）。返回了一个tuple，包含bayes判断结果的类别1（所对应的是赌博），以及对应的所有类别的相对概率，现在支持的类别有四个，用户可以自行添加数据然后进行训练
