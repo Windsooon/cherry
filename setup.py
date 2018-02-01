@@ -19,7 +19,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='cherry',
-    version='0.2.0',
+    version='0.2.2',
     description='classify data set',
     long_description=long_description,
     url='https://github.com/Sunkist-Cherry/cherry',
@@ -42,6 +42,8 @@ setup(
         ],
     packages=['classify'],
     package_data={
-        'classify': ['cache/*', 'data/large/*.dat', 'data/small/*.dat'],
+        'classify': [
+        'all_data/Chinese/cache/*', 'all_data/Chinese/data/*.dat',
+        'all_data/Chinese/stop/*.dat'],
     },
 )
