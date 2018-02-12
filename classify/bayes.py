@@ -3,12 +3,7 @@ import pickle
 import random
 import jieba
 import numpy as np
-from .config import *
-
-BASE_DIR = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'classify')
-TEST_DATA_NUM = 30
-TOPN = 0
+from .config import BASE_DIR, TEST_DATA_NUM, TOPN
 
 
 class Classify:
@@ -37,13 +32,18 @@ class Classify:
             self.vector = self._get_vector()
             # Write self.vacab_list and self.vector as cache to file
             self._write_cache()
-    
+
     def _set_path(self, lan):
-        all_data_path = os.path.join(BASE_DIR, ('all_data/' + lan + '/'))
-        self.vocab_cache_path = os.path.join(all_data_path, 'cache/vocab.cache')
-        self.vector_cache_path = os.path.join(all_data_path, 'cache/vector.cache')
-        self.classify_cache_path = os.path.join(all_data_path, 'cache/classify.cache')
-        self.stop_word_path = os.path.join(all_data_path, 'stop/stop_word.dat')
+        all_data_path = os.path.join(
+            BASE_DIR, ('all_data/' + lan + '/'))
+        self.vocab_cache_path = os.path.join(
+            all_data_path, 'cache/vocab.cache')
+        self.vector_cache_path = os.path.join(
+            all_data_path, 'cache/vector.cache')
+        self.classify_cache_path = os.path.join(
+            all_data_path, 'cache/classify.cache')
+        self.stop_word_path = os.path.join(
+            all_data_path, 'stop/stop_word.dat')
         data_path = os.path.join(all_data_path, 'data/')
         self.file_path = [data_path + x for x in os.listdir(data_path)]
 
@@ -134,7 +134,8 @@ class Classify:
         random_list = random.sample(range(0, self.data_len), test_num)
         # get test data
         self.test_data = [self.data_list[r] for r in random_list]
-        self.test_classify = [self.CLASSIFY[self.classify[r]] for r in random_list]
+        self.test_classify = [
+            self.CLASSIFY[self.classify[r]] for r in random_list]
         # get train data
         self.train_data = [
             self.data_list[r] for r in
@@ -167,8 +168,8 @@ class Classify:
                     dic[i] = 1
         d = collections.Counter(dic)
         vocab_lst = [
-            i[0] for i in d.most_common() if (len(i[0]) > 1
-            and i[0] not in self.stop_word_lst)
+            i[0] for i in d.most_common() if (
+                len(i[0]) > 1 and i[0] not in self.stop_word_lst)
         ]
         self.vocab_list = vocab_lst[n:]
 
@@ -190,8 +191,8 @@ class Classify:
         for k in self.train_data:
             vocab_set = vocab_set | set(jieba.cut(k))
             self.vocab_list = [
-                i for i in vocab_set if (len(i) > 1
-                and i not in self.stop_word_lst)
+                i for i in vocab_set if (
+                    len(i) > 1 and i not in self.stop_word_lst)
             ]
 
     def _sentence_to_vector(self, sentence):
@@ -275,4 +276,5 @@ class Classify:
                 sub_array = np.zeros(max_array.shape)
                 for k in left_array:
                     sub_array += max_array - k
-                return self._clean_percentage_list(percentage_list), list(zip(non_zero_word, sub_array))
+                return self._clean_percentage_list(percentage_list), \
+                    list(zip(non_zero_word, sub_array))
