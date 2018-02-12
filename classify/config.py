@@ -1,20 +1,6 @@
-TYPE = {'NORMAL': 0,
-        'GAMBLE': 1,
-        'SEX': 2,
-        'POLITICS': 3}
+import os
 
-LAN = {'Chinese': 
-          {'type':
-              ['normal.dat',
-              'gamble.dat',
-              'sex.dat',
-              'politics.dat'],
-           'split': "nonspace",
-          },
-       'Englisth':
-           {'type':
-               ['normal.dat',
-               'spam.dat'],
-            'split': "nonspace",
-            },
-      }
+BASE_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'classify')
+TEST_DATA_NUM = 30
+TOPN = 0
