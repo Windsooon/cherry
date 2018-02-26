@@ -5,7 +5,9 @@ from classify import bayes
 
 
 class BayesTest(unittest.TestCase):
+
     def test_have_default_cache_files(self):
+        bayes.Classify(cache=False)
         self.assertTrue(
             os.path.isfile(
                 os.path.join(
