@@ -67,7 +67,7 @@ cherry
 .. code-block:: python
 
     >>> from classify import bayes
-    >>> test_bayes = bayes.Classify()
+    >>> test_bayes = bayes.Classify(cache=False) # 第一次需要建立缓存文件，之后可以直接使用bayes.Classify()
     >>> test_bayes.bayes_classify(
         '美联储当天结束货币政策例会后发表声明说，
         自2017年12月以来，美国就业市场和经济活动
@@ -128,7 +128,6 @@ cherry
 - 把中文分词库分离，让用户可以自己选择分词方式
 - 对长文本增加tf-idf计算词权重
 - 增加SVM分类算法
-- 增加HMM算法
 
 
 .. _`english-version`:
