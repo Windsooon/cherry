@@ -38,4 +38,3 @@ class BayesTest(unittest.TestCase):
             test_bayes = bayes.Classify(cache=False)
             a.append(error_rate(test_bayes))
         print('The error rate is %s' % "{0:.2f}".format(sum(a)/test_times*100)+'%')
-
