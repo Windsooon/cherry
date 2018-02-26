@@ -3,7 +3,7 @@ import pickle
 import random
 import jieba
 import numpy as np
-from .config import BASE_DIR, TEST_DATA_NUM, TOPN
+from .config import BASE_DIR, TEST_DATA_NUM
 
 
 class Classify:
@@ -12,22 +12,17 @@ class Classify:
             self,
             lan='Chinese',
             test_num=TEST_DATA_NUM,
-            topN=TOPN,
             cache=True,
             ):
 
+        # Data files path set up
         self._set_path(lan)
-
         if cache:
             self._load_cache()
         else:
             self.files_num = len(self.file_path)
             self._split_data(test_num)
-            # topN wouldn't work with cache
-            if topN:
-                self._vocab_list_remove_topN(topN)
-            else:
-                self._vocab_list()
+            self._vocab_list()
             self.matrix_list = self._get_vocab_matrix()
             self.vector = self._get_vector()
             # Write self.vacab_list and self.vector as cache to file
@@ -58,8 +53,8 @@ class Classify:
                 self.vector = pickle.load(f)
             with open(self.classify_cache_path, 'rb') as f:
                 self.CLASSIFY = pickle.load(f)
-        except IndexError:
-                raise IOError("Can't find cache files")
+        except FileNotFoundError:
+                raise
 
     def _write_cache(self):
         with open(self.vocab_cache_path, 'wb') as f:
@@ -85,7 +80,12 @@ class Classify:
 
         self.classify: [2, 0, 1, 2]
 
+        self.CLASSIFY: ['gamble.dat', 'normal.dat', ...]
+
         self.data_len: 4
+
+        self.stop_word_ls: ['如果', '只是', ...]
+
         '''
         self.data_list = []
         self.classify = []
@@ -93,9 +93,9 @@ class Classify:
         for i in range(self.files_num):
             with open(self.file_path[i], encoding='utf-8') as f:
                 for k in f.readlines():
-                    # Insert all data from files in to data_list
+                    # Insert all data from files into data_list
                     self.data_list.append(k)
-                    # Store this sentence belongs to which category
+                    # Store category about this sentence
                     self.classify.append(i)
                 # Get classify name
                 self.CLASSIFY.append(
@@ -130,7 +130,8 @@ class Classify:
         '''
         self._read_files()
         if test_num > self.data_len - 1:
-            raise IndexError("Test data should small than %s" % self.data_len)
+            raise IndexError(
+                "Test data numbers should small than %s" % self.data_len)
         random_list = random.sample(range(0, self.data_len), test_num)
         # get test data
         self.test_data = [self.data_list[r] for r in random_list]
@@ -143,35 +144,6 @@ class Classify:
         self.train_classify = [
             self.classify[r] for r in range(self.data_len)
             if r not in random_list]
-
-    def _vocab_list_remove_topN(self, n):
-        '''
-        Remove topN most occur word
-
-        Set up:
-
-        self.vocab_list:
-            [
-                'What', 'lovely', 'day',
-                'Free', 'porn', 'videos',
-                'sex', 'movie', 'like',
-                'gamble', 'love', 'dog', 'sunkist'
-            ]
-        '''
-        import collections
-        dic = {}
-        for k in self.train_data:
-            for i in jieba.cut(k):
-                if i in dic:
-                    dic[i] += 1
-                else:
-                    dic[i] = 1
-        d = collections.Counter(dic)
-        vocab_lst = [
-            i[0] for i in d.most_common() if (
-                len(i[0]) > 1 and i[0] not in self.stop_word_lst)
-        ]
-        self.vocab_list = vocab_lst[n:]
 
     def _vocab_list(self):
         '''
