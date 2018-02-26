@@ -1,3 +1,6 @@
+# -*- coding:utf-8 -*-
+from __future__ import unicode_literals
+import io
 import os
 import pickle
 import random
@@ -63,11 +66,11 @@ class Classify:
 
     def _write_cache(self):
         with open(self.vocab_cache_path, 'wb') as f:
-            pickle.dump(self.vocab_list, f)
+            pickle.dump(self.vocab_list, f, protocol=2)
         with open(self.vector_cache_path, 'wb') as f:
-            pickle.dump(self.vector, f)
+            pickle.dump(self.vector, f, protocol=2)
         with open(self.classify_cache_path, 'wb') as f:
-            pickle.dump(self.CLASSIFY, f)
+            pickle.dump(self.CLASSIFY, f, protocol=2)
 
     def _read_files(self):
         '''
@@ -91,7 +94,7 @@ class Classify:
         self.classify = []
         self.CLASSIFY = []
         for i in range(self.files_num):
-            with open(self.file_path[i], encoding='utf-8') as f:
+            with io.open(self.file_path[i], encoding='utf-8') as f:
                 for k in f.readlines():
                     # Insert all data from files in to data_list
                     self.data_list.append(k)
@@ -102,7 +105,7 @@ class Classify:
                     os.path.basename(os.path.normpath(self.file_path[i])))
         self.data_len = len(self.classify)
 
-        with open(self.stop_word_path, encoding='utf-8') as f:
+        with io.open(self.stop_word_path, encoding='utf-8') as f:
             self.stop_word_lst = [l[:-1] for l in f.readlines()]
 
     def _split_data(self, test_num):
