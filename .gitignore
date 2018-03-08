@@ -101,3 +101,7 @@ ENV/
 .mypy_cache/
 *.DS_Store
 *.cache
+gamble.dat
+normal.dat
+sex.dat
+politics.dat
