@@ -162,10 +162,10 @@ class Classify:
         vocab_set = set()
         for k in self.train_data:
             vocab_set = vocab_set | set(jieba.cut(k))
-            self.vocab_list = [
-                i for i in vocab_set if (
-                    len(i) > 1 and i not in self.stop_word_lst)
-            ]
+        self.vocab_list = [
+            i for i in vocab_set if (
+                len(i) > 1 and i not in self.stop_word_lst)
+        ]
 
     def _sentence_to_vector(self, sentence):
         '''
