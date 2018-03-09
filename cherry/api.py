@@ -8,16 +8,22 @@ This module implements the cherry API.
 :license: MIT License, see LICENSE for more details.
 """
 
-from .models import Result
+from .config import POSITIVE, BINARY_CLASSIFICATION
+from .models import Result, Trainer
+
+
+def classify(text, lan='Chinese', split=None):
+    return _build_result(text=text, lan=lan, split=split)
+
+
+def train(
+        lan='Chinese', positive=POSITIVE,
+        binary=BINARY_CLASSIFICATION, test=False):
+    return Trainer(lan=lan, positive=positive, binary=binary)
 
 
 def _build_result(**kwargs):
     '''
     Build classify result
     '''
-    result = Result(**kwargs)
-    return result
-
-
-def classify(text, lan, split=None):
-    return _build_result(text=text, lan=lan, split=split)
+    return Result(**kwargs)
