@@ -18,5 +18,5 @@ class LanguageNotFoundError(CherryIOException, ValueError):
     """An language not found error occurred."""
 
 
-class TestDataTooManyError(CherryIOException, IndexError):
+class TestDataNumError(CherryIOException, IndexError):
     """Test data number larger than all data number"""

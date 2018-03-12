@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-cherry.models
+cherry.tokenizer
 ~~~~~~~~~~~~
 This module implements text tokenizer.
 :copyright: (c) 2018 by Windson Yang
@@ -32,10 +32,6 @@ class Token:
             return [
                 t for t in jieba.cut(text) if len(t) > 1
                 and t not in self.stop_word]
-        elif lan == 'English':
-            return [
-                t for t in text.lower().split(' ')
-                if t not in self.stop_word]
 
     def _get_stop_word(self):
         '''
