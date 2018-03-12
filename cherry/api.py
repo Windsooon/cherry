@@ -13,17 +13,12 @@ from .models import Result, Trainer
 
 
 def classify(text, lan='Chinese', split=None):
-    return _build_result(text=text, lan=lan, split=split)
+    return Result(text=text, lan=lan, split=split)
 
 
 def train(
-        lan='Chinese', positive=POSITIVE,
-        binary=BINARY_CLASSIFICATION, test=False):
-    return Trainer(lan=lan, positive=positive, binary=binary)
-
-
-def _build_result(**kwargs):
-    '''
-    Build classify result
-    '''
-    return Result(**kwargs)
+        lan='Chinese', test_num=0, test_mode=False, split=None,
+        positive=POSITIVE, binary=BINARY_CLASSIFICATION):
+    return Trainer(
+        lan=lan, test_num=test_num, test_mode=test_mode,
+        split=split, positive=positive, binary=binary)
