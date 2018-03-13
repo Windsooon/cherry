@@ -15,8 +15,12 @@ class CherryIOException(IOError):
 
 
 class LanguageNotFoundError(CherryIOException, ValueError):
-    """An language not found error occurred."""
+    '''An language not found error occurred.'''
 
 
 class TestDataNumError(CherryIOException, IndexError):
-    """Test data number larger than all data number"""
+    '''Test data number should between 0 to all data'''
+
+
+class CacheNotFoundError(CherryIOException, IOError):
+    '''Cache files not found'''
