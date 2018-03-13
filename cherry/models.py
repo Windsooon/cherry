@@ -10,10 +10,13 @@ This module implements the cherry models.
 
 import os
 import random
+import pickle
 import numpy as np
 from .config import DATA_DIR
 from .tokenizer import Token
 from .exceptions import TestDataNumError
+
+np.set_printoptions(threshold=np.nan)
 
 
 class Result:
@@ -46,6 +49,8 @@ class Trainer:
         self._split_data(self.test_num)
         self._vocab_list()
         self.matrix_list = self._get_vocab_matrix()
+        self._training()
+        self._write_cache()
 
     @property
     def test_num(self):
@@ -143,8 +148,7 @@ class Trainer:
         '''
         Convert all sentences to vector
         '''
-        print(self._train_data)
-        return [self._data_to_vector(i) for i in self._train_data[1]]
+        return [self._data_to_vector(i[1]) for i in self._train_data]
 
     def _data_to_vector(self, data):
         '''
@@ -152,7 +156,7 @@ class Trainer:
         type data: strings
         '''
         return_vec = [0]*len(self.vocab_list)
-        token = Token(text=data[1], lan=self.lan, split=self.split)
+        token = Token(text=data, lan=self.lan, split=self.split)
         for i in token.tokenizer:
             if i in self.vocab_list:
                 return_vec[self.vocab_list.index(i)] += 1
@@ -162,16 +166,23 @@ class Trainer:
         '''
         Native bayes training
         '''
-        num = np.ones(len(self.matrix_list[0]))
+        vector = np.ones(len(self.matrix_list[0]))
         self._ps_vector = []
-        start_index = 0
+        vector_list = [{
+            'vector': vector, 'cal': 2.0, 'num': 0.0}
+            for i in range(len(self.CLASSIFY))]
         for k, v in enumerate(self.train_data):
-            cal, sentence = 2.0, 0.0
-            if v[0] == start_index:
-                sentence += 1
-                num += self.matrix_list[k]
-                cal += sum(self.matrix_list[k])
-            else:
-                self._ps_vector.append(
-                    np.log(num/cal), sentence/len(self.train_data))
-                start_index += 1
+            vector_list[v[0]]['num'] += 1
+            vector_list[v[0]]['vector'] += self.matrix_list[k]
+            vector_list[v[0]]['cal'] += sum(self.matrix_list[k])
+        for i in range(len(self.CLASSIFY)):
+            self._ps_vector.append((
+                np.log(vector_list[i]['vector']/vector_list[i]['cal']),
+                np.log(vector_list[i]['num']/len(self.train_data))))
+
+    def _write_cache(self):
+        cache_path = os.path.join(DATA_DIR, 'data/' + self.lan + '/cache/')
+        with open(cache_path + 'vocab_list.cache', 'wb') as f:
+            pickle.dump(self._vocab_list, f)
+        with open(cache_path + 'vector.cache', 'wb') as f:
+            pickle.dump(self._ps_vector, f)
