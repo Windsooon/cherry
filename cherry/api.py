@@ -8,7 +8,8 @@ This module implements the cherry API.
 :license: MIT License, see LICENSE for more details.
 """
 
-from .models import Result, Trainer
+from .trainer import Trainer
+from .classify import Result
 
 
 def classify(text, lan='Chinese', split=None):
@@ -16,8 +17,6 @@ def classify(text, lan='Chinese', split=None):
 
 
 def train(
-        lan='Chinese', test_num=0,
-        test_mode=False, split=None):
+        lan='Chinese', test_num=0, split=None):
     return Trainer(
-        lan=lan, test_num=test_num, test_mode=test_mode,
-        split=split)
+        lan=lan, test_num=test_num, split=split)
