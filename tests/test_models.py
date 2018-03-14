@@ -10,8 +10,8 @@ class ModelsTest(unittest.TestCase):
     @mock.patch('builtins.open', mock.mock_open(read_data='警方发布了最新消息\n'))
     def test_read_files(self, mock_cut):
         trainer = Trainer(
-            test_num=0, test_mode=False, lan='Chinese',
-            split=None, positive=POSITIVE, binary=True)
+            test_num=0, test_mode=False,
+            lan='Chinese', split=None)
         self.assertEqual(
             trainer.data_list,
             [(0, '警方发布了最新消息\n'), (1, '警方发布了最新消息\n')])
