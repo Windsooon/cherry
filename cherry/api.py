@@ -16,7 +16,5 @@ def classify(text, lan='Chinese', split=None):
     return Result(text=text, lan=lan, split=split)
 
 
-def train(
-        lan='Chinese', test_num=0, split=None):
-    return Trainer(
-        lan=lan, test_num=test_num, split=split)
+def train(lan='Chinese', test_num=0, split=None):
+    return Trainer(lan=lan, test_num=test_num, split=split)
