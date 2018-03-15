@@ -32,7 +32,7 @@ class Trainer:
         # Get data from data directory
         self._read_files()
         # Split data by test num
-        self._split_data(self.test_num)
+        self._split_data()
         self._get_vocab_list()
         self.matrix_list = self._get_vocab_matrix()
         self._training()
@@ -41,6 +41,10 @@ class Trainer:
     @property
     def vocab_list(self):
         return self._vocab_list
+
+    @property
+    def test_data_classify(self):
+        return [k for k, v in self._test_data]
 
     @property
     def meta_classify(self):
@@ -71,7 +75,7 @@ class Trainer:
             raise TestDataNumError(error)
         self._test_num = num
 
-    def _split_data(self, test_num):
+    def _split_data(self):
         '''
         Split data into test data and train data randomly.
 
@@ -85,7 +89,7 @@ class Trainer:
                 (0, "I love my dog sunkist")
             ]
         '''
-        random_list = random.sample(range(0, self.data_len), test_num)
+        random_list = random.sample(range(0, self.data_len), self._test_num)
         # Get test data
         self._test_data, self._train_data = [], []
         for i in range(self.data_len):
