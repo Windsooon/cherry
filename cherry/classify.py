@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+
+"""
+cherry.api
+~~~~~~~~~~~~
+This module implements the cherry API.
+:copyright: (c) 2018 by Windson Yang
+:license: MIT License, see LICENSE for more details.
+"""
+
+
 import os
 import pickle
 from operator import itemgetter
@@ -61,11 +72,17 @@ class Result:
                     list(zip(non_zero_word, sub_array))
 
     def _update_category(self, lst):
-        out_lst = [[self.CLASSIFY[i], lst[i]] for i in range(len(self.CLASSIFY))]
+        # [('gamble.dat', -6.73...), ('normal.dat', -8.40...)]
+        out_lst = [
+            (self.CLASSIFY[i], lst[i]) for i in range(len(self.CLASSIFY))]
+        # [('gamble.dat', -6.73...), ('normal.dat', -8.40...)]
         sorted_lst = sorted(out_lst, key=itemgetter(1), reverse=True)
-        relative_lst = [2**(v-sorted_lst[0][1]) for k, v in sorted_lst]
-        percentage_lst = [i/sum(relative_lst) for i in relative_lst]
-        return sorted_lst
+        # [('gamble.dat', 1.0), ('normal.dat', 0.31...)]
+        relative_lst = [(k, 2**(v-sorted_lst[0][1])) for k, v in sorted_lst]
+        # [('gamble.dat', 0.76...), ('normal.dat', 0.23...)]
+        percentage_lst = [
+            (k, v/sum(v for _, v in relative_lst)) for k, v in relative_lst]
+        return percentage_lst
 
     def _load_cache(self):
         cache_path = os.path.join(DATA_DIR, 'data/' + self.lan + '/cache/')

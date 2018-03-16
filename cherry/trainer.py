@@ -3,7 +3,7 @@
 """
 cherry.models
 ~~~~~~~~~~~~
-This module implements the cherry models.
+This module implements the cherry Trainer.
 :copyright: (c) 2018 by Windson Yang
 :license: MIT License, see LICENSE for more details.
 """
@@ -16,25 +16,19 @@ from .config import DATA_DIR
 from .tokenizer import Token
 from .exceptions import TestDataNumError
 
-np.set_printoptions(threshold=np.nan)
-
 
 class Trainer:
     def __init__(self, **kwargs):
         self.data_list, self.CLASSIFY = [], []
         self.lan = kwargs['lan']
         self.split = kwargs['split']
-        if kwargs['test_num'] != 0:
-            self._test_num = kwargs['test_num']
-        else:
-            self._test_num = 0
-
-        # Get data from data directory
+        # Get all data from data directory
         self._read_files()
-        # Split data by test num
+        self._test_num = kwargs['test_num']
+        # Split data to train_data and test_data by test num
         self._split_data()
         self._get_vocab_list()
-        self.matrix_list = self._get_vocab_matrix()
+        self._get_vocab_matrix()
         self._training()
         self._write_cache()
 
@@ -114,6 +108,7 @@ class Trainer:
         self.data_len: 3
         '''
         file_dir_path = os.path.join(DATA_DIR, 'data/' + self.lan + '/data/')
+        # Data files should end with .dat
         file_path = [
             os.path.join(file_dir_path, f) for f in
             os.listdir(file_dir_path) if f.endswith('.dat')]
@@ -137,28 +132,25 @@ class Trainer:
             ]
         '''
         vocab_set = set()
-        for k, data in self._train_data:
-            token = Token(text=data, lan=self.lan, split=self.split)
-            vocab_set = vocab_set | set(token.tokenizer)
+        all_train_data = ''.join([v for _, v in self._train_data])
+        token = Token(text=all_train_data, lan=self.lan, split=self.split)
+        vocab_set = vocab_set | set(token.tokenizer)
         self._vocab_list = list(vocab_set)
 
     def _get_vocab_matrix(self):
         '''
-        Convert all sentences to vector
-        '''
-        return [self._data_to_vector(i[1]) for i in self._train_data]
-
-    def _data_to_vector(self, data):
-        '''
         Convert strings to vector depends on vocal_list
         type data: strings
         '''
-        return_vec = [0]*len(self._vocab_list)
-        token = Token(text=data, lan=self.lan, split=self.split)
-        for i in token.tokenizer:
-            if i in self._vocab_list:
-                return_vec[self._vocab_list.index(i)] += 1
-        return return_vec
+        array_list = []
+        for k, data in self._train_data:
+            return_vec = np.zeros(len(self._vocab_list))
+            token = Token(text=data, lan=self.lan, split=self.split)
+            for i in token.tokenizer:
+                if i in self._vocab_list:
+                    return_vec[self._vocab_list.index(i)] += 1
+            array_list.append(return_vec)
+        self._matrix_lst = array_list
 
     def _training(self):
         '''
@@ -166,12 +158,12 @@ class Trainer:
         '''
         self._ps_vector = []
         vector_list = [{
-            'vector': np.ones(len(self.matrix_list[0])),
+            'vector': np.ones(len(self._matrix_lst[0])),
             'cal': 2.0, 'num': 0.0} for i in range(len(self.CLASSIFY))]
         for k, v in enumerate(self.train_data):
             vector_list[v[0]]['num'] += 1
-            vector_list[v[0]]['vector'] += self.matrix_list[k]
-            vector_list[v[0]]['cal'] += sum(self.matrix_list[k])
+            vector_list[v[0]]['vector'] += self._matrix_lst[k]
+            vector_list[v[0]]['cal'] += sum(self._matrix_lst[k])
         for i in range(len(self.CLASSIFY)):
             self._ps_vector.append((
                 np.log(vector_list[i]['vector']/vector_list[i]['cal']),

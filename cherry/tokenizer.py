@@ -23,7 +23,8 @@ class Token:
         # Get stop word in lan directory
         self.stop_word = self._get_stop_word()
         if kwargs['split']:
-            self.tokenizer = kwargs['split'](kwargs['text'], self.stop_word)
+            self.tokenizer = list(
+                kwargs['split'](kwargs['text']))
         else:
             self.tokenizer = self._get_tokenizer(kwargs['text'], kwargs['lan'])
 
