@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch, MagicMock
 import cherry
 
 
@@ -7,8 +8,6 @@ class ApiTest(unittest.TestCase):
     def test_classify(self):
         pass
 
-    def test_train(self):
-        train = cherry.train(
-            lan='Chinese', test_num=0, test_mode=False,
-            positive=cherry.config.POSITIVE, binary=True)
-        print(train.test_data)
+    @patch('cherry.trainer.Trainer')
+    def test_trainer(self, Trainer):
+        pass
