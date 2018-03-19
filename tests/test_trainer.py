@@ -8,19 +8,6 @@ class TrainerTest(unittest.TestCase):
 
     @mock.patch('jieba.cut')
     @mock.patch('builtins.open', mock.mock_open(read_data='警方发布了最新消息\n'))
-    def test_read_files(self, mock_cut):
-        trainer = Trainer(test_num=0, lan='Chinese', split=None)
-        self.assertEqual(
-            trainer.data_list,
-            [(0, '警方发布了最新消息\n'), (1, '警方发布了最新消息\n')])
-        self.assertEqual(
-            trainer.CLASSIFY,
-            ['gamble.dat', 'normal.dat'])
-        self.assertEqual(
-            trainer.data_len, 2)
-
-    @mock.patch('jieba.cut')
-    @mock.patch('builtins.open', mock.mock_open(read_data='警方发布了最新消息\n'))
     def test_test_data_num_with_custom_split(self, mock_cut):
         mock_cut.return_value = ['警方', '发布', '了', '最新消息']
 

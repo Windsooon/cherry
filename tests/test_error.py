@@ -1,8 +1,9 @@
 import unittest
 import cherry
-
+import numpy as np
+from terminaltables import AsciiTable
 TEST_TIME = 1
-TEST_NUM = 50
+TEST_NUM = 80
 
 
 class ErrorTest(unittest.TestCase):
@@ -14,8 +15,21 @@ class ErrorTest(unittest.TestCase):
             for k, data in enumerate(trainer.test_data):
                 r = cherry.classify(data[1])
                 if (r.percentage[0][0] !=
-                        trainer.meta_classify[trainer.test_data_classify[k]]):
+                        trainer.meta_classify[data[0]]):
                     e += 1
                     print(data)
                     print(r.percentage)
         print(e/(TEST_TIME * TEST_NUM))
+
+        z = []
+        z.append([' '] + trainer.meta_classify)
+        for i in trainer.meta_classify:
+            k = [i] + [0] * len(trainer.meta_classify)
+            z.append(k)
+
+        title = 'Confusion matrix'
+        # AsciiTable.
+        table_instance = AsciiTable(tuple(z), title)
+        for i in range(1, len(trainer.meta_classify)+1):
+            table_instance.justify_columns[i] = 'right'
+        print(table_instance.table)
