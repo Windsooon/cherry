@@ -140,7 +140,6 @@ class Trainer:
     def _get_vocab_matrix(self):
         '''
         Convert strings to vector depends on vocal_list
-        type data: strings
         '''
         array_list = []
         for k, data in self._train_data:

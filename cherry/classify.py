@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 """
-cherry.api
+cherry.classify
 ~~~~~~~~~~~~
-This module implements the cherry API.
+This module implements the cherry classify.
 :copyright: (c) 2018 by Windson Yang
 :license: MIT License, see LICENSE for more details.
 """
@@ -31,8 +31,27 @@ class Result:
         return self.percentage
 
     @property
+    def get_token(self):
+        return self.token.tokenizer
+
+    @property
     def get_word_list(self):
         return self.word_list
+
+    def _load_cache(self):
+        cache_path = os.path.join(DATA_DIR, 'data/' + self.lan + '/cache/')
+        try:
+            with open(cache_path + 'vocab_list.cache', 'rb') as f:
+                self._vocab_list = pickle.load(f)
+            with open(cache_path + 'vector.cache', 'rb') as f:
+                self._ps_vector = pickle.load(f)
+            with open(cache_path + 'classify.cache', 'rb') as f:
+                self.CLASSIFY = pickle.load(f)
+        except FileNotFoundError:
+            error = (
+                'Cache files not found,' +
+                'maybe you should train the data first.')
+            raise CacheNotFoundError(error)
 
     def _data_to_vector(self):
         '''
@@ -45,14 +64,15 @@ class Result:
 
     def _bayes_classify(self):
         '''
-        Bayes classify
+        Calculate the probability of different category
         '''
         possibility_vector = []
         log_list = []
+        # self._ps_vector: ([-3.44, -3.56, -2.90], 0.4)
         for i in self._ps_vector:
             # final_vector: [0, -7.3, 0, 0, -8, ...]
             final_vector = i[0] * self.word_vec
-            # word_index: [1, 4]
+            # Get most distance non zero word list
             word_index = np.nonzero(final_vector)
             non_zero_word = np.array(self._vocab_list)[word_index]
             # non_zero_vector: [-7.3, -8]
@@ -72,6 +92,9 @@ class Result:
                     list(zip(non_zero_word, sub_array))
 
     def _update_category(self, lst):
+        '''
+        Convert log to percentage
+        '''
         # [('gamble.dat', -6.73...), ('normal.dat', -8.40...)]
         out_lst = [
             (self.CLASSIFY[i], lst[i]) for i in range(len(self.CLASSIFY))]
@@ -83,22 +106,3 @@ class Result:
         percentage_lst = [
             (k, v/sum(v for _, v in relative_lst)) for k, v in relative_lst]
         return percentage_lst
-
-    def _load_cache(self):
-        cache_path = os.path.join(DATA_DIR, 'data/' + self.lan + '/cache/')
-        try:
-            with open(cache_path + 'vocab_list.cache', 'rb') as f:
-                self._vocab_list = pickle.load(f)
-            with open(cache_path + 'vector.cache', 'rb') as f:
-                self._ps_vector = pickle.load(f)
-            with open(cache_path + 'classify.cache', 'rb') as f:
-                self.CLASSIFY = pickle.load(f)
-        except FileNotFoundError:
-            error = (
-                'Cache files not found,' +
-                'maybe you should train the data first.')
-            raise CacheNotFoundError(error)
-
-    @property
-    def get_token(self):
-        return self.token
