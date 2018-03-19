@@ -1,9 +1,8 @@
 import unittest
 import cherry
-import numpy as np
 from terminaltables import AsciiTable
 TEST_TIME = 1
-TEST_NUM = 80
+TEST_NUM = 60
 
 
 class ErrorTest(unittest.TestCase):
@@ -19,16 +18,14 @@ class ErrorTest(unittest.TestCase):
                     e += 1
                     print(data)
                     print(r.percentage)
-        print(e/(TEST_TIME * TEST_NUM))
-
+                    print(r.word_list)
+        # print(e/(TEST_TIME * TEST_NUM))
         z = []
-        z.append([' '] + trainer.meta_classify)
+        z.append(['Confusion matrix'] + trainer.meta_classify)
         for i in trainer.meta_classify:
             k = [i] + [0] * len(trainer.meta_classify)
             z.append(k)
-
-        title = 'Confusion matrix'
-        # AsciiTable.
+        title = 'Cherry'
         table_instance = AsciiTable(tuple(z), title)
         for i in range(1, len(trainer.meta_classify)+1):
             table_instance.justify_columns[i] = 'right'
