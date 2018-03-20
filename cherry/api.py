@@ -10,6 +10,8 @@ This module implements the cherry API.
 
 from .trainer import Trainer
 from .classify import Result
+from .analysis import Analysis
+from .infomation import Info
 
 
 def classify(text, lan='Chinese', split=None):
@@ -18,3 +20,12 @@ def classify(text, lan='Chinese', split=None):
 
 def train(lan='Chinese', test_num=0, split=None):
     return Trainer(lan=lan, test_num=test_num, split=split)
+
+
+def analysis(lan='Chinese', test_time=10, test_num=60, split=None):
+    return Analysis(
+        lan=lan, test_time=test_time, test_num=test_num, split=split)
+
+
+def info(lan='Chinese'):
+    return Info(lan=lan)
