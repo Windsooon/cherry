@@ -14,16 +14,17 @@ import pickle
 import numpy as np
 from .config import DATA_DIR
 from .tokenizer import Token
+from .infomation import Info
 from .exceptions import TestDataNumError
 
 
 class Trainer:
     def __init__(self, **kwargs):
-        self.data_list, self.CLASSIFY = [], []
         self.lan = kwargs['lan']
         self.split = kwargs['split']
         # Get all data from data directory
-        self._read_files()
+        self.data_list, self.CLASSIFY = Info.read_files(lan=self.lan)
+        self.data_len = len(self.data_list)
         self._test_num = kwargs['test_num']
         # Split data to train_data and test_data by test num
         self._split_data()
@@ -39,10 +40,6 @@ class Trainer:
     @property
     def test_data_classify(self):
         return [k for k, v in self._test_data]
-
-    @property
-    def meta_classify(self):
-        return self.CLASSIFY
 
     @property
     def test_data(self):
@@ -92,34 +89,7 @@ class Trainer:
             else:
                 self._train_data.append(self.data_list[i])
 
-    def _read_files(self):
-        '''
-        Read data from given file path
 
-        :param file_path: ./data/Chinese/data/
-
-        data_list:
-            [
-                (0, "What a lovely day"),
-                (1, "I like gambling"),
-                (0, "I love my dog sunkist)"
-            ]
-        self.CLASSIFY: ['gamble.dat', 'normal.dat']
-        self.data_len: 3
-        '''
-        file_dir_path = os.path.join(DATA_DIR, 'data/' + self.lan + '/data/')
-        # Data files should end with .dat
-        file_path = [
-            os.path.join(file_dir_path, f) for f in
-            os.listdir(file_dir_path) if f.endswith('.dat')]
-        for i in range(len(file_path)):
-            with open(file_path[i], encoding='utf-8') as f:
-                for data in f.readlines():
-                    self.data_list.append((i, data))
-                # Get file name
-                self.CLASSIFY.append(
-                    os.path.basename(os.path.normpath(file_path[i])))
-        self.data_len = len(self.data_list)
 
     def _get_vocab_list(self):
         '''
