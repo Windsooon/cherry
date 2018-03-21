@@ -43,7 +43,7 @@ cherry
   
 git clone仓库之后运行
 
-  .. code-block:: bash
+.. code-block:: bash
 
   python runanalysis.py -h
 
@@ -65,7 +65,7 @@ git clone仓库之后运行
 
 runanalysis是测试脚本，默认从数据中随机选取60个数据做为测试数据，剩下的数据用作训练数据。如果你需要进行10次训练和测试（大约需要2分钟），运行： 
 
-  .. code-block:: bash
+.. code-block:: bash
 
   python runanalysis.py -t 10
 
