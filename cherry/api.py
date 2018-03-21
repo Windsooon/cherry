@@ -22,9 +22,12 @@ def train(lan='Chinese', test_num=0, split=None):
     return Trainer(lan=lan, test_num=test_num, split=split)
 
 
-def analysis(lan='Chinese', test_time=10, test_num=60, split=None):
+def analysis(
+        lan='Chinese', test_time=10,
+        test_num=60, split=None, debug=False):
     return Analysis(
-        lan=lan, test_time=test_time, test_num=test_num, split=split)
+        lan=lan, test_time=test_time,
+        test_num=test_num, split=split, debug=debug)
 
 
 def info(lan='Chinese'):

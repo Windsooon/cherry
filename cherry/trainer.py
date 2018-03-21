@@ -89,8 +89,6 @@ class Trainer:
             else:
                 self._train_data.append(self.data_list[i])
 
-
-
     def _get_vocab_list(self):
         '''
         Get a list contain all unique non stop words belongs to train_data

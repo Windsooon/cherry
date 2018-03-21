@@ -20,26 +20,33 @@ class Analysis:
         self.test_time = kwargs['test_time']
         self.test_num = kwargs['test_num']
         self.split = kwargs['split']
+        self.debug = kwargs['debug']
+        self._wrong_lst = []
         self._error_rate = 0
         self._start_analysis()
 
     @property
-    def cmatrix(self):
-        return self.table_instance.table
+    def ctable(self):
+        return self.confusion_table.table
+
+    @property
+    def wtable(self):
+        return self.wrong_lst_table.table
 
     @property
     def error_rate(self):
         return "{0:.2f}".format(
-            self._error_rate/self.test_time*self.test_num*100)+'%'
+            self._error_rate*100/(self.test_time*self.test_num))+'%'
 
     def _start_analysis(self):
         # Create deafullt confustion matrix
         info = Info(lan=self.lan)
 
+        # Create a confusiton matrix list
         cm_lst = []
         cm_lst.append(['Confusion matrix'] + info.classify)
         for i in info.classify:
-            cm_lst.append([i] + [0] * len(info.classify))
+            cm_lst.append(['(Real)'+i] + [0] * len(info.classify))
 
         # Test begins
         for i in range(self.test_time):
@@ -51,12 +58,19 @@ class Analysis:
                     r.percentage[0][0])+1] += 1
                 if data[0] != info.classify.index(r.percentage[0][0]):
                     self._error_rate += 1
-                # print(data)
-                # print(r.percentage)
-                # print(r.word_list)
+                    if self.debug:
+                        print('*'*20)
+                        print(data)
+                        print('\n')
+                        print(r.percentage)
+                        print('\n')
+                        print(r.word_list)
+                        print('*'*20 + '\n')
 
-        # Set up confustion matrix style
+        cm_lst.append(["Error rate is {0:.2f}".format(
+            self._error_rate*100/(self.test_time*self.test_num))+'%'])
+        # Set up confustion matrix table style
         title = 'Cherry'
-        self.table_instance = AsciiTable(tuple(cm_lst), title)
+        self.confusion_table = AsciiTable(tuple(cm_lst), title)
         for i in range(1, len(info.classify)+1):
-            self.table_instance.justify_columns[i] = 'right'
+            self.confusion_table.justify_columns[i] = 'right'

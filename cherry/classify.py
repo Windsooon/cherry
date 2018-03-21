@@ -38,6 +38,9 @@ class Result:
     def get_word_list(self):
         return self.word_list
 
+    def _round(self, val):
+        return float(np.around(val, decimals=3))
+
     def _load_cache(self):
         cache_path = os.path.join(DATA_DIR, 'data/' + self.lan + '/cache/')
         try:
@@ -104,5 +107,6 @@ class Result:
         relative_lst = [(k, 2**(v-sorted_lst[0][1])) for k, v in sorted_lst]
         # [('gamble.dat', 0.76...), ('normal.dat', 0.23...)]
         percentage_lst = [
-            (k, v/sum(v for _, v in relative_lst)) for k, v in relative_lst]
+            (k, self._round(v/sum(v for _, v in relative_lst)))
+            for k, v in relative_lst]
         return percentage_lst
