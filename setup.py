@@ -6,7 +6,7 @@ https://github.com/pypa/sampleproject
 """
 
 # Always prefer setuptools over distutils
-from setuptools import setup, find_packages
+from setuptools import setup
 # To use a consistent encoding
 from codecs import open
 from os import path
@@ -19,8 +19,8 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='cherry',
-    version='0.2.2',
-    description='classify data set',
+    version='0.3.0',
+    description='classify data with native bayes',
     long_description=long_description,
     url='https://github.com/Sunkist-Cherry/cherry',
     author='Windson Yang',
@@ -34,16 +34,18 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
     keywords='data classify content filter',
     install_requires=[
         'jieba>=0.39',
-        'numpy>=1.13.3', 
+        'numpy>=1.13.3',
+        'terminaltables>=3.1.0',
         ],
-    packages=['classify'],
+    packages=['cherry'],
     package_data={
-        'classify': [
-        'all_data/Chinese/cache/*', 'all_data/Chinese/data/*.dat',
-        'all_data/Chinese/stop/*.dat'],
+        'cherry': [
+            'data/Chinese/cache/*', 'data/Chinese/*.dat',
+            'data/English/cache/*', 'data/English/*.dat']
     },
 )

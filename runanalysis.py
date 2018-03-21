@@ -1,10 +1,10 @@
 import cherry
 import argparse
 
-parser = argparse.ArgumentParser(description='Process some integers.')
+parser = argparse.ArgumentParser(description='Native bayes testing.')
 parser.add_argument(
     '-l', '--language', type=str, default='Chinese',
-    help='Which language\'s dataset we use to test')
+    help='Which language\'s dataset we will use')
 parser.add_argument(
     '-s', '--split', type=str, default=None,
     help='Split function to tokenizer data')
