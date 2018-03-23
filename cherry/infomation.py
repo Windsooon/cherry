@@ -1,5 +1,5 @@
 import os
-from .config import DATA_DIR
+from .config import DATA_DIR, LAN_DICT
 
 
 class Info:
@@ -31,15 +31,31 @@ class Info:
         '''
         data_list, classify = [], []
         file_dir_path = os.path.join(DATA_DIR, 'data/' + lan + '/data/')
-        # Data files should end with .dat
-        file_path = [
-            os.path.join(file_dir_path, f) for f in
-            os.listdir(file_dir_path) if f.endswith('.dat')]
-        for i in range(len(file_path)):
-            with open(file_path[i], encoding='utf-8') as f:
-                for data in f.readlines():
-                    data_list.append((i, data))
-                # Get file name
-                classify.append(
-                    os.path.basename(os.path.normpath(file_path[i])))
+        # Read data from files
+        dir = LAN_DICT[lan]['dir']
+        type = LAN_DICT[lan]['type']
+        if dir:
+            tem_lst = []
+            # classify = [spam, ham]
+            classify = os.listdir(file_dir_path)
+            # Gel files list
+            for k, v in enumerate(classify):
+                tem_lst.append(
+                    (k, [os.path.join(file_dir_path+v, f) for f in
+                     os.listdir(file_dir_path+v) if f.endswith(type)]))
+            for k, v in tem_lst:
+                for i in v:
+                    with open(i, encoding='utf-8') as f:
+                        data_list.append((k, f.read()))
+        else:
+            file_path = [
+                os.path.join(file_dir_path, f) for f in
+                os.listdir(file_dir_path) if f.endswith(type)]
+            for i in range(len(file_path)):
+                with open(file_path[i], encoding='utf-8') as f:
+                    for data in f.readlines():
+                        data_list.append((i, data))
+                    # Get file name
+                    classify.append(
+                        os.path.basename(os.path.normpath(file_path[i])))
         return data_list, classify

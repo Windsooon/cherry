@@ -92,7 +92,9 @@ class Result:
                 for k in left_array:
                     sub_array += max_array - k
                 return self._update_category(log_list), \
-                    list(zip(non_zero_word, sub_array))
+                    sorted(
+                        list(zip(non_zero_word, sub_array)),
+                        key=lambda x: x[1], reverse=True)
 
     def _update_category(self, lst):
         '''

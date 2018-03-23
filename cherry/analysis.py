@@ -12,6 +12,7 @@ from terminaltables import AsciiTable
 from .trainer import Trainer
 from .classify import Result
 from .infomation import Info
+from .config import LAN_DICT
 
 
 class Analysis:
@@ -19,8 +20,10 @@ class Analysis:
         self.lan = kwargs['lan']
         self.test_time = kwargs['test_time']
         self.test_num = kwargs['test_num']
-        self.split = kwargs['split']
         self.debug = kwargs['debug']
+        self.split = LAN_DICT[self.lan]['split']
+        self.dir = LAN_DICT[self.lan]['dir']
+        self.type = LAN_DICT[self.lan]['type']
         self._wrong_lst = []
         self._error_rate = 0
         self._start_analysis()
@@ -51,21 +54,26 @@ class Analysis:
         # Test begins
         for i in range(self.test_time):
             trainer = Trainer(
-                lan=self.lan, test_num=self.test_num, split=self.split)
+                lan=self.lan, test_num=self.test_num,
+                split=self.split, dir=self.dir, type=self.type)
             for k, data in enumerate(trainer.test_data):
-                r = Result(text=data[1], lan=self.lan, split=self.split)
+                r = Result(text=data[1], lan=self.lan)
                 cm_lst[data[0]+1][info.classify.index(
                     r.percentage[0][0])+1] += 1
                 if data[0] != info.classify.index(r.percentage[0][0]):
                     self._error_rate += 1
                     if self.debug:
                         print('*'*20)
-                        print(data)
-                        print('\n')
-                        print(r.percentage)
-                        print('\n')
-                        print(r.word_list)
-                        print('*'*20 + '\n')
+                        print(
+                            'real clasify is {0}'.
+                            format(info.classify[data[0]]))
+                        print('-'*20)
+                        print('data is {0}'.format(data[1]))
+                        print('-'*20)
+                        print('percentage is {0}'.format(r.percentage))
+                        print('-'*20)
+                        print('word_list is {0}'.format(r.word_list))
+                        print('-'*20)
 
         cm_lst.append(["Error rate is {0:.2f}".format(
             self._error_rate*100/(self.test_time*self.test_num))+'%'])

@@ -14,20 +14,20 @@ from .analysis import Analysis
 from .infomation import Info
 
 
-def classify(text, lan='Chinese', split=None):
-    return Result(text=text, lan=lan, split=split)
+def classify(text, lan='Chinese'):
+    return Result(text=text, lan=lan)
 
 
-def train(lan='Chinese', test_num=0, split=None):
-    return Trainer(lan=lan, test_num=test_num, split=split)
+def train(lan='Chinese', test_num=0):
+    return Trainer(lan=lan, test_num=test_num)
 
 
 def analysis(
         lan='Chinese', test_time=10,
-        test_num=60, split=None, debug=False):
+        test_num=60, debug=False):
     return Analysis(
         lan=lan, test_time=test_time,
-        test_num=test_num, split=split, debug=debug)
+        test_num=test_num, debug=debug)
 
 
 def info(lan='Chinese'):

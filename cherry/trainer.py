@@ -12,7 +12,7 @@ import os
 import random
 import pickle
 import numpy as np
-from .config import DATA_DIR
+from .config import DATA_DIR, LAN_DICT
 from .tokenizer import Token
 from .infomation import Info
 from .exceptions import TestDataNumError
@@ -21,9 +21,12 @@ from .exceptions import TestDataNumError
 class Trainer:
     def __init__(self, **kwargs):
         self.lan = kwargs['lan']
-        self.split = kwargs['split']
+        self.split = LAN_DICT[self.lan]['split']
+        self.dir = LAN_DICT[self.lan]['dir']
+        self.type = LAN_DICT[self.lan]['type']
         # Get all data from data directory
-        self.data_list, self.CLASSIFY = Info.read_files(lan=self.lan)
+        self.data_list, self.CLASSIFY = Info.read_files(
+                lan=self.lan)
         self.data_len = len(self.data_list)
         self._test_num = kwargs['test_num']
         # Split data to train_data and test_data by test num

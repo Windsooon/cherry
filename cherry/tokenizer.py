@@ -9,8 +9,7 @@ This module implements text tokenizer.
 """
 
 import os
-import jieba
-from .config import DATA_DIR
+from .config import DATA_DIR, LAN_DICT
 from .exceptions import LanguageNotFoundError
 
 
@@ -22,17 +21,8 @@ class Token:
         self.lan = kwargs['lan']
         # Get stop word in lan directory
         self.stop_word = self._get_stop_word()
-        if kwargs['split']:
-            self.tokenizer = list(
-                kwargs['split'](kwargs['text']))
-        else:
-            self.tokenizer = self._get_tokenizer(kwargs['text'], kwargs['lan'])
-
-    def _get_tokenizer(self, text, lan):
-        if lan == 'Chinese':
-            return [
-                t for t in jieba.cut(text) if len(t) > 1
-                and t not in self.stop_word]
+        split_fun = LAN_DICT[self.lan]['split']
+        self.tokenizer = split_fun(kwargs['text'], self.stop_word)
 
     def _get_stop_word(self):
         '''
