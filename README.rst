@@ -17,52 +17,84 @@ cherry
 :Download: https://pypi.python.org/pypi/cherry/
 :Source: https://github.com/Sunkist-Cherry/cherry
 :Support: >=Python3.3
-:Keywords: spam, filter, classify, native, bayes
+:Keywords: native, bayes, classify
 
 .. _`中文版本`:
 
-这个项目目的是使用机器学习／人工智能进行数据分类。
+cherry使用贝叶斯模型算法对文本进行多元分类（目前支持中英文），并提供混淆矩阵用作数据分析
 
 特点
 ------
 
-- 内置预训练模型缓存，开箱即用。使用numpy库做矩阵计算，判断速度极快
+- 内置预训练模型缓存，开箱即用。使用numpy库做矩阵计算，判断速度极快。
 
-- 准确率高，例子一使用1000个训练数据，多元分类下准确率达到96%，二元分类下准确率达到98%。
+- 准确率高，例子使用1000个训练数据，多元分类下准确率达到96%，二元分类下准确率达到98%。
 
-- 容易定制，只需要把需要分类的数据放在不同的文件用作训练，就能得到目标分类器，支持自定义以及分词算法
+- 容易定制，只需要把需要分类的数据放在不同的文件用作训练，就能得到目标分类器，支持自定义以及分词算法。
 
-- 增加了混淆矩阵，以及错误数据分类输出模式，可以根据被错误分类的结果来调整分类数据
+- 新增测试功能，能够获取测试后的混淆矩阵，以及被错误分类的结果。
 
-通过pip安装：
----------------
+安装
+--------
 
 .. code-block:: bash
 
    pip install cherry
 
-基本使用:
+基本使用
 ------------
 
 .. code-block:: python
 
     >>> import cherry
-    >>> result = cherry.classify('理查德费曼')
+    >>> result = cherry.classify('她们对计算机很有热情，也希望学习到数据分析，网络爬虫，人工智能等方面的知识，从而运用在她们工作上')
     Building prefix dict from the default dictionary ...
     Loading model from cache /var/folders/md/0251yy51045d6nknpkbn6dc80000gn/T/jieba.cache
-    Loading model cost 1.172 seconds.
+    Loading model cost 0.899 seconds.
     Prefix dict has been built succesfully.
-    >>> r.percentage
-    >>> r.word_list
+    >>> result.percentage
+    [('normal.dat', 0.837), ('politics.dat', 0.108), ('gamble.dat', 0.053), ('sex.dat', 0.002)]
+    >>> result.word_list
+    [('工作', 7.0784042046861373), ('学习', 4.2613376272953198), ('方面', 3.795076414904381), ('希望', 2.1552995125795613), ('人工智能', 1.1353997980863895), ('网络', 0.41148095885968772), ('从而', 0.27235358073104443), ('数据分析', 0.036787509418279463), ('热情', 0.036787509418278574), ('她们', -4.660672209426675)]
 
-我们使用了 `jieba`_ 进行分词，上面的1.172秒是分词的时间（感谢fxsjy维护如此优秀的中文分词库）。结果返回的是一个Result对象，Result对象的percentage属性显示了对应数据每个类别的概率，word_list属性显示的是句子的有效部分（这里的有效部分根据分词函数来划分，中文的话，结巴分词结果中长度大于1，不在stop_word列表中，并且在其他训练数据中出现过这个词）的对划分类别的影响程度。在上面的例子中。
+默认情况下使用 `jieba`_ 分词，上面的0.899秒是它载入模型的时间（感谢fxsjy维护如此优秀的中文分词库）。结果返回的是一个Result对象，Result的percentage属性显示了对应数据每个类别的概率，
+
+.. code-block:: bash
+
+    [('normal.dat', 0.837), ('politics.dat', 0.108), ('gamble.dat', 0.053), ('sex.dat', 0.002)]
+    
+Result的word_list属性显示的是句子的有效部分（这里的有效部分**根据分词函数划分**，默认情况下，要求在结巴分词结果中长度大于1，不在stop_word列表中，并且在其他训练数据中出现过这个词）对划分类别的影响程度。
+    
+.. code-block:: bash
+
+    [('工作', 7.0784042046861373), ('学习', 4.2613376272953198), ('方面', 3.795076414904381), ('希望', 2.1552995125795613), ('人工智能', 1.1353997980863895), ('网络', 0.41148095885968772), ('从而', 0.27235358073104443), ('数据分析', 0.036787509418279463), ('热情', 0.036787509418278574), ('她们', -4.660672209426675)]
+
+在上面的例子中。句子被正确分类成正常类别。影响度最大的词语分别是“工作”，“学习”，“方面”
+
 
 .. _`jieba`: https://github.com/fxsjy/jieba
+
+定制
+-------
+
+默认支持中英文分类，如果需要支持其他语言，可以修改config.py中的LAN_DICT，每个语言接受3个参数，
+
+- dir
+
+  + 数据是否单独存放在一个文件中（参加英文数据/data/English/data/）还是存放在同一个文件（参照中文数据/data/Chinese/data/）
+
+- type
+
+  + 数据文件后缀，例如.dat，.txt。
+
+- split
+
+  + 分词函数，需要返回一个列表，包含分词后的每个词语，并添加在config文件中。
 
 测试
 -------
 
-  由于测试数据包含敏感内容，如果用户想进行测试，可以下载 `test_data`_ 然后放在'data/Chinese/data/'文件夹下面。
+  由于测试数据包含敏感内容，如果用户想进行测试，可以下载 `test_data`_ 然后放在'data/[LANGUAGE]/data/'文件夹下面。
   
 .. _`test_data`: https://drive.google.com/file/d/1eP_dWZnmjBrYcmCoPETSRzmmqCHBGUfZ/view?usp=sharing
   
@@ -72,8 +104,7 @@ git clone仓库之后运行
 
   >>> python runanalysis.py -h
 
-  usage: runanalysis.py [-h] [-l LANGUAGE] [-s SPLIT] [-t TEST_TIME] [-n NUM]
-                      [-d]
+  usage: runanalysis.py [-h] [-l LANGUAGE] [-t TEST_TIME] [-n NUM] [-d]
 
     Native bayes testing.
 
@@ -81,14 +112,12 @@ git clone仓库之后运行
       -h, --help            show this help message and exit
       -l LANGUAGE, --language LANGUAGE
                             Which language's dataset we will use
-      -s SPLIT, --split SPLIT
-                            Split function to tokenizer data
       -t TEST_TIME, --test_time TEST_TIME
                             How many times we split data for testing
       -n NUM, --num NUM     How many test data we need every time
       -d                    Show wrong classified data
 
-runanalysis是测试脚本，默认从数据中随机选取60个数据做为测试数据，剩下的数据用作训练数据。如果你需要进行10次训练和测试（大约需要2分钟），运行： 
+runanalysis.py是测试脚本，默认从数据中随机选取60个数据做为测试数据，剩下的数据用作训练数据。重复10次：
 
 .. code-block:: bash
 
@@ -104,18 +133,19 @@ runanalysis是测试脚本，默认从数据中随机选取60个数据做为测�
   | Error rate is 4.00% |            |         |            |              |
   +---------------------+------------+---------+------------+--------------+
 
-得到混淆矩阵以及准确率，如上图。混淆矩阵可以了解哪些数据被错误分类了，如上图，大部分被错误分类的都是正常的数据，可以看到查准率非常高(118+2)/120=98%，不过查全率较低118/(3+8+11+118)=84%
+得到混淆矩阵以及准确率，如上图。混淆矩阵可以了解哪些数据被错误分类了，如上图，大部分被错误分类的都是正常的数据。如果把正常类别看成阳性，可以看到
 
-.. code-block:: python
+查准率(precision)为
 
-    percentage_list, word_list = test_bayes.bayes_classify(
-        '美联储当天结束货币政策例会后发表声明说，
-        自2017年12月以来，美国就业市场和经济活动继续保持稳健增长，
-        失业率继续维持在低水平。')
-    result = sorted(
-        percentage_list, key=lambda x: x[1], reverse=True)[0][0]
+.. math::
 
-第二个列表包含了输入句子中所有被分词的词语对应最高概率分类的概率，在这个例子里，这个列表中包含的是每个词语对句子被判断为normal.dat的影响度，可以看到，经济，美国，维持这三个词语的值最大，对句子的影响也最大。
+    (118+2) / 120= 0.98
+
+查全率(recall)
+
+.. math::
+
+    118 / (3+8+11+118)= 0.84
 
 注意事项
 --------
