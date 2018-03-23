@@ -6,10 +6,7 @@ parser.add_argument(
     '-l', '--language', type=str, default='Chinese',
     help='Which language\'s dataset we will use')
 parser.add_argument(
-    '-s', '--split', type=str, default=None,
-    help='Split function to tokenizer data')
-parser.add_argument(
-    '-t', '--test_time', type=int, default=5,
+    '-t', '--test_time', type=int, default=10,
     help='How many times we split data for testing')
 parser.add_argument(
     '-n', '--num', type=int, default=60,
@@ -24,7 +21,7 @@ def main():
     print('This may takes some time, Go get a coffee :D.')
     a = cherry.analysis(
         lan=args.language, test_time=args.test_time,
-        test_num=args.num, split=args.split, debug=args.debug)
+        test_num=args.num, debug=args.debug)
     print(a.ctable)
 
 
