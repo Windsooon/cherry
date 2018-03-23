@@ -100,7 +100,6 @@ ENV/
 # mypy
 .mypy_cache/
 *.DS_Store
-*.cache
 gamble.dat
 normal.dat
 sex.dat
