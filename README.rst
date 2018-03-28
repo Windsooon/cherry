@@ -1,8 +1,7 @@
 cherry
 =======================
 .. image:: https://api.travis-ci.org/Sunkist-Cherry/cherry.png?branch=master
-    :target: https://travis-ci.org/repositories/Sunkist-Cherry/cherry
-
+    :targetWe use nltk
 .. image:: https://img.shields.io/pypi/v/cherry.svg
     :target: https://pypi.python.org/pypi/cherry
 
@@ -20,6 +19,7 @@ cherry
 :Keywords: native, bayes, classify
 
 .. _`中文版本`:
+.. _`English Version`:
 
 cherry使用贝叶斯模型算法对文本进行分类（目前支持中英文），并提供混淆矩阵用作数据分析（本项目由 `伏宸安全实验室`_ 开发），项目原理以及分析请浏览 `贝叶斯分类器`_ 。
 
@@ -177,13 +177,13 @@ runanalysis.py是测试脚本，默认从中文数据中随机选取60个数据�
 
 得到混淆矩阵以及准确率，如上图。混淆矩阵可以了解哪些数据被错误分类了，如上图，大部分被错误分类的都是正常的数据。如果把正常类别看成阳性，可以看到
 
-查准率(precision)为
+查准率(precision)：
 
 .. math::
 
-    (118+2) / 120= 98%
+    118 / (118 + 2) = 98%
 
-查全率(recall)
+查全率(recall)：
 
 .. math::
 
@@ -198,3 +198,150 @@ runanalysis.py是测试脚本，默认从中文数据中随机选取60个数据�
 
 - 增加Adaboost算法
 
+.. _`English Version`:
+
+cherry uses Bayesian model algorithm to classify text (currently supports Chinese and English) and provides confusion matrix for data analysis (this project was developed by `future-sec Lab`_ ), 
+
+Features
+-----------
+
+- Built-in pre-training model cache. Using the numpy library for matrix calculations so it is extremely fast.
+
+- High accuracy, Example 1 uses 1000 training data. The accuracy rate reaches 98%.
+
+- Easy to customize, just put the data in different files for training, you get the target classifier, custom word segmentation algorithm also support.
+
+- Added testing capabilities to obtain post-test confusion matrix and misclassified results.
+
+Install
+--------
+
+.. code-block:: bash
+
+   pip install cherry
+
+Quick start
+------------
+
+.. code-block:: python
+
+    >>> result = cherry.classify(lan='English', text='Richard Phillips Feynman was an American theoretical physicist known for his work in the path integral formulation of quantum mechanics, the theory of quantum electrodynamics, and the physics of the superfluidity of supercooled liquid helium, as well as in particle physics for which he proposed the parton model.')
+    >>> result.percentage
+    [('ham', 0.808), ('spam', 0.192)]
+    >>> result.word_list
+    [('path', 4.2232105330703087), ('proposed', 1.2109489575651065), ('well', 0.90264759791059124), ('work', 0.7629242350381471), ('theory', 0.51780177700516106), ('model', -0.041814010930261603), ('liquid', -0.58081051166294806), ('mechanics', -0.58081051166294806), ('particle', -0.98627561977111178), ('helium', -1.2739576922228935), ('known', -2.0848879084392227)]
+
+We get a result object，result's percentage show different categories of probabilities. we can see that the text has 80.8% will be **ham** and 19.2% will be **spam**. the categories depend on the dataset in data categories.
+
+.. code-block:: bash
+
+    [('ham', 0.808), ('spam', 0.192)]
+     
+We use nltk.tokenize for text segmentation, result's word_list shows most informative words. In this example, **path**, **proposed**, **well** has most weight on **ham** category.
+    
+.. code-block:: bash
+
+    [('path', 4.2232105330703087), ('proposed', 1.2109489575651065), ('well', 0.90264759791059124), ('work', 0.7629242350381471), ('theory', 0.51780177700516106), ('model', -0.041814010930261603), ('liquid', -0.58081051166294806), ('mechanics', -0.58081051166294806), ('particle', -0.98627561977111178), ('helium', -1.2739576922228935), ('known', -2.0848879084392227)]
+
+Custome
+-------
+
+cherry support Chinese and English by default, if you need to support other languages, you can refer **LAN_DICT** in **config.py**, each language accepts 3 parameters,
+
+- dir
+
+  + Whether the dataset are stored in a separate file (English: data /data/English/data/) or in the same file (Chinese: data/data/Chinese/data/)
+    
+.. code-block:: bash
+
+    .
+    ├── Chinese
+    │   ├── cache
+    │   │   ├── classify.cache
+    │   │   ├── vector.cache
+    │   │   └── vocab_list.cache
+    │   ├── data
+    │   │   ├── gamble.dat
+    │   │   ├── normal.dat
+    │   │   ├── politics.dat
+    │   │   └── sex.dat
+    │   └── stop_word.dat
+    └── English
+        ├── cache
+        │   ├── classify.cache
+        │   ├── vector.cache
+        │   └── vocab_list.cache
+        ├── data
+        │   ├── ham
+        │   │   ├── 0001.1999-12-10.farmer.ham.txt
+        │   │   ├── 0002.1999-12-13.farmer.ham.txt
+        │   ├── spam
+        │   │   ├── 0003.1999-12-10.farmer.ham.txt
+        │   │   ├── 0004.1999-12-13.farmer.ham.txt
+
+- type
+
+  + data type，for instance, .dat，.txt。
+
+- split
+
+  + text segmentation function，should return a list contains every valid word.
+
+Testing
+---------
+
+  First, download `test_data`_ , and put them into the correct path.
+  
+.. _`test_data`: https://drive.google.com/file/d/1OtbY7RCjkoQWYb0fHIOTBcJfgDlW5Tjz/view?usp=sharing
+  
+after git clone the repo, run
+
+.. code-block:: bash
+
+  >>> python runanalysis.py -h
+
+  usage: runanalysis.py [-h] [-l LANGUAGE] [-t TEST_TIME] [-n NUM] [-d]
+
+    Native bayes testing.
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -l LANGUAGE, --language LANGUAGE
+                            Which language's dataset we will use
+      -t TEST_TIME, --test_time TEST_TIME
+                            How many times we split data for testing
+      -n NUM, --num NUM     How many test data we need every time
+      -d                    Show wrong classified data
+
+By default, runanalysis.py choose 60 data from dataset randomly for testing, the others use for training. Repeat 10 times.
+
+.. code-block:: bash
+
+    >>> python runanalysis.py -l English
+
+    +Cherry---------------+------+-----+
+    | Confusion matrix    | spam | ham |
+    +---------------------+------+-----+
+    | (Real)spam          |  269 |  22 |
+    | (Real)ham           |    3 | 306 |
+    | Error rate is 4.17% |      |     |
+    +---------------------+------+-----+
+
+The terminal print confusion matrix and error rate as above.
+
+- Precision
+
+.. math::
+
+    269 / (269 + 3) = 98.9%
+
+- Recall
+
+.. math::
+
+    269 / (269 + 22)= 92.4%
+
+Future
+--------
+
+- add Adaboost algorithm
