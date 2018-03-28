@@ -45,14 +45,14 @@ class Info:
                      os.listdir(file_dir_path+v) if f.endswith(type)]))
             for k, v in tem_lst:
                 for i in v:
-                    with open(i, encoding='utf-8') as f:
+                    with open(i, encoding='utf-8', errors='ignore') as f:
                         data_list.append((k, f.read()))
         else:
             file_path = [
                 os.path.join(file_dir_path, f) for f in
                 os.listdir(file_dir_path) if f.endswith(type)]
             for i in range(len(file_path)):
-                with open(file_path[i], encoding='utf-8') as f:
+                with open(file_path[i], encoding='utf-8', errors='ignore') as f:
                     for data in f.readlines():
                         data_list.append((i, data))
                     # Get file name
