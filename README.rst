@@ -189,6 +189,16 @@ runanalysis.py是测试脚本，默认从中文数据中随机选取60个数据�
 
     118 / (3+8+11+118)= 84%
 
+如果需要计算AUC的话，可以加上-p
+
+.. code-block:: bash
+
+  >>> python runanalysis.py -t 10 -p
+ 
+目录下会得到auc.png
+
+.. image:: https://raw.githubusercontent.com/EngineGirl/enginegirl.github.io/master/images/bayes/auc.png
+
 注意事项
 --------
 - 输入句子需转换成简体中文
@@ -340,6 +350,16 @@ The terminal print confusion matrix and error rate as above.
 .. math::
 
     269 / (269 + 22)= 92.4%
+
+If you want to calculate AUC, you can use -p
+
+.. code-block:: bash
+
+  >>> python runanalysis.py -t 10 -p
+ 
+you can find auc.png in the directory
+
+.. image:: https://raw.githubusercontent.com/EngineGirl/enginegirl.github.io/master/images/bayes/auc.png
 
 Future
 --------
