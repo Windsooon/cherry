@@ -1,7 +1,7 @@
 cherry
 =======================
 .. image:: https://api.travis-ci.org/Sunkist-Cherry/cherry.png?branch=master
-    :targetWe use nltk
+    :target https://travis-ci.org/Sunkist-Cherry/cherry
 .. image:: https://img.shields.io/pypi/v/cherry.svg
     :target: https://pypi.python.org/pypi/cherry
 
@@ -18,8 +18,8 @@ cherry
 :Support: >=Python3.3
 :Keywords: native, bayes, classify
 
-.. _`中文版本`:
-.. _`English Version`:
+中文版本
+----------
 
 cherry使用贝叶斯模型算法对文本进行分类（目前支持中英文），并提供混淆矩阵用作数据分析（本项目由 `伏宸安全实验室`_ 开发），项目原理以及分析请浏览 `贝叶斯分类器`_ 。
 
@@ -208,9 +208,12 @@ runanalysis.py是测试脚本，默认从中文数据中随机选取60个数据�
 
 - 增加Adaboost算法
 
-.. _`English Version`:
+English Version
+------------------
 
-cherry uses Bayesian model algorithm to classify text (currently supports Chinese and English) and provides confusion matrix for data analysis (this project was developed by `future-sec Lab`_ ), 
+cherry uses Bayesian model algorithm to classify text (currently supports Chinese and English) and provides confusion matrix for data analysis (this project was developed by `future-sec Lab`_ ).
+
+.. _`future-sec Lab`: http://future-sec.com/
 
 Features
 -----------
