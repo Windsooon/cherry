@@ -1,7 +1,8 @@
 cherry
 =======================
-.. image:: https://api.travis-ci.org/Sunkist-Cherry/cherry.png?branch=master
-    :target https://travis-ci.org/Sunkist-Cherry/cherry
+.. image:: https://travis-ci.org/Sunkist-Cherry/cherry.svg?branch=master
+    :target: https://travis-ci.org/Sunkist-Cherry/cherry
+
 .. image:: https://img.shields.io/pypi/v/cherry.svg
     :target: https://pypi.python.org/pypi/cherry
 
