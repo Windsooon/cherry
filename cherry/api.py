@@ -24,10 +24,8 @@ def train(lan='Chinese', test_num=0):
 
 def analysis(
         lan='Chinese', test_time=10,
-        test_num=60, debug=False):
-    return Analysis(
-        lan=lan, test_time=test_time,
-        test_num=test_num, debug=debug)
+        test_num=60, debug=False, positive=None):
+    return Analysis(lan, test_time, test_num, debug, positive)
 
 
 def info(lan='Chinese'):

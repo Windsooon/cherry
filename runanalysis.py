@@ -12,6 +12,9 @@ parser.add_argument(
     '-n', '--num', type=int, default=60,
     help='How many test data we need every time')
 parser.add_argument(
+    '-p', dest='positive', const=True, action='store_const',
+    help='Show ROC curve or not')
+parser.add_argument(
     '-d', dest='debug', const=True, action='store_const',
     help='Show wrong classified data')
 args = parser.parse_args()
@@ -21,7 +24,7 @@ def main():
     print('This may takes some time, Go get a coffee :D.')
     a = cherry.analysis(
         lan=args.language, test_time=args.test_time,
-        test_num=args.num, debug=args.debug)
+        test_num=args.num, debug=args.debug, positive=args.positive)
     print(a.ctable)
 
 
