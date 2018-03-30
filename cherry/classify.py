@@ -44,8 +44,8 @@ class Result:
     def _load_cache(self):
         cache_path = os.path.join(DATA_DIR, 'data/' + self.lan + '/cache/')
         try:
-            with open(cache_path + 'vocab_list.cache', 'rb') as f:
-                self._vocab_list = pickle.load(f)
+            with open(cache_path + 'vocab_dict.cache', 'rb') as f:
+                self._vocab_dict = pickle.load(f)
             with open(cache_path + 'vector.cache', 'rb') as f:
                 self._ps_vector = pickle.load(f)
             with open(cache_path + 'classify.cache', 'rb') as f:
@@ -60,10 +60,14 @@ class Result:
         '''
         Convert input data to word_vector
         '''
-        self.word_vec = [0]*len(self._vocab_list)
+        self.word_vec = np.zeros(len(self._vocab_dict))
+        self.word_index, self.non_zero_word = [], []
         for i in self.token.tokenizer:
-            if i in self._vocab_list:
-                self.word_vec[self._vocab_list.index(i)] += 1
+            if i in self._vocab_dict:
+                if i not in self.non_zero_word:
+                    self.non_zero_word.append(i)
+                    self.word_index.append(self._vocab_dict[i])
+                self.word_vec[self._vocab_dict[i]] += 1
 
     def _bayes_classify(self):
         '''
@@ -76,10 +80,8 @@ class Result:
             # final_vector: [0, -7.3, 0, 0, -8, ...]
             final_vector = i[0] * self.word_vec
             # Get most distance non zero word list
-            word_index = np.nonzero(final_vector)
-            non_zero_word = np.array(self._vocab_list)[word_index]
             # non_zero_vector: [-7.3, -8]
-            non_zero_vector = final_vector[word_index]
+            non_zero_vector = final_vector[np.array(self.word_index)]
             possibility_vector.append(non_zero_vector)
             log_list.append(sum(final_vector) + i[1])
         possibility_array = np.array(possibility_vector)
@@ -93,7 +95,7 @@ class Result:
                     sub_array += max_array - k
                 return self._update_category(log_list), \
                     sorted(
-                        list(zip(non_zero_word, sub_array)),
+                        list(zip(self.non_zero_word, sub_array)),
                         key=lambda x: x[1], reverse=True)
 
     def _update_category(self, lst):

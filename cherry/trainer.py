@@ -29,6 +29,7 @@ class Trainer:
                 lan=self.lan)
         self.data_len = len(self.data_list)
         self._test_num = kwargs['test_num']
+        self._vocab_set = set()
         # Split data to train_data and test_data by test num
         self._split_data()
         self._get_vocab_list()
@@ -37,8 +38,8 @@ class Trainer:
         self._write_cache()
 
     @property
-    def vocab_list(self):
-        return self._vocab_list
+    def vocab_set(self):
+        return self._vocab_set
 
     @property
     def test_data_classify(self):
@@ -73,11 +74,11 @@ class Trainer:
         '''
         Split data into test data and train data randomly.
 
-        self.test_data:
+        self._test_data:
             [
                 (0, "What a lovely day"),
             ]
-        self.train_data:
+        self._train_data:
             [
                 (1, "I like gambling"),
                 (0, "I love my dog sunkist")
@@ -96,17 +97,15 @@ class Trainer:
         '''
         Get a list contain all unique non stop words belongs to train_data
         Set up:
-        self.vocab_list:
-            [
-                'What', 'lovely', 'day',
-                'like', 'gamble', 'love', 'dog', 'sunkist'
-            ]
+        self._vocab_dict:
+            {
+                'What': 0,  'lovely': 1, 'day': 2...
+            }
         '''
-        vocab_set = set()
         all_train_data = ''.join([v for _, v in self._train_data])
         token = Token(text=all_train_data, lan=self.lan, split=self.split)
-        vocab_set = vocab_set | set(token.tokenizer)
-        self._vocab_list = list(vocab_set)
+        self._vocab_set = self._vocab_set | set(token.tokenizer)
+        self._vocab_dict = {v: k for k, v in enumerate(self._vocab_set)}
 
     def _get_vocab_matrix(self):
         '''
@@ -114,11 +113,11 @@ class Trainer:
         '''
         array_list = []
         for k, data in self._train_data:
-            return_vec = np.zeros(len(self._vocab_list))
+            return_vec = np.zeros(len(self._vocab_set))
             token = Token(text=data, lan=self.lan, split=self.split)
             for i in token.tokenizer:
-                if i in self._vocab_list:
-                    return_vec[self._vocab_list.index(i)] += 1
+                if i in self._vocab_dict:
+                    return_vec[self._vocab_dict[i]] += 1
             array_list.append(return_vec)
         self._matrix_lst = array_list
 
@@ -141,8 +140,8 @@ class Trainer:
 
     def _write_cache(self):
         cache_path = os.path.join(DATA_DIR, 'data/' + self.lan + '/cache/')
-        with open(cache_path + 'vocab_list.cache', 'wb') as f:
-            pickle.dump(self._vocab_list, f)
+        with open(cache_path + 'vocab_dict.cache', 'wb') as f:
+            pickle.dump(self._vocab_dict, f)
         with open(cache_path + 'vector.cache', 'wb') as f:
             pickle.dump(self._ps_vector, f)
         with open(cache_path + 'classify.cache', 'wb') as f:
