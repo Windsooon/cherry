@@ -239,6 +239,11 @@ Quick start
 
 .. code-block:: python
 
+    # We use nltk for word segmentation
+    >>> import nltk
+    >>> nltk.download('punkt')
+    [nltk_data] Downloading package punkt to /Users/windson/nltk_data...
+
     >>> result = cherry.classify(lan='English', text='Richard Phillips Feynman was an American theoretical physicist known for his work in the path integral formulation of quantum mechanics, the theory of quantum electrodynamics, and the physics of the superfluidity of supercooled liquid helium, as well as in particle physics for which he proposed the parton model.')
     >>> result.percentage
     [('ham', 0.808), ('spam', 0.192)]
