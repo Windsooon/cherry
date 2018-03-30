@@ -32,4 +32,4 @@ class TrainerTest(unittest.TestCase):
     def test_empty_vocab_list(self, mock_cut):
         trainer = Trainer(test_num=1, lan='Chinese', split=None)
         self.assertEqual(
-            trainer.vocab_list, [])
+            trainer.vocab_set, set())
