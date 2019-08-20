@@ -104,3 +104,7 @@ gamble.dat
 normal.dat
 sex.dat
 politics.dat
+*.cache
+*.dat
+*.txt
+*.png
