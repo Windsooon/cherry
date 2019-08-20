@@ -19,7 +19,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='cherry',
-    version='0.3.2',
+    version='0.4.0',
     description='classify data with native bayes',
     long_description=long_description,
     url='https://github.com/Sunkist-Cherry/cherry',
