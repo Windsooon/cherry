@@ -9,16 +9,14 @@ This module implements the cherry Trainer.
 """
 
 import os
-import cPickle
-import sklearn
-import panda as pd
-
-from .config import DATA_DIR, STOP_WORDS, TOKENIZER
+import pickle
+import pandas as pd
+from sklearn.naive_bayes import MultinomialNB
+from .config import DATA_DIR, STOP_WORDS, TOKENIZER, VECTORIZER
 
 
 class Trainer:
     def __init__(self, **kwargs):
-        self._write_cache()
         self._read_data()
         self.train()
         self._write_cache()
@@ -27,12 +25,11 @@ class Trainer:
         '''
         Train bayes model with input data
         '''
-        vectorizer = sklearn.feature_extraction.text.CountVectorizer(
-            tokenizer=TOKENIZER,
-            stop_words=STOP_WORDS)
-        training_data = vectorizer.fit_transform(self.x_data)
-        naive_bayes = MultinomialNB()
-        naive_bayes.fit(self.x_data, self.y_data)
+        self.ve = VECTORIZER.fit(self.x_data)
+        breakpoint()
+        training_data = self.ve.transform(self.x_data)
+        self.bayes = MultinomialNB()
+        self.bayes.fit(training_data, self.y_data)
 
     def _read_data(self):
         '''
@@ -47,6 +44,9 @@ class Trainer:
         '''
         Write cache file under DATA_DIR
         '''
-        cache_path = os.path.join(DATA_DIR, '/bayes.pkl')
+        cache_path = os.path.join(DATA_DIR, 'train.pkl')
         with open(cache_path, 'wb') as f:
-            cPickle.dump(naive_bayes, f)
+            pickle.dump(self.bayes, f)
+        cache_path = os.path.join(DATA_DIR, 've.pkl')
+        with open(cache_path, 'wb') as f:
+            pickle.dump(self.ve, f)
