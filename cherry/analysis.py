@@ -4,16 +4,15 @@
 cherry.analysis
 ~~~~~~~~~~~~
 This module implements the cherry Analysis.
-:copyright: (c) 2018 by Windson Yang
+:copyright: (c) 2018-2019 by Windson Yang
 :license: MIT License, see LICENSE for more details.
 """
 
 import matplotlib.pyplot as plt
 from terminaltables import AsciiTable
 from .trainer import Trainer
-from .classify import Result
+from .classify import Classify
 from .infomation import Info
-from .config import LAN_DICT, POSITIVE
 
 
 class Analysis:

@@ -1,5 +1,5 @@
 import os
-from .config import DATA_DIR, LAN_DICT
+from .config import DATA_DIR
 
 
 class Info:

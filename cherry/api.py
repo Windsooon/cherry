@@ -4,29 +4,38 @@
 cherry.api
 ~~~~~~~~~~~~
 This module implements the cherry API.
-:copyright: (c) 2018 by Windson Yang
+:copyright: (c) 2018-2019 by Windson Yang
 :license: MIT License, see LICENSE for more details.
 """
 
 from .trainer import Trainer
-from .classify import Result
+from .classify import Classify
 from .analysis import Analysis
 from .infomation import Info
 
 
-def classify(text, lan='Chinese'):
-    return Result(text=text, lan=lan)
+def classify(text):
+    '''
+    return a Result object which contains *percentage* and *word_list*
 
+    input: text (string): the text to be classified
+    output: result (Result object)
+    '''
+    return Classify(text=text)
 
-def train(lan='Chinese', test_num=0):
-    return Trainer(lan=lan, test_num=test_num)
+def train():
+    '''
+    Train the data inthe data dir with stop_word and split function
 
+    input: stop_word (list) list of stop word (string)
+           split (function) the function use to tokenizer the text in the data
+    output: None
 
-def analysis(
-        lan='Chinese', test_time=10,
-        test_num=60, debug=False, positive=None):
-    return Analysis(lan, test_time, test_num, debug, positive)
+    '''
+    return Trainer()
 
-
-def info(lan='Chinese'):
-    return Info(lan=lan)
+def analysis():
+    '''
+    Use k-fold cross validation t calculate precision, recall, F1 score and ROC canvas.
+    '''
+    return Analysis()
