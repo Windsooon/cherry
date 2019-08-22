@@ -15,7 +15,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 def _stop_word(dir):
     '''
-    Stop word should store in the stop_words.dat file
+    Stop word located in the stop_words.dat file
     '''
     try:
         stop_word_path = os.path.join(dir, 'stop_words.dat')
@@ -26,9 +26,17 @@ def _stop_word(dir):
         raise StopWordsNotFoundError(error)
     return stop_word
 
-
 def _tokenizer(text):
+    '''
+    You can change the tokenizer function here
+    '''
     return jieba.cut(text)
+
+def _vectorizer(vocabulary=None):
+    return CountVectorizer(
+            tokenizer=TOKENIZER,
+            stop_words=STOP_WORDS,
+            vocabulary=vocabulary)
 
 # Base Dir
 CHERRY_DIR = os.path.join(
@@ -42,7 +50,3 @@ STOP_WORDS = _stop_word(DATA_DIR)
 
 # tokenizer function
 TOKENIZER = _tokenizer
-
-VECTORIZER = CountVectorizer(
-            tokenizer=TOKENIZER,
-            stop_words=STOP_WORDS)

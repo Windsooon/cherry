@@ -12,7 +12,7 @@ import os
 import pickle
 import pandas as pd
 from sklearn.naive_bayes import MultinomialNB
-from .config import DATA_DIR, STOP_WORDS, TOKENIZER, VECTORIZER
+from .config import DATA_DIR, STOP_WORDS, TOKENIZER, _vectorizer
 
 
 class Trainer:
@@ -25,9 +25,9 @@ class Trainer:
         '''
         Train bayes model with input data
         '''
-        self.ve = VECTORIZER.fit(self.x_data)
-        breakpoint()
-        training_data = self.ve.transform(self.x_data)
+        self.vector = _vectorizer()
+        self.vector.fit(self.x_data)
+        training_data = self.vector.transform(self.x_data)
         self.bayes = MultinomialNB()
         self.bayes.fit(training_data, self.y_data)
 
@@ -35,7 +35,6 @@ class Trainer:
         '''
         Read data from data file inside DATA_DIR
         '''
-        # df = pd.read_csv(os.path.join(DATA_DIR, 'data.csv'), skipinitialspace=True)
         df = pd.read_csv(os.path.join(DATA_DIR, 'data.csv'))
         self.x_data = df['text']
         self.y_data = df['label']
@@ -44,9 +43,9 @@ class Trainer:
         '''
         Write cache file under DATA_DIR
         '''
-        cache_path = os.path.join(DATA_DIR, 'train.pkl')
+        cache_path = os.path.join(DATA_DIR, 'trained.pkl')
         with open(cache_path, 'wb') as f:
             pickle.dump(self.bayes, f)
         cache_path = os.path.join(DATA_DIR, 've.pkl')
         with open(cache_path, 'wb') as f:
-            pickle.dump(self.ve, f)
+            pickle.dump(self.vector.vocabulary_, f)

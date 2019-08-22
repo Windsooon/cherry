@@ -11,9 +11,7 @@ This module implements the cherry classify.
 
 import os
 import pickle
-from operator import itemgetter
-import numpy as np
-from .config import DATA_DIR, VECTORIZER
+from .config import DATA_DIR, _vectorizer
 from .exceptions import CacheNotFoundError
 
 
@@ -21,30 +19,31 @@ class Classify:
     def __init__(self, **kwargs):
         self._load_cache()
         text = kwargs['text']
-        self.percentage, self.word_list = self._classify(text)
-
-    @property
-    def get_percentage(self):
-        return self.percentage
+        self._res = self._classify(text)
 
     @property
     def get_word_list(self):
         return self.word_list
 
+    @property
+    def get_res(self):
+        return self._res
+
     def _load_cache(self):
-        cache_path = os.path.join(DATA_DIR, 'train.pkl')
+        '''
+        Load cache from pre-trained model
+        '''
+        self.trained_model = self._load_from_file('trained.pkl')
+        self.vocabulary = self._load_from_file('ve.pkl')
+
+    def _load_from_file(self, filename):
+        '''
+        Load file from filename
+        '''
+        cache_path = os.path.join(DATA_DIR, filename)
         try:
             with open(cache_path, 'rb') as f:
-                self.train_model = pickle.load(f)
-        except FileNotFoundError:
-            error = (
-                'Cache files not found,' +
-                'maybe you should train the data first.')
-            raise CacheNotFoundError(error)
-        cache_path = os.path.join(DATA_DIR, 've.pkl')
-        try:
-            with open(cache_path, 'rb') as f:
-                self.ve = pickle.load(f)
+                self.trained_model = pickle.load(f)
         except FileNotFoundError:
             error = (
                 'Cache files not found,' +
@@ -52,23 +51,11 @@ class Classify:
             raise CacheNotFoundError(error)
 
     def _classify(self, text):
-        vector = self.ve.fit([text])
-        breakpoint()
-        return self.train_model.predict(vector)
-
-    def _update_category(self, lst):
         '''
-        Convert log to percentage
+        1. Build vector using pre-trained vocabulary
+        2. Transform the input text to text vector
+        3. Predict the text
         '''
-        # [('gamble.dat', -6.73...), ('normal.dat', -8.40...)]
-        out_lst = [
-            (self.CLASSIFY[i], lst[i]) for i in range(len(self.CLASSIFY))]
-        # [('gamble.dat', -6.73...), ('normal.dat', -8.40...)]
-        sorted_lst = sorted(out_lst, key=itemgetter(1), reverse=True)
-        # [('gamble.dat', 1.0), ('normal.dat', 0.31...)]
-        relative_lst = [(k, 2**(v-sorted_lst[0][1])) for k, v in sorted_lst]
-        # [('gamble.dat', 0.76...), ('normal.dat', 0.23...)]
-        percentage_lst = [
-            (k, self._round(v/sum(v for _, v in relative_lst)))
-            for k, v in relative_lst]
-        return percentage_lst
+        self.vector = _vectorizer(vocabulary=self.vocabulary)
+        text_vector = self.vector.transform(text)
+        return self.trained_model.predict_prob(text_vector)
