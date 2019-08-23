@@ -10,9 +10,9 @@ This module implements the cherry Trainer.
 
 import os
 import pickle
-import pandas as pd
+from pandas import read_csv
 from sklearn.naive_bayes import MultinomialNB
-from .config import DATA_DIR, STOP_WORDS, TOKENIZER, _vectorizer
+from .config import DATA_DIR, STOP_WORDS, _tfidf_vectorizer
 
 
 class Trainer:
@@ -25,9 +25,8 @@ class Trainer:
         '''
         Train bayes model with input data
         '''
-        self.vector = _vectorizer()
-        self.vector.fit(self.x_data)
-        training_data = self.vector.transform(self.x_data)
+        self.tfidf_vectorizer = _tfidf_vectorizer()
+        training_data = self.tfidf_vectorizer.fit_transform(self.x_data)
         self.bayes = MultinomialNB()
         self.bayes.fit(training_data, self.y_data)
 
@@ -35,7 +34,7 @@ class Trainer:
         '''
         Read data from data file inside DATA_DIR
         '''
-        df = pd.read_csv(os.path.join(DATA_DIR, 'data.csv'))
+        df = read_csv(os.path.join(DATA_DIR, 'data.csv'))
         self.x_data = df['text']
         self.y_data = df['label']
 
@@ -48,4 +47,4 @@ class Trainer:
             pickle.dump(self.bayes, f)
         cache_path = os.path.join(DATA_DIR, 've.pkl')
         with open(cache_path, 'wb') as f:
-            pickle.dump(self.vector.vocabulary_, f)
+            pickle.dump(self.tfidf_vectorizer, f)

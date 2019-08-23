@@ -11,7 +11,8 @@ This module implements the cherry classify.
 
 import os
 import pickle
-from .config import DATA_DIR, _vectorizer
+import numpy as np
+from .config import DATA_DIR, _tfidf_vectorizer
 from .exceptions import CacheNotFoundError
 
 
@@ -34,7 +35,7 @@ class Classify:
         Load cache from pre-trained model
         '''
         self.trained_model = self._load_from_file('trained.pkl')
-        self.vocabulary = self._load_from_file('ve.pkl')
+        self.vector = self._load_from_file('ve.pkl')
 
     def _load_from_file(self, filename):
         '''
@@ -43,7 +44,7 @@ class Classify:
         cache_path = os.path.join(DATA_DIR, filename)
         try:
             with open(cache_path, 'rb') as f:
-                self.trained_model = pickle.load(f)
+                return pickle.load(f)
         except FileNotFoundError:
             error = (
                 'Cache files not found,' +
@@ -56,6 +57,8 @@ class Classify:
         2. Transform the input text to text vector
         3. Predict the text
         '''
-        self.vector = _vectorizer(vocabulary=self.vocabulary)
-        text_vector = self.vector.transform(text)
-        return self.trained_model.predict_prob(text_vector)
+        text_vector = self.vector.transform([text])
+        tv = text_vector.toarray()[0, :]
+        fea = np.asarray(self.vector.get_feature_names())
+        print(sorted(list(zip(tv, fea)), reverse=True)[:20])
+        return self.trained_model.predict_proba(text_vector)

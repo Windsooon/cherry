@@ -9,9 +9,8 @@ Base config of cherry classify
 """
 
 import os
-import jieba
 from .exceptions import StopWordsNotFoundError
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 
 def _stop_word(dir):
     '''
@@ -30,9 +29,19 @@ def _tokenizer(text):
     '''
     You can change the tokenizer function here
     '''
-    return jieba.cut(text)
+    import jieba
+    return [
+        t for t in jieba.cut(text) if len(t) > 1
+        and t not in STOP_WORDS]
 
-def _vectorizer(vocabulary=None):
+def _tfidf_vectorizer(vocabulary=None):
+    return TfidfVectorizer(
+            tokenizer=TOKENIZER,
+            stop_words=STOP_WORDS,
+            vocabulary=vocabulary,
+            use_idf=True)
+
+def _count_vectorizer(vocabulary=None):
     return CountVectorizer(
             tokenizer=TOKENIZER,
             stop_words=STOP_WORDS,
