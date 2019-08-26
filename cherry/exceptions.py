@@ -16,3 +16,9 @@ class CacheNotFoundError(CherryIOException, IOError):
 
 class StopWordsNotFoundError(CherryIOException, IOError):
     '''Stop words files not found'''
+
+class MethodNotFoundError(CherryIOException, AttributeError):
+    '''method not found'''
+
+class UnicodeFileEncodeError(CherryIOException, UnicodeEncodeError):
+    '''Unicode File Encode Error'''
