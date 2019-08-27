@@ -10,8 +10,8 @@ This module implements the cherry API.
 
 from .trainer import Trainer
 from .classify import Classify
-from .analysis import Analysis
-from .infomation import Info
+from .performance import Performance
+from .config import read_data
 
 
 def classify(text):
@@ -23,19 +23,16 @@ def classify(text):
     '''
     return Classify(text=text)
 
-def train():
+def train(x_data=None, y_data=None, feature='Count', clf='MNB'):
     '''
-    Train the data inthe data dir with stop_word and split function
+    Train the data inside data dir
+    '''
+    if not (x_data and y_data):
+        x_data, y_data = read_data()
+    return Trainer(x_data=x_data, y_data=y_data, feature=feature, clf=clf)
 
-    input: stop_word (list) list of stop word (string)
-           split (function) the function use to tokenizer the text in the data
-    output: None
-
+def performance(method='kfolds', n_splits=5):
     '''
-    return Trainer()
-
-def analysis():
+    Calculate scores and ROC from the models
     '''
-    Use k-fold cross validation t calculate precision, recall, F1 score and ROC canvas.
-    '''
-    return Analysis()
+    return Performance(method=method, n_splits=n_splits)

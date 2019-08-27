@@ -12,23 +12,23 @@ This module implements the cherry classify.
 import os
 import pickle
 import numpy as np
-from .config import DATA_DIR, _tfidf_vectorizer
+from .config import DATA_DIR
 from .exceptions import CacheNotFoundError
 
 
 class Classify:
     def __init__(self, **kwargs):
-        self._load_cache()
         text = kwargs['text']
-        self._res = self._classify(text)
+        self._load_cache()
+        self.probability, self.word_list = self._classify(text)
 
     @property
     def get_word_list(self):
         return self.word_list
 
     @property
-    def get_res(self):
-        return self._res
+    def get_probability(self):
+        return self.probability
 
     def _load_cache(self):
         '''
@@ -57,8 +57,9 @@ class Classify:
         2. Transform the input text to text vector
         3. Predict the text
         '''
-        text_vector = self.vector.transform([text])
+        text_vector = self.vector.transform(text)
         tv = text_vector.toarray()[0, :]
-        fea = np.asarray(self.vector.get_feature_names())
-        print(sorted(list(zip(tv, fea)), reverse=True)[:20])
-        return self.trained_model.predict_proba(text_vector)
+        feature_names = np.asarray(self.vector.get_feature_names())
+        word_list = sorted([word for word in list(zip(tv, feature_names)) if word[0] != 0.0][:20], reverse=True)
+        probability = self.trained_model.predict_proba(text_vector)
+        return probability, word_list

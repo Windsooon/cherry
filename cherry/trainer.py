@@ -10,33 +10,30 @@ This module implements the cherry Trainer.
 
 import os
 import pickle
-from pandas import read_csv
-from sklearn.naive_bayes import MultinomialNB
-from .config import DATA_DIR, STOP_WORDS, _tfidf_vectorizer
+from sklearn.pipeline import Pipeline
+from .config import DATA_DIR, tfidf_vectorizer, count_vectorizer, get_vect_and_clf, read_data
+from .exceptions import MethodNotFoundError
 
 
 class Trainer:
     def __init__(self, **kwargs):
-        self._read_data()
-        self.train()
+        x_data = kwargs['x_data']
+        y_data = kwargs['y_data']
+        feature = kwargs['feature']
+        clf = kwargs['clf']
+        self.train(x_data, y_data, feature, clf)
         self._write_cache()
 
-    def train(self):
+    def train(self, x_data, y_data, feature='Count', ngram_range=(1, 1), max_df=1.0, min_df=1, clf='MNB'):
         '''
-        Train bayes model with input data
+        Train bayes model with input data and decide which feature extraction method
+        and classify method should use
         '''
-        self.tfidf_vectorizer = _tfidf_vectorizer()
-        training_data = self.tfidf_vectorizer.fit_transform(self.x_data)
-        self.bayes = MultinomialNB()
-        self.bayes.fit(training_data, self.y_data)
-
-    def _read_data(self):
-        '''
-        Read data from data file inside DATA_DIR
-        '''
-        df = read_csv(os.path.join(DATA_DIR, 'data.csv'))
-        self.x_data = df['text']
-        self.y_data = df['label']
+        self.vectorizer, self.clf = get_vect_and_clf(feature, clf)
+        text_clf = Pipeline([
+            ('vectorizer', self.vectorizer),
+            ('clf', self.clf)])
+        text_clf.fit(x_data, y_data)
 
     def _write_cache(self):
         '''
@@ -44,7 +41,7 @@ class Trainer:
         '''
         cache_path = os.path.join(DATA_DIR, 'trained.pkl')
         with open(cache_path, 'wb') as f:
-            pickle.dump(self.bayes, f)
+            pickle.dump(self.clf, f)
         cache_path = os.path.join(DATA_DIR, 've.pkl')
         with open(cache_path, 'wb') as f:
-            pickle.dump(self.tfidf_vectorizer, f)
+            pickle.dump(self.vectorizer, f)
