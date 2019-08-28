@@ -12,45 +12,34 @@ import numpy as np
 from sklearn.model_selection import KFold
 from sklearn.pipeline import Pipeline
 from sklearn import metrics
-from sklearn.naive_bayes import MultinomialNB
-from .config import read_data, tfidf_vectorizer, count_vectorizer
+from .base import load_data, write_file
+from .config import DEFAULT_CLF, DEFAULT_VECTORIZER
 from .trainer import Trainer
 from .classify import Classify
 from .exceptions import MethodNotFoundError
 
 class Performance:
     def __init__(self, **kwargs):
+        vectorizer = kwargs['vectorizer']
+        clf = kwargs['clf']
         method = kwargs['method']
         n_splits = kwargs['n_splits']
         output = kwargs['output']
-        x_train, x_test, y_train, y_test = self.split_data(method, n_splits)
-        self.score(x_train, x_test, y_train, y_test, output)
+        prefix = kwargs['prefix']
+        x_train, y_train = load_data(prefix)
+        x_test, y_test = load_data(prefix + '_test')
+        self.score(vectorizer, clf, x_train, y_train, x_test, y_test, output)
 
-    def split_data(self, method, n_splits):
-        '''
-        TODO
-        '''
-        if method == 'kfolds':
-            x_data, y_data = read_data()
-            cv = KFold(n_splits=n_splits, random_state=42, shuffle=True)
-            for train_index, test_index in cv.split(x_data):
-                x_train, x_test = x_data[train_index], x_data[test_index]
-                y_train, y_test = y_data[train_index], y_data[test_index]
-                return x_train, x_test, y_train, y_test
-        elif method == 'leaveone':
-            pass
-        else:
-            error = 'We didn\'t support this method yet'
-            raise MethodNotFoundError(error)
-
-    def score(self, x_train, x_test, y_train, y_test, output):
+    def score(self, vectorizer, clf, x_train, y_train, x_test, y_test, output):
+        vectorizer = DEFAULT_VECTORIZER if not vectorizer else vectorizer
+        clf = DEFAULT_CLF if not clf else clf
         text_clf = Pipeline([
-            ('tfidf', count_vectorizer()),
-            ('clf', MultinomialNB())])
+            ('vectorizer', vectorizer),
+            ('clf', clf)])
         text_clf.fit(x_train, y_train)
         predicted = text_clf.predict(x_test)
         report = metrics.classification_report(y_test, predicted)
         if output == 'Stdout':
             print(report)
         else:
-            self.write_to_file(output, report)
+            self.write_file(output, report)

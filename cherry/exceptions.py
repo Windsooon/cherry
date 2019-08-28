@@ -7,18 +7,15 @@ This module contains the set of cheery' exceptions.
 :license: MIT License, see LICENSE for more details.
 """
 
-class CherryIOException(IOError):
-    def __init__(self, *args, **kwargs):
-        super(CherryIOException, self).__init__(*args, **kwargs)
 
-class CacheNotFoundError(CherryIOException, IOError):
+class CacheNotFoundError(IOError):
     '''Cache files not found'''
 
-class StopWordsNotFoundError(CherryIOException, IOError):
+class StopWordsNotFoundError(IOError):
     '''Stop words files not found'''
 
-class MethodNotFoundError(CherryIOException, AttributeError):
+class MethodNotFoundError(AttributeError):
     '''method not found'''
 
-class UnicodeFileEncodeError(CherryIOException, UnicodeEncodeError):
+class UnicodeFileEncodeError(UnicodeEncodeError):
     '''Unicode File Encode Error'''

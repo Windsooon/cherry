@@ -4,16 +4,13 @@
 cherry.classify
 ~~~~~~~~~~~~
 This module implements the cherry classify.
-:copyright: (c) 2018-2019 by Windson Yang
-:license: MIT License, see LICENSE for more details.
+:copyright: (c) 2018-2019 by Windson Yang :license: MIT License, see LICENSE for more details.
 """
 
 
 import os
-import pickle
 import numpy as np
-from .config import DATA_DIR
-from .exceptions import CacheNotFoundError
+from .base import DATA_DIR, load_cache_from_file
 
 
 class Classify:
@@ -34,22 +31,8 @@ class Classify:
         '''
         Load cache from pre-trained model
         '''
-        self.trained_model = self._load_from_file('trained.pkl')
-        self.vector = self._load_from_file('ve.pkl')
-
-    def _load_from_file(self, filename):
-        '''
-        Load file from filename
-        '''
-        cache_path = os.path.join(DATA_DIR, filename)
-        try:
-            with open(cache_path, 'rb') as f:
-                return pickle.load(f)
-        except FileNotFoundError:
-            error = (
-                'Cache files not found,' +
-                'maybe you should train the data first.')
-            raise CacheNotFoundError(error)
+        self.trained_model = load_cache_from_file('trained.pkl')
+        self.vector = load_cache_from_file('ve.pkl')
 
     def _classify(self, text):
         '''
