@@ -16,4 +16,5 @@ usage:
 :license: MIT License, see LICENSE for more details.
 """
 
-from .api import classify, train, performance, search
+# search -> display -> train -> classify -> performance
+from .api import classify, train, performance, search, display

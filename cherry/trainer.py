@@ -22,28 +22,29 @@ class Trainer:
         y_data = kwargs['y_data']
         vectorizer = kwargs['vectorizer']
         clf = kwargs['clf']
-        self.train(vectorizer, clf, x_data, y_data)
-        self._write_cache()
+        vectorizer, clf = self.train(vectorizer, clf, x_data, y_data)
+        self._write_cache(vectorizer, clf)
 
     def train(self, vectorizer, clf, x_data, y_data):
         '''
         Train bayes model with input data and decide which feature extraction method
         and classify method should use
         '''
-        self.vectorizer = DEFAULT_VECTORIZER if not vectorizer else vectorizer
-        self.clf = DEFAULT_CLF if not clf else clf
+        vectorizer = DEFAULT_VECTORIZER if not vectorizer else vectorizer
+        clf = DEFAULT_CLF if not clf else clf
         text_clf = Pipeline([
-            ('vectorizer', self.vectorizer),
-            ('clf', self.clf)])
+            ('vectorizer', vectorizer),
+            ('clf', clf)])
         text_clf.fit(x_data, y_data)
+        return vectorizer, clf
 
-    def _write_cache(self):
+    def _write_cache(self, vectorizer, clf):
         '''
         Write cache file under DATA_DIR
         '''
         cache_path = os.path.join(DATA_DIR, 'trained.pkl')
         with open(cache_path, 'wb') as f:
-            pickle.dump(self.clf, f)
+            pickle.dump(clf, f)
         cache_path = os.path.join(DATA_DIR, 've.pkl')
         with open(cache_path, 'wb') as f:
-            pickle.dump(self.vectorizer, f)
+            pickle.dump(vectorizer, f)
