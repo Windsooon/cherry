@@ -1,35 +1,34 @@
+import os
 import unittest
 from unittest import mock
-import jieba
+from sklearn.pipeline import Pipeline
+from cherry.config import DEFAULT_VECTORIZER, DEFAULT_CLF
+from cherry.base import DATA_DIR
 from cherry.trainer import Trainer
 
 
 class TrainerTest(unittest.TestCase):
 
-    @mock.patch('jieba.cut')
-    @mock.patch('builtins.open', mock.mock_open(read_data='警方发布了最新消息\n'))
-    def test_test_data_num_with_custom_split(self, mock_cut):
-        mock_cut.return_value = ['警方', '发布', '了', '最新消息']
+    def setUp(self):
+        self.x_data = [1, 2]
+        self.y_data = [0, 1]
 
-        def split_function(text):
-            stop_word = ['但是']
-            return [
-                t for t in jieba.cut(text) if len(t) > 1
-                and t not in stop_word]
-        trainer = Trainer(test_num=0, lan='Chinese', split=split_function)
-        self.assertEqual(
-            trainer.test_num, 0)
+    @mock.patch('cherry.trainer.Trainer.train')
+    def test_write_cache(self, mock_train):
+        '''
+        TODO: use create special cache files for testing
+        '''
+        mock_train.return_value = DEFAULT_VECTORIZER, DEFAULT_CLF
+        t = Trainer(vectorizer=DEFAULT_VECTORIZER, clf=DEFAULT_CLF, x_data=self.x_data, y_data=self.y_data)
+        self.assertTrue(os.path.exists(os.path.join(DATA_DIR, 'trained.pkl')))
+        self.assertTrue(os.path.exists(os.path.join(DATA_DIR, 've.pkl')))
 
-    @mock.patch('jieba.cut')
-    @mock.patch('builtins.open', mock.mock_open(read_data='警方发布了最新消息\n'))
-    def test_test_data_num(self, mock_cut):
-        trainer = Trainer(test_num=1, lan='Chinese', split=None)
-        self.assertEqual(
-            trainer.test_num, 1)
-
-    @mock.patch('jieba.cut')
-    @mock.patch('builtins.open', mock.mock_open(read_data='警方发布了最新消息\n'))
-    def test_empty_vocab_list(self, mock_cut):
-        trainer = Trainer(test_num=1, lan='Chinese', split=None)
-        self.assertEqual(
-            trainer.vocab_set, set())
+    @mock.patch('sklearn.pipeline.Pipeline.fit')
+    def test_Trainer_init(self, mock_fit):
+        mock_fit.return_value = DEFAULT_VECTORIZER, DEFAULT_CLF
+        x_data = [1,2]
+        y_data = [0,1]
+        t = Trainer(vectorizer=DEFAULT_VECTORIZER, clf=DEFAULT_CLF, x_data=x_data, y_data=y_data)
+        vectorizer, clf = t.train(DEFAULT_VECTORIZER, DEFAULT_CLF, x_data, y_data)
+        self.assertEqual(vectorizer, DEFAULT_VECTORIZER)
+        self.assertEqual(clf, DEFAULT_CLF)
