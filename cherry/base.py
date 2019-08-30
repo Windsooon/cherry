@@ -8,7 +8,6 @@ Base method for cherry classify
 :license: MIT License, see LICENSE for more details.
 """
 import os
-import csv
 import numpy as np
 import pickle
 from .exceptions import StopWordsNotFoundError, UnicodeFileEncodeError, CacheNotFoundError
@@ -17,14 +16,14 @@ CHERRY_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'cherry')
 DATA_DIR = os.path.join(CHERRY_DIR, 'data')
 
-def stop_words(prefix):
+def stop_words(filename):
     '''
-    Return Stop words depent on prefix
-    stop_word('chinese_classify_') will return the data in
-    DATA_DIR/chinese_classify_stop_words.dat
+    Return Stop words depent on filename
+    stop_word('chinese_classify.dat') will return the data in
+    DATA_DIR/stop_words_chinese_classify.dat
     '''
     try:
-        stop_words_path = os.path.join(DATA_DIR, prefix + '_stop_words.dat')
+        stop_words_path = os.path.join(DATA_DIR, filename)
         with open(stop_words_path, encoding='utf-8') as f:
             stop_words = [l[:-1] for l in f.readlines()]
     except IOError:
@@ -35,19 +34,12 @@ def stop_words(prefix):
         raise UnicodeFileEncodeError(error)
     return stop_words
 
-def tokenizer(text):
-    '''
-    You can use your own tokenizer function here
-    '''
-    import jieba
-    return [t for t in jieba.cut(text) if len(t) > 1]
-
-def load_data(prefix):
+def load_data(filename):
     '''
     TODO: use a generator instead
     '''
     text, label = [], []
-    with open(os.path.join(DATA_DIR, prefix + '_data.csv')) as file:
+    with open(os.path.join(DATA_DIR, filename)) as file:
         for line in file.readlines():
             row = line.split('\n')[0].rsplit(',', 1)
             text.append(row[0])
@@ -58,12 +50,12 @@ def write_file(self, path, data):
     '''
     Write data to path
     '''
-    with open(output, 'w') as f:
-        f.write(report)
+    with open(path, 'w') as f:
+        f.write(data)
 
-def load_cache_from_file(filename):
+def load_cache(filename):
     '''
-    Load file from filename
+    Load cache data from file
     '''
     cache_path = os.path.join(DATA_DIR, filename)
     try:

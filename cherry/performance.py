@@ -15,7 +15,7 @@ from sklearn import metrics
 from .base import load_data, write_file
 from .config import DEFAULT_CLF, DEFAULT_VECTORIZER
 from .trainer import Trainer
-from .classify import Classify
+from .classifyer import Classify
 from .exceptions import MethodNotFoundError
 
 class Performance:
@@ -25,9 +25,9 @@ class Performance:
         method = kwargs['method']
         n_splits = kwargs['n_splits']
         output = kwargs['output']
-        prefix = kwargs['prefix']
-        x_train, y_train = load_data(prefix)
-        x_test, y_test = load_data(prefix + '_test')
+        filename = kwargs['filename']
+        x_train, y_train = load_data(filename)
+        x_test, y_test = load_data('test_' + filename)
         self.score(vectorizer, clf, x_train, y_train, x_test, y_test, output)
 
     def score(self, vectorizer, clf, x_train, y_train, x_test, y_test, output):
