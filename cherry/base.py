@@ -89,9 +89,8 @@ def tokenizer(text):
 
 def get_vectorizer(model, vectorizer_method):
     from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, HashingVectorizer
-    # Default method
     if not vectorizer_method:
-        return CountVectorizer(tokenizer=tokenizer, stop_words=get_stop_words(model))
+        vectorizer_method = 'Count'
     else:
         mapping = {
             'Count': CountVectorizer,
