@@ -135,12 +135,13 @@
     weighted avg    0.96      0.96     0.96       190
 
 ### 可视化
-使用 `display()` API 可以得出不同特征函数以及分类器下的学习曲线
+使用 `display()` API 可以得出不同特征函数以及分类器下的学习曲线，以下以此为默认 `MNB, SGD, RandomForest` 方法的学习曲线图像
 
 	>>> cherry.display(model='harmful', clf_method='SGD')
 	
-![]()
-![]()
+<img src="https://raw.githubusercontent.com/Windsooon/cherry/master/imgs/MNB.png" alt="" height="500">
+<img src="https://raw.githubusercontent.com/Windsooon/cherry/master/imgs/SGD.png" alt="" height="500">
+<img src="https://raw.githubusercontent.com/Windsooon/cherry/master/imgs/RandomForest.png" alt="" height="500">
 	
 ### 搜索
 通过把传人需要搜索的参数范围，可以得出最佳参数。
