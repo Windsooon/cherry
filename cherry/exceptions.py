@@ -11,11 +11,11 @@ This module contains the set of cheery' exceptions.
 class CacheNotFoundError(IOError):
     '''Cache files not found'''
 
-class StopWordsNotFoundError(IOError):
-    '''Stop words files not found'''
+class FilesNotFoundError(IOError):
+    '''Files not found'''
 
 class MethodNotFoundError(AttributeError):
-    '''method not found'''
+    '''Method not found'''
 
 class UnicodeFileEncodeError(UnicodeEncodeError):
     '''Unicode File Encode Error'''
