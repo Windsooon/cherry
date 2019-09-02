@@ -160,7 +160,55 @@
 
 ### API
 
-TODO
+**def train(model, vectorizer=None, vectorizer\_method=None, clf=None, clf\_method=None, x\_data=None, y\_data=None):**
+
+- model (string)
+    
+    使用的训练模型，默认模型包括 `harmful`, `news` 和 `spam`
+
+- vectorizer (sklearn object)
+
+    特征函数，可以直接传入 sklearn 的 [特征函数](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.feature_extraction.text)，默认使用 `CountVectorizer()`，
+ 
+   > 短文本建议使用 `CountVectorizer()`，长文本建议使用 `TfidfVectorizer()`，大型数据集可以使用 `HashingVectorizer()` 节省内存。
+   
+- vectorizer_method (string)
+
+    cherry 支持使用缩写来设置特征函数（仅当 `vectorizer` 为 `None` 时会被调用），'Count' 会调用 `CountVectorizer(tokenizer=tokenizer, stop_words=get_stop_words(model))`，`tokenizer` 对应 `base.py` 中定义的分词函数。`Tfidf` 对应 `TfidfVectorizer`，`Hashing` 对应 `HashingVectorizer`。
+    
+- clf (sklearn object)
+
+    分类函数，可以直接传入 sklearn 的 [分类函数](https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html)，默认使用 `MultinomialNB()`。
+ 
+- clf_method (string)
+
+    cherry 支持使用缩写来设置常用分类函数（包含常用参数）（仅当 `clf` 为 `None` 时会被调用），`MNB` 会调用 `MultinomialNB(alpha=0.1)`, `SGD` 对应 `SGDClassifier`, `RandomForest` 对应 `RandomForestClassifier`, `AdaBoost` 对应 `AdaBoostClassifier`。
+
+- x_data (numpy array)
+
+    `train()` 支持直接传入文本数据进行训练，`x_data` 包含全部训练文本。
+
+- y_data (numpy array)
+
+    `train()` 支持直接传入文本数据进行训练，`y_data` 包含全部训练文本对应的类别。
+    
+
+**def classify(text, model, N=20):**
+
+- text (list)
+    
+    需要训练的文本列表内容
+    
+- model
+    
+    使用的训练模型，默认模型包括 `harmful`, `news` 和 `spam`
+    
+- N
+
+	`word_list`属性 中 输出的词语数量，默认为 20
+	
+   
+
 	
 ### FAQ
 
