@@ -14,10 +14,10 @@ from .base import load_cache
 
 
 class Classify:
-    def __init__(self, **kwargs):
+    def __init__(self, model, **kwargs):
         text = kwargs['text']
         N = kwargs['N']
-        self._load_cache()
+        self._load_cache(model)
         self.probability, self.word_list = self._classify(text, N)
 
     @property
@@ -28,12 +28,12 @@ class Classify:
     def get_probability(self):
         return self.probability
 
-    def _load_cache(self):
+    def _load_cache(self, model):
         '''
         Load cache from pre-trained model
         '''
-        self.trained_model = load_cache('trained.pkl')
-        self.vector = load_cache('ve.pkl')
+        self.trained_model = load_cache(model, 'trained.pkl')
+        self.vector = load_cache(model, 've.pkl')
 
     def _classify(self, text, N):
         '''
@@ -42,8 +42,9 @@ class Classify:
         3. return the probability and word_list of the text
         '''
         text_vector = self.vector.transform(text)
-        tv = text_vector.toarray()[0, :]
-        feature_names = np.asarray(self.vector.get_feature_names())
-        word_list = sorted([word for word in list(zip(tv, feature_names)) if word[0] != 0.0][:N], reverse=True)
+        word_list = []
+        for tv in text_vector.toarray():
+            feature_names = np.asarray(self.vector.get_feature_names())
+            word_list.append(sorted([word for word in list(zip(tv, feature_names)) if word[0] != 0.0][:N], reverse=True))
         probability = self.trained_model.predict_proba(text_vector)
-        return probability, word_list
+        return probability, np.asarray(word_list)

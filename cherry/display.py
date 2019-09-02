@@ -1,19 +1,22 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.naive_bayes import GaussianNB
-from sklearn.svm import SVC
-from sklearn.datasets import load_digits
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import learning_curve
 from sklearn.model_selection import ShuffleSplit
+from .base import get_vectorizer, get_clf
 
 
 class Display:
-    def __init__(self, **kwargs):
+    def __init__(self, model, **kwargs):
         x_data = kwargs['x_data']
         y_data = kwargs['y_data']
         vectorizer = kwargs['vectorizer']
+        vectorizer_method = kwargs['vectorizer_method']
+        clf_method = kwargs['clf_method']
         clf = kwargs['clf']
+        if not vectorizer:
+            vectorizer = get_vectorizer(model, vectorizer_method)
+        if not clf:
+            clf = get_clf(model, clf_method)
         text_clf = Pipeline([
             ('vectorizer', vectorizer),
             ('clf', clf)])
@@ -27,6 +30,7 @@ class Display:
 
     def plot_learning_curve(self, estimator, title, X, y, ylim=None, cv=None,
                             n_jobs=None, train_sizes=np.linspace(.1, 1.0, 5)):
+        import matplotlib.pyplot as plt
         plt.figure()
         plt.title(title)
         if ylim is not None:
