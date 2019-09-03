@@ -13,7 +13,7 @@ from .trainer import Trainer
 from .classifyer import Classify
 from .performance import Performance
 from .search import Search
-from .display import Display
+from .displayer import Display
 
 
 def classify(text, model, N=20):

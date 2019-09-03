@@ -1,7 +1,6 @@
 import os
 import unittest
 from unittest import mock
-from sklearn.pipeline import Pipeline
 from cherry.trainer import Trainer
 from cherry.base import DATA_DIR, load_data
 

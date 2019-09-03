@@ -29,7 +29,6 @@ class Display:
         cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=0)
         self.plot_learning_curve(estimator, title, x_data, y_data, ylim=(0.7, 1.01), cv=cv, n_jobs=-1)
 
-
     def plot_learning_curve(self, estimator, title, X, y, ylim=None, cv=None,
                             n_jobs=None, train_sizes=np.linspace(.1, 1.0, 5)):
         import matplotlib.pyplot as plt
