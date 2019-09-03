@@ -29,7 +29,6 @@ class Performance:
             clf = get_clf(model, clf_method)
         n_splits = kwargs['n_splits']
         output = kwargs['output']
-        x_data, y_data = load_data(model)
         for train_index, test_index in KFold(n_splits=n_splits, shuffle=True).split(x_data):
             x_train, x_test = x_data[train_index], x_data[test_index]
             y_train, y_test = y_data[train_index], y_data[test_index]

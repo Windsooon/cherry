@@ -49,20 +49,24 @@ def performance(
     '''
     Calculate scores and ROC from the models
     '''
+    if not (x_data and y_data):
+        x_data, y_data = load_data(model)
     return Performance(
             model, vectorizer=vectorizer, vectorizer_method=None,
             clf=clf, clf_method=None, x_data=x_data, y_data=y_data,
             n_splits=n_splits, output=output)
 
 def search(model, parameters, vectorizer=None, vectorizer_method=None,
-        clf=None, clf_method=None, method='RandomizedSearchCV', cv=3, iid=False, n_jobs=1):
+        clf=None, clf_method=None, x_data=None, y_data=None, method='RandomizedSearchCV', cv=3, iid=False, n_jobs=1):
     '''
     Search the best parameters
     '''
+    if not (x_data and y_data):
+        x_data, y_data = load_data(model)
     return Search(
             model, parameters=parameters, vectorizer=vectorizer,
             vectorizer_method=vectorizer_method, clf=clf, clf_method=clf_method,
-            method=method, cv=cv, iid=iid, n_jobs=n_jobs)
+            method=method, x_data=x_data, y_data=y_data, cv=cv, iid=iid, n_jobs=n_jobs)
 
 def display(
         model, vectorizer=None, vectorizer_method=None,

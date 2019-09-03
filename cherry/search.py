@@ -21,6 +21,8 @@ class Search:
         '''
         vectorizer = kwargs['vectorizer']
         vectorizer_method = kwargs['vectorizer_method']
+        x_data = kwargs['x_data']
+        y_data = kwargs['y_data']
         clf = kwargs['clf']
         clf_method = kwargs['clf_method']
         if not vectorizer:
@@ -32,7 +34,6 @@ class Search:
         cv = kwargs['cv']
         iid = kwargs['iid']
         n_jobs = kwargs['n_jobs']
-        x_test, y_test = load_data(model)
         text_clf = Pipeline([
             ('vectorizer', vectorizer),
             ('clf', clf)])
@@ -43,7 +44,7 @@ class Search:
         else:
             error = 'We didn\'t support {0} method yet'.format(method)
             raise MethodNotFoundError(error)
-        self.best_score(search_clf, parameters, x_test, y_test)
+        self.best_score(search_clf, parameters, x_data, y_data)
 
     def best_score(self, search_clf, parameters, x_test, y_test):
         search_clf = search_clf.fit(x_test, y_test)
