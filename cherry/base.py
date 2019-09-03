@@ -91,18 +91,17 @@ def get_vectorizer(model, vectorizer_method):
     from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, HashingVectorizer
     if not vectorizer_method:
         vectorizer_method = 'Count'
+    mapping = {
+        'Count': CountVectorizer,
+        'Tfidf': TfidfVectorizer,
+        'Hashing': HashingVectorizer,
+    }
+    try:
+        method = mapping[vectorizer_method]
+    except KeyError:
+        raise MethodNotFoundError
     else:
-        mapping = {
-            'Count': CountVectorizer,
-            'Tfidf': TfidfVectorizer,
-            'Hashing': HashingVectorizer,
-        }
-        try:
-            method = mapping[vectorizer_method]
-        except KeyError:
-            raise MethodNotFoundError
-        else:
-            return method(tokenizer=tokenizer, stop_words=get_stop_words(model))
+        return method(tokenizer=tokenizer, stop_words=get_stop_words(model))
 
 def get_clf(model, clf_method):
     from sklearn.naive_bayes import MultinomialNB

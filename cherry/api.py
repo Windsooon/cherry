@@ -21,7 +21,7 @@ def classify(text, model, N=20):
     Return a Classify object which contains *probability* and *word_list*
 
     input: text (list of string): the text to be classified
-    input: number of word list (int): how many word should be list in the word list
+           number of word list (int): how many word should be list in the word list
     output: Classify (Classify object)
     '''
     return Classify(text=text, model=model, N=N)
@@ -36,8 +36,6 @@ def train(model, vectorizer=None, vectorizer_method=None, clf=None, clf_method=N
           x_data (array): training data
           y_data (array): training label
     '''
-    if not (x_data and y_data):
-        x_data, y_data = load_data(model)
     return Trainer(
             model, vectorizer=vectorizer, vectorizer_method=None,
             clf=clf, clf_method=None, x_data=x_data, y_data=y_data)
@@ -47,10 +45,8 @@ def performance(
         clf=None, clf_method=None, x_data=None,
         y_data=None, n_splits=5, output='Stdout'):
     '''
-    Calculate scores and ROC from the models
+    Calculate scores from the models
     '''
-    if not (x_data and y_data):
-        x_data, y_data = load_data(model)
     return Performance(
             model, vectorizer=vectorizer, vectorizer_method=None,
             clf=clf, clf_method=None, x_data=x_data, y_data=y_data,
@@ -61,8 +57,6 @@ def search(model, parameters, vectorizer=None, vectorizer_method=None,
     '''
     Search the best parameters
     '''
-    if not (x_data and y_data):
-        x_data, y_data = load_data(model)
     return Search(
             model, parameters=parameters, vectorizer=vectorizer,
             vectorizer_method=vectorizer_method, clf=clf, clf_method=clf_method,
@@ -74,8 +68,6 @@ def display(
     '''
     Display the learning curve
     '''
-    if not (x_data and y_data):
-        x_data, y_data = load_data(model)
     return Display(
             model, vectorizer=vectorizer, vectorizer_method=vectorizer_method,
             clf=clf, clf_method=clf_method, x_data=x_data, y_data=y_data)

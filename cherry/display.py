@@ -2,13 +2,15 @@ import numpy as np
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import learning_curve
 from sklearn.model_selection import ShuffleSplit
-from .base import get_vectorizer, get_clf
+from .base import load_data, get_vectorizer, get_clf
 
 
 class Display:
     def __init__(self, model, **kwargs):
         x_data = kwargs['x_data']
         y_data = kwargs['y_data']
+        if not (x_data and y_data):
+            x_data, y_data = load_data(model)
         vectorizer = kwargs['vectorizer']
         vectorizer_method = kwargs['vectorizer_method']
         clf_method = kwargs['clf_method']

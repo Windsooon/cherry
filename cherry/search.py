@@ -23,6 +23,8 @@ class Search:
         vectorizer_method = kwargs['vectorizer_method']
         x_data = kwargs['x_data']
         y_data = kwargs['y_data']
+        if not (x_data and y_data):
+            x_data, y_data = load_data(model)
         clf = kwargs['clf']
         clf_method = kwargs['clf_method']
         if not vectorizer:

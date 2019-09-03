@@ -19,6 +19,10 @@ from .exceptions import MethodNotFoundError
 
 class Performance:
     def __init__(self, model, **kwargs):
+        x_data = kwargs['x_data']
+        y_data = kwargs['y_data']
+        if not (x_data and y_data):
+            x_data, y_data = load_data(model)
         vectorizer = kwargs['vectorizer']
         vectorizer_method = kwargs['vectorizer_method']
         clf = kwargs['clf']
