@@ -21,7 +21,7 @@
 
 - **无需机器学习知识，开箱即用，定制简单**
 
-    cherry 自带三个预训练模型，预训练模型分类只需一行代码。使用自己的数据集进行定制训练也只需要十行代码。同时 cherry 支持自定义分词算法，分类算法以及 stop words 词库。
+    cherry 自带两个预训练模型，使用预训练模型进行分类只需一行代码。使用自己的数据集进行定制训练也只需要十行代码。同时 cherry 支持自定义分词算法，分类算法以及 stop words 词库。
     
 - **高精确率，召回率**
 
@@ -47,7 +47,7 @@
 1. 赌博 / 色情 / 敏感 / 正常 (`model='harmful'`，4个 类别包含约 1000条 中文句子)
 2. 彩票 / 财经 / 房产 / 家居 / 科技 / 社会 / 体育 / 游戏 / 娱乐 (`model=news`，9个 类别包含约 45000条 中文新闻)
 
-使用预训练模型进行文本分类非常简单，只需要直接调用 `classify()` 方法，可以指定两个参数，`text` 是由待分类文本组成的列表，`models` 参数是 `spam`, `harmful`, `news` 三者之一。
+使用预训练模型进行文本分类非常简单，只需要直接调用 `classify()` 方法，可以指定两个参数，`text` 是由待分类文本组成的列表，`models` 参数是 `harmful`, `news` 两者之一。
 
 	>>> res = cherry.classify(model='harmful', text=['她们对计算机很有热情，也希望学习到数据分析，网络爬虫，人工智能等方面的知识，从而运用在她们工作上'])
     >>> res.word_list
@@ -62,10 +62,10 @@
 有两种方法使用自定义数据集。第一，你可以直接把数据以及对应参数直接传给 `train()` API，具体方式请参考[训练](#训练)。第二，通过文本文件进行训练。
 
 #### 数据集
-数据集需要包含两个文件
+数据集需要包含两个文件（参考 `example/data_example` 文件夹）
 
 1. 数据集 `data.xxx`（需命名为 `data`开头，任意后缀的文件）
-2. 停止词 `stop_words.xxx`（需命名为 `stop_words`开头，任意后缀的文件，停止词可直接拷贝 cherry 例子中自带的停止词）
+2. 停止词 `stop_words.xxx`（需命名为 `stop_words`开头，任意后缀的文件，停止词可直接拷贝 `example` 文件夹中自带的 `stop_words.txt`）
 
 #### 停止词
 `stop_words.xxx` 文件每行包含一个停止词，例如
@@ -326,8 +326,8 @@
 
 
 **def display(
-        model, vectorizer=None, vectorizer_method=None,
-        clf=None, clf_method=None, x_data=None, y_data=None)**
+        model, vectorizer=None, vectorizer\_method=None,
+        clf=None, clf\_method=None, x\_data=None, y\_data=None)**
 
 - model (string)
     
