@@ -172,7 +172,7 @@
 
 ### API
 
-**def train(model, vectorizer=None, vectorizer\_method=None, clf=None, clf\_method=None, x\_data=None, y\_data=None):**
+### def train(model, vectorizer=None, vectorizer\_method=None, clf=None, clf\_method=None, x\_data=None, y\_data=None)
 
 - model (string)
     
@@ -205,7 +205,7 @@
     `train()` 支持直接传入文本数据进行训练，`y_data` 包含全部训练文本对应的类别。
     
 
-**def classify(text, model, N=20):**
+### def classify(text, model, N=20)
 
 - text (list)
     
@@ -232,10 +232,7 @@
     
         array([[4.43336608e-03, 9.95215198e-01, 3.51419231e-04, 1.68657851e-08]])
 	
-**def performance(
-        model, vectorizer=None, vectorizer\_method=None,
-        clf=None, clf\_method=None, x\_data=None,
-        y\_data=None, n\_splits=5, output='Stdout')**
+### def performance(model, vectorizer=None, vectorizer\_method=None, clf=None, clf\_method=None, x\_data=None, y\_data=None, n\_splits=5, output='Stdout')
         
 - model (string)
     
@@ -275,8 +272,7 @@
 
     输出结果，默认输出到终端，这里可以指定输出的文件名。
     
-**def search(model, parameters, vectorizer=None, vectorizer\_method=None,
-        clf=None, clf\_method=None, x\_data=None, y\_data=None, method='RandomizedSearchCV', cv=3, iid=False, n_jobs=1)**
+### def search(model, parameters, vectorizer=None, vectorizer\_method=None, clf=None, clf\_method=None, x\_data=None, y\_data=None, method='RandomizedSearchCV', cv=3, iid=False, n_jobs=1)
         
 - model (string)
     
@@ -325,9 +321,7 @@
 	运行 `search()` 时使用的处理器数量
 
 
-**def display(
-        model, vectorizer=None, vectorizer\_method=None,
-        clf=None, clf\_method=None, x\_data=None, y\_data=None)**
+### def display(model, vectorizer=None, vectorizer\_method=None, clf=None, clf\_method=None, x\_data=None, y\_data=None) 
 
 - model (string)
     
