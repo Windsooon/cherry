@@ -19,10 +19,11 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='cherry',
-    version='0.4.0',
-    description='classify data with native bayes',
+    version='0.5.2',
+    description='easy text classification using machine learning',
+    long_description_content_type='text/markdown',
     long_description=long_description,
-    url='https://github.com/Sunkist-Cherry/cherry',
+    url='https://github.com/Windsooon/cherry',
     author='Windson Yang',
     author_email='wiwindson@outlook.com',
     license='MIT',
@@ -38,16 +39,16 @@ setup(
     ],
     keywords='data classify content filter',
     install_requires=[
-        'jieba>=0.39',
         'numpy>=1.13.3',
-        'terminaltables>=3.1.0',
-        'nltk>=3.2.5',
-        'matplotlib>=2.2.2'
+        'scikit-learn>=0.21.3',
+        'matplotlib>=2.2.2',
+        'jieba>=0.39',
+        'pytest>=5.1.2'
         ],
     packages=['cherry'],
     package_data={
         'cherry': [
-            'data/Chinese/cache/*', 'data/Chinese/*.dat',
-            'data/English/cache/*', 'data/English/*.dat']
+            'data/harmful/trained.pkl', 'data/harmful/ve.pkl',
+            'data/news/trained.pkl', 'data/news/ve.pkl']
     },
 )
