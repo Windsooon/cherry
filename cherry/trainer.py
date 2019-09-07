@@ -40,7 +40,7 @@ class Trainer:
         text_clf = Pipeline([
             ('vectorizer', vectorizer),
             ('clf', clf)])
-        print('Training may take some time depend on your dataset')
+        print('Training may take some time depending on your dataset')
         text_clf.fit(x_data, y_data)
 
     def _write_cache(self, model, vectorizer, clf):

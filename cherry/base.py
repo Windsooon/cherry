@@ -10,7 +10,8 @@ Base method for cherry classify
 import os
 import numpy as np
 import pickle
-from .exceptions import FilesNotFoundError, UnicodeFileEncodeError, CacheNotFoundError, MethodNotFoundError
+from .exceptions import FilesNotFoundError, UnicodeFileEncodeError, \
+    CacheNotFoundError, MethodNotFoundError, DataMismatchError
 
 CHERRY_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'cherry')
@@ -46,6 +47,9 @@ def load_data(model):
             with open(os.path.join(model_path, data_file)) as file:
                 for line in file.readlines():
                     row = line.split('\n')[0].rsplit(',', 1)
+                    if len(row) != 2:
+                        error = 'data mismatch in {0}, make sure there is a "," before the category index'.format(row)
+                        raise DataMismatchError(error)
                     text.append(row[0])
                     label.append(row[1])
             return np.asarray(text), np.asarray(label)

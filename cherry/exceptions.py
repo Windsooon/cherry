@@ -17,5 +17,8 @@ class FilesNotFoundError(IOError):
 class MethodNotFoundError(AttributeError):
     '''Method not found'''
 
+class DataMismatchError(AttributeError):
+    '''Data mismatch'''
+
 class UnicodeFileEncodeError(UnicodeEncodeError):
     '''Unicode File Encode Error'''
