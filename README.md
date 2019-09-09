@@ -382,7 +382,7 @@
 
 - **No machine learning knowledge needed, easy to customize**
 
-    cherry comes with two build-in Chinese models. We only need one line of code to classify text using pre-trained models. No more than 10 lines of code to train your dataset. Moreover, cherry support custom tokenizer method, classify method and stop words.
+    cherry comes with two built-in Chinese models. We only need one line of code to classify text using pre-trained models. No more than 10 lines of code to train your dataset. Moreover, cherry supports custom tokenizer methods, classify methods and stop words.
     
 - **High accuracy, recall rate**
 
@@ -405,7 +405,7 @@
 
 **Because the amount of data is too large, cherry library does not contain training any data**, so the pre-trained models only support the `classify()` method. **The pre-trained models contain two datasets, respectively
 
-1. Gamble / Porn / Political / Nomal (`model='harmful'`，1000 chinese text data contains 4 categories)
+1. Gamble / Porn / Political / Normal (`model='harmful'`，1000 chinese text data contains 4 categories)
 2. Lottery ticket / Finance / Estate / Home / Tech / Society / Sport / Game / Entertainment (`model=news`，50000 chinese news contains 7 categories)
 
 Using the pre-training model for text categorization is simple. You can specify two parameters in `classify()`. `text` is a list of text to be classified. The `models` parameter is one of `harmful`, `news `.
@@ -420,7 +420,7 @@ Using the pre-training model for text categorization is simple. You can specify 
 `res` object contains `word_list` and `probability`. `word_list` contains the first 20 words in the text to be classified (in descending order of appearance frequency), and `probability` contains the probability under the corresponding category index (the index is consistent with the last category of each training data).
 
 ### Custom
-There are two ways to use custom dataset. First, you can pass the training data and its label to `train()` API. For more details, checkout out [Training](#training). Second, you can use a text file for training as below.
+There are two ways to use a custom dataset. First, you can pass the training data and its label to the `train()` API. For more details, checkout out [Training](#training). Second, you can use a text file for training as shown below.
 
 #### Dataset
 The dataset should include two files (just like the example in `example/data_example`)
@@ -448,10 +448,10 @@ Each row in the `stop_words.xxx` should include a stop word like this:
 #### Put it together
 
 1. Create a new folder inside the `data` folder, your training data, stop words file and cache will be stored in this folder.
-2. Put `data.xxx` and `stop_words.xxx` into the new folder, the new folder is the model name you will use later in training other API.
+2. Put `data.xxx` and `stop_words.xxx` into the new folder, the new folder is the model name you will use later in training other APIs.
 
 #### Settings
-Before training, you can custom tokenizer function. cherry use `jieba` to support Chinese tokenizer by default ( in `base.py/`tokenizer()` . Your tokenizer function should accept the text as input and return a list include all the token. For English, you can use nltk by uncommenting the code below:
+Before training, you can create a custom tokenizer function. cherry uses `jieba` to support Chinese tokenizer by default ( in `base.py/`tokenizer()` . Your tokenizer function should accept the text as input and return a list that includes all the tokens. For English, you can use nltk by uncommenting the code below:
 
     # base.py
     
@@ -469,14 +469,14 @@ Before training, you can custom tokenizer function. cherry use `jieba` to suppor
 
     >>> cherry.train(model='your_folder_name')
     
-That is it，You can also pass the data to `train()` function. For instance, 
+That is it，You can also pass the data to the `train()` function. For instance, 
 
     >>> from sklearn import datasets
     >>> iris = datasets.load_iris()
     >>> x_data, y_data = iris.data, iris.target
     >>> cherry.train(model='your_folder_name', x_data=x_data, y_data=y_data)
     
-You still have to create `you_folder_name` to store the cache files. If you are familiar with `sklearn`, you can pass the feature extraction function and classify function to `train()` API. For more details, you may have a look at [API](#api). For unbalanced dataset you can custome priori probability.
+You still have to create `you_folder_name` to store the cache files. If you are familiar with `sklearn`, you can pass the feature extraction function and classify function to the `train()` API. For more details, you may have a look at [API](#api). For unbalanced dataset you can custome priori probability.
 
     >>> from sklearn.naive_bayes import MultinomialNB
     >>> mnb = MultinomialNB(class_prior=[0.4, 0.15, 0.15, 0.15, 0.15, 0.1])
@@ -496,7 +496,7 @@ After training, cherry will create cache files under `your_folder_name`. You can
 ## Advance Usage
 
 ### Performance
-`performance()` calculate the CV score after split the training data into `n_splits`
+`performance()` calculates the CV score after splitting the training data into `n_splits`
 
     >>> cherry.performance(model='harmful', n_splits=5)
     
@@ -512,7 +512,7 @@ After training, cherry will create cache files under `your_folder_name`. You can
     weighted avg    0.96      0.96     0.96       190
 
 ### Display
-You can use `display()` API to display the learning curve using different feature extraction functions and classify functions. 
+You can use the`display()` API to display the learning curve using different feature extraction functions and classify functions. 
 
     >>> cherry.display(model='harmful', clf_method='SGD')
     
@@ -521,7 +521,7 @@ You can use `display()` API to display the learning curve using different featur
 <img src="https://raw.githubusercontent.com/Windsooon/cherry/master/imgs/RandomForest.png" alt="" height="500">
     
 ### Search
-You can pass the parameter you want to search, then calculate its best score
+You can pass the parameters you want to search, then calculate its best score
 
     >>> parameters = {
     ...     'clf__alpha': [0.1, 0.5, 1],
@@ -577,7 +577,7 @@ You can pass the parameter you want to search, then calculate its best score
     
 - model
     
-    `model` to be used，pre-trained model include `harmful` and `news`.
+    `model` to be used，pre-trained models include `harmful` and `news`.
     
 - N
 
@@ -601,7 +601,7 @@ You can pass the parameter you want to search, then calculate its best score
         
 - model (string)
     
-    `model` to be used，pre-trained model include `harmful` and `news`.
+    `model` to be used，pre-trained model includes `harmful` and `news`.
 
 - vectorizer (sklearn object)
 
@@ -641,7 +641,7 @@ You can pass the parameter you want to search, then calculate its best score
         
 - model (string)
     
-    `model` to be used，pre-trained model include `harmful` and `news`.
+    `model` to be used，pre-trained model includes `harmful` and `news`.
 
 - vectorizer (sklearn object)
 
@@ -690,7 +690,7 @@ You can pass the parameter you want to search, then calculate its best score
 
 - model (string)
     
-    `model` to be used，pre-trained model include `harmful` and `news`.
+    `model` to be used，pre-trained model includes `harmful` and `news`.
 
 - vectorizer (sklearn object)
 
