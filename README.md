@@ -39,7 +39,7 @@
 
 ### Install
 
-    pip install cherry
+    pip install -U cherry
     
 ### Quickstart
 
