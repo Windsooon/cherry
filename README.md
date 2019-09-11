@@ -1,3 +1,16 @@
+# cherry
+
+[![image](https://travis-ci.org/Windsooon/cherry.svg?branch=master)](https://travis-ci.org/Windsooon/cherry)
+[![image](https://img.shields.io/pypi/v/cherry.svg)](https://pypi.python.org/pypi/cherry)
+[![image](https://img.shields.io/pypi/l/cherry.svg)](https://pypi.python.org/pypi/cherry)
+[![image](https://img.shields.io/pypi/pyversions/cherry.svg)](https://pypi.python.org/pypi/cherry)
+
+|  cherry   | Windson  |
+|  ----     | ----  |
+| Download  | https://pypi.python.org/pypi/cherry |
+| Source    | https://github.com/Windsooon/cherry |
+| Keywords  | text classification |
+
 ## Documentation
 - [**English Document**](#english-document)
 - [**中文文档**](#中文文档)
