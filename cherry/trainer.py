@@ -12,7 +12,6 @@ import os
 import pickle
 from sklearn.pipeline import Pipeline
 from .base import DATA_DIR, load_data, get_vectorizer, get_clf
-from .exceptions import MethodNotFoundError
 
 
 class Trainer:

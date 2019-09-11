@@ -10,7 +10,9 @@ This module implements the cherry classify.
 
 import os
 import numpy as np
+from sklearn.exceptions import NotFittedError
 from .base import load_cache
+from .exceptions import TokenNotFoundError
 
 
 class Classify:
@@ -41,7 +43,11 @@ class Classify:
         2. Transform the input text to text vector
         3. return the probability and word_list of the text
         '''
-        text_vector = self.vector.transform(text)
+        try:
+            text_vector = self.vector.transform(text)
+        except NotFittedError:
+            error = 'Some of the tokens in text never appear in training data'
+            raise TokenNotFoundError(error)
         word_list = []
         for tv in text_vector.toarray():
             feature_names = np.asarray(self.vector.get_feature_names())
