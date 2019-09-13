@@ -56,12 +56,13 @@
     
 ### Quickstart
 
-**Because the amount of data is too large, cherry library does not contain training any data**, so the pre-trained models only support the `classify()` method. **The pre-trained models contain two datasets, respectively
+#### Use pre-trained model
+Because the training data is too large, cherry library does not contain any training data, so the pre-trained models only support the `classify()` method. The pre-trained models contain two datasets, respectively
 
-1. Gamble / Porn / Political / Normal (`model='harmful'`，1000 chinese text data contains 4 categories)
-2. Lottery ticket / Finance / Estate / Home / Tech / Society / Sport / Game / Entertainment (`model=news`，50000 chinese news contains 7 categories)
+1. Gamble / Normal / Political / Porn (1000 chinese text data contains 4 categories which model name is 'harmful'.)
+2. Lottery ticket / Finance / Estate / Home / Tech / Society / Sport / Game / Entertainment (50000 chinese news contains 7 categories which model name is 'news'，)
 
-Using the pre-training model for text categorization is simple. You can specify two parameters in `classify()`. `text` is a list of text to be classified. The `models` parameter is one of `harmful`, `news `.
+Using the pre-trained model for text classification is simple. You can specify two parameters in `classify()`. `text` is a list of text to be classified. The `models` is the model name (Like `harmful`, `news`).
 
     >>> res = cherry.classify(model='harmful', text=['她们对计算机很有热情，也希望学习到数据分析，网络爬虫，人工智能等方面的知识，从而运用在她们工作上'])
     >>> res.word_list
@@ -72,10 +73,8 @@ Using the pre-training model for text categorization is simple. You can specify 
 
 `res` object contains `word_list` and `probability`. `word_list` contains the first 20 words in the text to be classified (in descending order of appearance frequency), and `probability` contains the probability under the corresponding category index (the index is consistent with the last category of each training data).
 
-> By default, cherry will use [MultinomialNB](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html) for classification.
-
 ### Custom
-There are two ways to use a custom dataset. First, you can pass the training data and its label to the `train()` API. For more details, checkout out [Training](#training). Second, you can use a text file for training as shown below.
+There are two ways to use a custom dataset. First, you can pass the training data and its label to the `train()` API. For more details, checkout out [Training](#training). Second, you can use your own dataset for training as shown below.
 
 #### Dataset
 The dataset should include two files (just like the example in `example/data_example`)
@@ -83,16 +82,16 @@ The dataset should include two files (just like the example in `example/data_exa
 1. training data `data.xxx`（file name begins with `data`)
 2. stop words `stop_words.xxx`（file name begin with `stop_words`)
 
-#### Training data
-Each row in the `data.xxx` represents a training data, it should end with ',' + 'category index' like this:
+#### data.xxx
+Each row in the `data.xxx` represents a training data, it should end with ',' + 'category index':
 
-    > This is a training data,0
-    > 
-    > This is another training data,1
+    This is a training data,0
+    This is another training data,1
+    ...
 
-    **cherry will extract the last index of each row as a label for training**
+cherry will extract the last index (0, 1, etc.) of each row as an index for the output of `res.probability`
 
-#### Stop words
+#### stop_words.xxx
 Each row in the `stop_words.xxx` should include a stop word like this:
 
     because
@@ -102,11 +101,11 @@ Each row in the `stop_words.xxx` should include a stop word like this:
 
 #### Put it together
 
-1. Create a new folder inside the `data` folder, your training data, stop words file and cache will be stored in this folder.
-2. Put `data.xxx` and `stop_words.xxx` into the new folder, the new folder is the model name you will use later in training other APIs.
+1. Create a new folder `your_folder` inside the `data` folder, your data, stop words file and cache will be stored in this folder.
+2. Put `data.xxx` and `stop_words.xxx` into `your_folder`, `your_folder` is the model name you will use later in all of the APIs.
 
 #### Settings
-Before training, you can create a custom tokenizer function. cherry uses `jieba` to support Chinese tokenizer by default ( in `base.py/`tokenizer()` . Your tokenizer function should accept the text as input and return a list that includes all the tokens. For English, you can use nltk by uncommenting the code below:
+Before training, you can use a custom tokenizer function. cherry uses `jieba` to support Chinese tokenizer by default (under `base.py/tokenizer()`). The tokenizer function should accept the text as input and return a list that includes all the tokens. For English, you can use nltk by uncommenting the code inside `base.py`:
 
     # base.py
     
@@ -131,15 +130,24 @@ That is it，You can also pass the data to the `train()` function. For instance,
     >>> x_data, y_data = iris.data, iris.target
     >>> cherry.train(model='your_folder_name', x_data=x_data, y_data=y_data)
     
-You still have to create `you_folder_name` to store the cache files. If you are familiar with `sklearn`, you can pass the feature extraction function and classify function to the `train()` API. For more details, you may have a look at [API](#api). For unbalanced dataset you can custome priori probability.
+You still have to create `your_folder` to store the cache files.  By default, cherry will use [CountVectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html) for feature extraction and [MultinomialNB](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html) for text classification. You can also pass the feature extraction function and classify function to the `train()` API if you are familiar with `sklearn`.
+
+    >>> from sklearn import datasets
+    >>> iris = datasets.load_iris()
+    >>> x_data, y_data = iris.data, iris.target
+    >>> cherry.train(model='your_folder_name', clf_method='SGD', vectorizer_method ='Tfidf ', x_data=x_data, y_data=y_data)
+
+For more details, you can have a look at [API](#api). For unbalanced dataset you can custome priori probability.
 
     >>> from sklearn.naive_bayes import MultinomialNB
     >>> mnb = MultinomialNB(class_prior=[0.4, 0.15, 0.15, 0.15, 0.15, 0.1])
-    >>> cherry.train(model='your_data_name', clf=mnb)
+    >>> cherry.train(model='your_folder')
     >>> res = cherry.classify(model='your_data_name', text=['your text'])
 
+> In order to save memory, you can use [HashingVectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.HashingVectorizer.html) or [TfidfVectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html) for feature extraction for big dataset.
+
 #### Classify
-After training, cherry will create cache files under `your_folder_name`. You can classify your data use `classify()`:
+After training, cherry will create cache files under `your_folder`. You can classify your data use `classify()`:
 
     >>> res = cherry.classify(model='harmful', text=['她们对计算机很有热情，也希望学习到数据分析，网络爬虫，人工智能等方面的知识，从而运用在她们工作上'])
     >>> res.word_list
@@ -396,7 +404,7 @@ You can pass the parameters you want to search, then calculate its best score
     
 - **高精确率，召回率**
 
-    在小型数据集（4个类别 共 1000条 数据）平均达到 96% 精确率以及召回率。在大型数据集（9个类别 共 5万条 数据，数据来自[这里](http://thuctc.thunlp.org/)）平均达到 97% 精确率以及召回率。
+    在小型数据集（4个类别 共 1000条 数据）平均达到 96% 精确率以及召回率。在大型数据集（7个类别 共 5万条 数据，数据来自[这里](http://thuctc.thunlp.org/)）平均达到 97% 精确率以及召回率。
 
 - **支持多种自定义算法**
 
@@ -409,16 +417,16 @@ You can pass the parameters you want to search, then calculate its best score
 
 ### 安装
 
-    pip install cherry
+    pip install -U cherry
     
 ### 快速开始
 
-**由于数据量过大，cherry 库并没有包含训练数据，所以预训练模型只支持 `classify()` 方法，使用其他方法需使用自定义数据集。** 预训练模型包含 2个 数据集，分别是：
+由于数据量过大，cherry 库并没有包含训练数据，所以预训练模型只支持 `classify()` 方法，使用其他方法需使用自定义数据集。 预训练模型包含 2个 数据集，分别是：
 
-1. 赌博 / 色情 / 敏感 / 正常 (`model='harmful'`，4个 类别包含约 1000条 中文句子)
-2. 彩票 / 财经 / 房产 / 家居 / 科技 / 社会 / 体育 / 游戏 / 娱乐 (`model=news`，9个 类别包含约 45000条 中文新闻)
+1. 赌博 / 正常 / 政治 / 色情 (`model='harmful'`，4个 类别包含约 1000条 中文句子)
+2. 彩票 / 科技 / 财经 / 房产 / 社会 / 体育 / 娱乐 (`model=news`，7个 类别包含约 45000条 中文新闻)
 
-使用预训练模型进行文本分类非常简单，只需要直接调用 `classify()` 方法，可以指定两个参数，`text` 是由待分类文本组成的列表，`models` 参数是 `harmful`, `news` 两者之一。
+使用预训练模型进行文本分类非常简单，只需要直接调用 `classify()` 方法，可以指定两个参数，`text` 是由待分类文本组成的列表，`models` 是训练时指定的文件夹名。
 
 	>>> res = cherry.classify(model='harmful', text=['她们对计算机很有热情，也希望学习到数据分析，网络爬虫，人工智能等方面的知识，从而运用在她们工作上'])
     >>> res.word_list
@@ -429,8 +437,6 @@ You can pass the parameters you want to search, then calculate its best score
 
 返回的 `res` 对象包含 `word_list` 以及 `probability`。其中 `word_list` 包含待分类文本中前 20个 词语（按出现频率降序排列），`probability` 包含对应类别索引下的概率（索引与每一条训练数据最后的类别一致）。
 
-> 默认 cherry 会使用 [MultinomialNB](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html) 进行分类。
-
 ### 定制
 有两种方法使用自定义数据集。第一，你可以直接把数据以及对应参数直接传给 `train()` API，具体方式请参考[训练](#训练)。第二，通过文本文件进行训练。
 
@@ -439,6 +445,15 @@ You can pass the parameters you want to search, then calculate its best score
 
 1. 数据集 `data.xxx`（需命名为 `data`开头，任意后缀的文件）
 2. 停止词 `stop_words.xxx`（需命名为 `stop_words`开头，任意后缀的文件，停止词可直接拷贝 `example` 文件夹中自带的 `stop_words.txt`）
+
+### 数据集
+
+数据集中每一行代表一条数据，数据结束后需要添加 ',' 以及对应的分类类别（不需要空格），例如：
+
+    这是一条正常数据,0
+    这是赌博相关数据,1
+
+cherry 会提取每一行数据最后的类别作为标签进行训练。
 
 #### 停止词
 `stop_words.xxx` 文件每行包含一个停止词，例如
@@ -452,16 +467,8 @@ You can pass the parameters you want to search, then calculate its best score
 
 具体步骤
 
-1. 在 data 文件夹内新建 `your_data_name` 文件夹，你的模型所有数据以及生成的缓存都会存放在此文件夹中。
-2. 把 `data.xxx` 以及 `stop_words.xxx` 放在文件夹中（可参考例子）。`your_data_name` 用作给 cherry 分辨不同的模型。
-3. 数据集中每一行代表一条数据，数据结束后需要添加 ',' 以及对应的分类类别（不需要空格），例如：
-
-    > 这是一条正常数据,0
-    > 
-    > 这是赌博相关数据,1
-
-    cherry 会提取每一行数据最后的类别作为标签进行训练。
-
+1. 在 data 文件夹内新建 `your_folder` 文件夹，你的模型所有数据以及生成的缓存都会存放在此文件夹中。
+2. 把 `data.xxx` 以及 `stop_words.xxx` 放在文件夹中（可参考例子）。`your_folder` 用作调用 APIs 时需要的 `model` 参数。
 
 #### 设置
 在开始训练前，你可以自定义分词函数，cherry 默认使用 jieba 进行中文分词，你也可以使用其他第三方库或者自行实现。此函数接受输入待分类文本，并返回分词后词语组成的列表。它位于 `base.py` 中的 `tokenizer()`
@@ -480,24 +487,33 @@ You can pass the parameters you want to search, then calculate its best score
 
 #### 训练
 
-	>>> cherry.train(model='your_data_name')
+	>>> cherry.train(model='your_folder')
 	
 训练就是那么简单，你也可以把测试数据传到 `train()` 函数进行训练，这里以 sklearn 中的 iris 数据集为例
 
     >>> from sklearn import datasets
     >>> iris = datasets.load_iris()
     >>> x_data, y_data = iris.data, iris.target
-    >>> cherry.train(model='your_data_name', x_data=x_data, y_data=y_data)
+    >>> cherry.train(model='your_data_name', x_data=x_data, y_data=y_data)   
     
-注意，你依然需要新建 `your_data_name` 文件夹用来存放缓存文件，如果你熟悉 `sklearn`，你也可以自定义特征函数以及分类函数，具体使用方法可以参考 [API](#api)。非均衡数据集可以自定义先验概率：
+注意，你依然需要新建 `your_folder` 文件夹用来存放缓存文件，cherry 默认会使用 [CountVectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html) 进行特征提取，使用 [MultinomialNB](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html) 进行训练。如果你熟悉 `sklearn`，你也可以自定义特征函数以及分类函数
+
+    >>> from sklearn import datasets
+    >>> iris = datasets.load_iris()
+    >>> x_data, y_data = iris.data, iris.target
+    >>> cherry.train(model='your_folder_name', clf_method='SGD', vectorizer_method ='Tfidf ', x_data=x_data, y_data=y_data)
+
+具体使用方法可以参考 [API](#api)。非均衡数据集可以自定义先验概率：
 
     >>> from sklearn.naive_bayes import MultinomialNB
     >>> mnb = MultinomialNB(class_prior=[0.4, 0.15, 0.15, 0.15, 0.15, 0.1])
-    >>> cherry.train(model='your_data_name', clf=mnb)
+    >>> cherry.train(model='your_data_name')
     >>> res = cherry.classify(model='your_data_name', text=['your text'])
 
+> 在大型数据集中，可以使用 [HashingVectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.HashingVectorizer.html) 和 [TfidfVectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html) 以节省内存。
+
 #### 分类
-训练完之后，cherry 会在 `your_data_name` 下生成训练模型缓存，调用 `classify()` 就能直接使用模型进行分类了，
+训练完之后，cherry 会在 `your_folder` 下生成训练模型缓存，调用 `classify()` 就能直接使用模型进行分类了，
 
 	>>> res = cherry.classify(model='harmful', text=['她们对计算机很有热情，也希望学习到数据分析，网络爬虫，人工智能等方面的知识，从而运用在她们工作上'])
     >>> res.word_list
