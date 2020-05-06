@@ -53,7 +53,7 @@ def load_data(model):
                     text.append(row[0])
                     label.append(row[1])
             return np.asarray(text), np.asarray(label)
-    error = 'Data file not found'
+    error = 'Data file for {0} not found.'.format(model)
     raise FilesNotFoundError(error)
 
 def write_file(self, path, data):

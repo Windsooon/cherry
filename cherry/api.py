@@ -16,7 +16,7 @@ from .search import Search
 from .displayer import Display
 
 
-def classify(text, model, N=20):
+def classify(model, text, N=20):
     '''
     Return a Classify object which contains *probability* and *word_list*
 
@@ -24,17 +24,17 @@ def classify(text, model, N=20):
            number of word list (int): how many word should be list in the word list
     output: Classify (Classify object)
     '''
-    return Classify(text=text, model=model, N=N)
+    return Classify(model=model, text=text, N=N)
 
 def train(model, vectorizer=None, vectorizer_method=None, clf=None, clf_method=None, x_data=None, y_data=None):
     '''
-    Train the data inside data dir
+    Train the `model` inside data directory
 
-    input model (string): model name of the training dataset (i.e 'chinese_classify')
-          vectorizer (BaseEstimator object): feature extraction method, like CountVectorizer, TfidfVectorizer or HashingVectorizer object
-          clf (Classifier object): Classifier object, like DecisionTreeClassifier, RandomForestClassifier, AdaBoostClassifier
-          x_data (array): training data
-          y_data (array): training label
+    model (string): model name of the training dataset (e.g. 'harmful')
+    vectorizer (BaseEstimator object): feature extraction method, CountVectorizer, TfidfVectorizer, HashingVectorizer etc.
+    clf (Classifier object): Classifier object, DecisionTreeClassifier, RandomForestClassifier, AdaBoostClassifier etc.
+    x_data (array): training data
+    y_data (array): training label
     '''
     return Trainer(
             model, vectorizer=vectorizer, vectorizer_method=None,
