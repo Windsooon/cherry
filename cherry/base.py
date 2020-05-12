@@ -8,53 +8,68 @@ Base method for cherry classify
 :license: MIT License, see LICENSE for more details.
 """
 import os
-import numpy as np
 import pickle
+import numpy as np
+
+from urllib.request import urlretrieve
 from .exceptions import FilesNotFoundError, UnicodeFileEncodeError, \
     CacheNotFoundError, MethodNotFoundError, DataMismatchError
+from sklearn.feature_extraction._stop_words import ENGLISH_STOP_WORDS
+from sklearn.datasets.base import load_files
 
 CHERRY_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'cherry')
-DATA_DIR = os.path.join(CHERRY_DIR, 'data')
+DATA_DIR = os.path.join(CHERRY_DIR, 'dataset')
+BUILD_IN_MODELS = {'4sen-harmful': ('abc.com', 'harmful')}
 
-def get_stop_words(model):
+__all__ = ['get_stop_words',
+           'load_data',
+           'write_file',
+           'load_cache',
+           'tokenizer',
+           'get_vectorizer',
+           'get_clf']
+
+def get_stop_words(language=None):
     '''
-    Return Stop words depent on filename
-    stop_word('chinese_classify.dat') will return the data in
-    DATA_DIR/stop_words_chinese_classify.dat
+    TODO: add IDF after every stop word
     '''
-    model_path = os.path.join(DATA_DIR, model)
-    for stop_words_file in os.listdir(model_path):
-        if stop_words_file.startswith('stop_words'):
-            try:
-                with open(os.path.join(model_path, stop_words_file), encoding='utf-8') as file:
-                    stop_words = [l[:-1] for l in file.readlines()]
-            except UnicodeEncodeError as e:
-                error = e
-                raise UnicodeFileEncodeError(error)
-            return stop_words
-    error = 'Stop words file not found'
-    raise FilesNotFoundError(error)
+    if not language:
+        return ENGLISH_STOP_WORDS
+    else:
+        return stop_words[language]
 
 def load_data(model):
-    '''
-    TODO: use a generator instead
-    '''
-    text, label = [], []
-    model_path = os.path.join(DATA_DIR, model)
-    for data_file in os.listdir(model_path):
-        if data_file.startswith('data'):
-            with open(os.path.join(model_path, data_file)) as file:
-                for line in file.readlines():
-                    row = line.split('\n')[0].rsplit(',', 1)
-                    if len(row) != 2:
-                        error = 'data mismatch in {0}, make sure there is a "," before the category index'.format(row)
-                        raise DataMismatchError(error)
-                    text.append(row[0])
-                    label.append(row[1])
-            return np.asarray(text), np.asarray(label)
-    error = 'Data file for {0} not found.'.format(model)
-    raise FilesNotFoundError(error)
+    model_data_path = os.path.join(DATA_DIR, model)
+    if os.path.exists(model_data_path):
+        data = _load_data_from_local(model)
+    elif model in BUILD_IN_MODELS:
+        data = _load_data_from_remote(model)
+    else:
+        error = '{0} is not built in models and not found in dataset folder.'.format(model)
+        raise FilesNotFoundError(error)
+    return data
+
+def _load_data_from_local(model):
+    info = BUILD_IN_MODELS[model]
+    bunch = load_files(path)
+    return bunch
+
+def _load_data_from_remote(mode):
+    info = BUILD_IN_MODELS[model]
+    _download_data(info.url, info.path)
+    return _load_data_from_local(model)
+
+def _download_data(url, path, times):
+    count = 0
+    while 1:
+        try:
+            path = urlretrieve(url, path)
+        except:
+            count += 1
+            if count == times:
+                raise
+    return path
 
 def write_file(self, path, data):
     '''

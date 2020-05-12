@@ -16,10 +16,13 @@ from .base import DATA_DIR, load_data, get_vectorizer, get_clf
 
 class Trainer:
     def __init__(self, model, **kwargs):
-        x_data = kwargs['x_data']
-        y_data = kwargs['y_data']
-        if not (x_data and y_data):
+        try:
             x_data, y_data = load_data(model)
+        except FilesNotFoundError:
+            error = '{0} is not built in models and not found in dataset folder.'.format(model)
+            raise FilesNotFoundError(error)
+        except:
+            raise
         vectorizer = kwargs['vectorizer']
         vectorizer_method = kwargs['vectorizer_method']
         clf = kwargs['clf']
