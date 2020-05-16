@@ -15,24 +15,35 @@ from .base import DATA_DIR, load_data, get_vectorizer, get_clf
 
 
 class Trainer:
-    def __init__(self, model, **kwargs):
+    def __init__(self, model, categories=None, encoding=None, **kwargs):
+        '''
+        Data should be stored in a two levels folder structure such as the following:
+
+        dataset/
+          model_name/
+            category1/
+              file_1.txt file_2.txt … file_42.txt
+            category2/
+              file_43.txt file_44.txt …
+        '''
         try:
-            x_data, y_data = load_data(model)
+            # load model data and also write cache
+            bunch = load_data(model, categories=categories, encoding=encoding)
         except FilesNotFoundError:
-            error = '{0} is not built in models and not found in dataset folder.'.format(model)
+            error = 'Please make sure your put the {0} data inside `dataset` folder or choose models inside BUILD_IN_MODELS.'.format(model)
             raise FilesNotFoundError(error)
-        except:
-            raise
-        vectorizer = kwargs['vectorizer']
-        vectorizer_method = kwargs['vectorizer_method']
-        clf = kwargs['clf']
-        clf_method = kwargs['clf_method']
+        vectorizer = kwargs.get('vectorizer', None)
+        vectorizer_method = kwargs.get('vectorizer_method', None)
+        clf = kwargs.get('clf', None)
+        clf_method = kwargs.get('clf_method', None)
+        # By default, Cherry will use CountVectorizer() if `vectorizer` is None
         if not vectorizer:
             vectorizer = get_vectorizer(model, vectorizer_method)
+        # By default, Cherry will use CountVectorizer() if `MultinomialNB` is None
         if not clf:
             clf = get_clf(model, clf_method)
-        self.train(vectorizer, clf, x_data, y_data)
-        self._write_cache(model, vectorizer, clf)
+        # Start training data
+        self.train(vectorizer, clf, bunch)
 
     def train(self, vectorizer, clf, x_data, y_data):
         '''
@@ -44,14 +55,3 @@ class Trainer:
             ('clf', clf)])
         print('Training may take some time depending on your dataset')
         text_clf.fit(x_data, y_data)
-
-    def _write_cache(self, model, vectorizer, clf):
-        '''
-        Write cache file under DATA_DIR
-        '''
-        cache_path = os.path.join(DATA_DIR, model + '/trained.pkl')
-        with open(cache_path, 'wb') as f:
-            pickle.dump(clf, f)
-        cache_path = os.path.join(DATA_DIR, model + '/ve.pkl')
-        with open(cache_path, 'wb') as f:
-            pickle.dump(vectorizer, f)

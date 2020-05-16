@@ -7,7 +7,7 @@ This module contains the set of cheery' exceptions.
 :license: MIT License, see LICENSE for more details.
 """
 
-class CherryException(IOError):
+class CherryException(Exception):
     '''Base Exception'''
     def __init__(self, error):
         self.error = error
@@ -21,6 +21,9 @@ class CacheNotFoundError(IOError):
 
 class FilesNotFoundError(IOError):
     '''Files not found'''
+
+class DownloadError(CherryException):
+    '''Download data error'''
 
 class MethodNotFoundError(AttributeError):
     '''Method not found'''

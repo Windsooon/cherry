@@ -54,6 +54,5 @@ class Display:
                  label="Training score")
         plt.plot(train_sizes, test_scores_mean, 'o-', color="g",
                  label="Cross-validation score")
-
         plt.legend(loc="best")
         plt.show()
