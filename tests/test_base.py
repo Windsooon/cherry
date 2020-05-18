@@ -6,20 +6,21 @@ import tempfile
 import cherry
 from cherry.base import *
 
+class UseModel():
+
+    def __init__(self, model):
+        self.dir_path = os.path.join(DATA_DIR, model)
+
+    def __enter__(self):
+        os.mkdir(self.dir_path)
+        with open(os.path.join(self.dir_path, 'foo.pkz'), 'wb+') as f:
+            file = f.write(b'bar')
+        return file
+
+    def __exit__(self, *args):
+        shutil.rmtree(self.dir_path)
 
 class BaseTest(unittest.TestCase):
-
-    @staticmethod
-    def _create_model(model_name):
-        dir_path = os.path.join(DATA_DIR, model_name)
-        os.mkdir(dir_path)
-        with open(os.path.join(dir_path, 'foo.pkz'), 'wb+') as f:
-            f.write(b'bar')
-
-    @staticmethod
-    def _delete_model(model_name):
-        dir_path = os.path.join(DATA_DIR, model_name)
-        shutil.rmtree(dir_path)
 
     def test_stop_words(self):
         self.assertIn('anyone', get_stop_words())
@@ -47,9 +48,8 @@ class BaseTest(unittest.TestCase):
 
     @mock.patch('cherry.base._load_data_from_local')
     def test_load_data_found(self, mock_load_files):
-        self._create_model('foo')
-        load_data('foo')
-        self._delete_model('foo')
+        with UseModel('foo') as model:
+            load_data('foo')
         mock_load_files.assert_called_once_with('/Users/windson/learn/cherry/cherry/datasets/foo', 'foo', categories=None, encoding=None)
 
     @mock.patch('cherry.base.load_files')
@@ -60,10 +60,17 @@ class BaseTest(unittest.TestCase):
         mock_load_files.assert_called_once_with('foo', categories=None, encoding=None)
 
     def test_load_local_data_from_local_with_cache(self):
-        self._create_model('foo')
-        res = _load_data_from_local(os.path.join(DATA_DIR, 'foo'), 'foo')
-        self._delete_model('foo')
+        with UseModel('foo') as model:
+            res = _load_data_from_local(os.path.join(DATA_DIR, 'foo'), 'foo')
         self.assertEqual(res['data'], [])
+
+    @mock.patch('cherry.base.pickle.loads')
+    def test_load_local_data_from_local_with_cache_failed(self, load_data):
+        load_data.side_effect = cherry.exceptions.NotSupportError('not found')
+        # self._create_model('foo')
+        # res = _load_data_from_local(os.path.join(DATA_DIR, 'foo'), 'foo')
+        # self._delete_model('foo')
+        # self.assertEqual(res['data'], [])
 
     @mock.patch('cherry.base.urlretrieve')
     def test_download_data(self, url_data):

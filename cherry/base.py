@@ -9,6 +9,7 @@ Base method for cherry classify
 """
 import os
 import pickle
+import codecs
 import urllib
 import numpy as np
 
@@ -69,7 +70,7 @@ def _load_data_from_local(path, model, categories=None, encoding=None):
            3.1 Try to create cache files using data files inside `dataset`.
            2.2 Raise error if create cache files failed.
     '''
-    cache_path = os.path.join(path, model + 'pkz')
+    cache_path = os.path.join(path, model + '.pkz')
     if os.path.exists(cache_path):
         try:
             with open(cache_path, 'rb') as f:
@@ -79,7 +80,8 @@ def _load_data_from_local(path, model, categories=None, encoding=None):
             return pickle.loads(uncompressed_content)
         except Exception as e:
             # Can't load cache files
-            pass
+            error = 'Can\'t load data from {0} cache files. Please try again after delete those cache files'.format(model)
+            raise NotSupportError(error)
     return load_files(path, categories=categories, encoding=encoding)
 
 def _load_data_from_remote(model, categories=None, encoding=None):
