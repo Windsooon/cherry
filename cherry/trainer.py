@@ -27,7 +27,6 @@ class Trainer:
               file_43.txt file_44.txt …
         '''
         try:
-            # load model data and also write cache
             bunch = load_data(model, categories=categories, encoding=encoding)
         except FilesNotFoundError:
             error = 'Please make sure your put the {0} data inside `dataset` folder or choose models inside BUILD_IN_MODELS.'.format(model)

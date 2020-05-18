@@ -9,13 +9,15 @@ Base method for cherry classify
 """
 import os
 import pickle
+import urllib
 import numpy as np
 
 from urllib.request import urlretrieve
-from .exceptions import FilesNotFoundError, UnicodeFileEncodeError, \
-    CacheNotFoundError, MethodNotFoundError, DataMismatchError, DownloadError
+from .exceptions import *
+from cherry.datasets import STOP_WORDS, BUILD_IN_MODELS
 from sklearn.feature_extraction._stop_words import ENGLISH_STOP_WORDS
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, HashingVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, \
+    TfidfVectorizer, HashingVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import SGDClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
@@ -24,7 +26,6 @@ from sklearn.datasets.base import load_files
 CHERRY_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'cherry')
 DATA_DIR = os.path.join(CHERRY_DIR, 'datasets')
-BUILD_IN_MODELS = {'4sen-harmful': ('abc.com', 'harmful')}
 
 __all__ = ['DATA_DIR',
            'get_stop_words',
@@ -32,47 +33,72 @@ __all__ = ['DATA_DIR',
            'write_file',
            'load_cache',
            '_load_data_from_local',
+           '_load_data_from_remote',
+           '_download_data',
            'tokenizer',
            'get_vectorizer',
            'get_clf']
 
-def get_stop_words(language=None):
+def get_stop_words(language='English'):
     '''
-    TODO: add IDF after every stop word
+    There are several known issues in our provided ‘english’ stop word list. It does not aim to be a general, ‘one-size-fits-all’ solution as some tasks may require a more custom solution. See https://aclweb.org/anthology/W18-2502 for more details.
+    TODO: add IDF after every stop word.
     '''
-    if not language:
+    if language == 'English':
         return ENGLISH_STOP_WORDS
-    else:
-        return stop_words[language]
+    try:
+        stop_word = STOP_WORDS[language]
+    except KeyError:
+        error = 'Cherry didn\'t support {0} at this moment.'.format(language)
+        raise NotSupportError(error)
 
 def load_data(model, categories=None, encoding=None):
-    model_data_path = os.path.join(DATA_DIR, model)
-    if os.path.exists(model_data_path):
-        data = _load_data_from_local(model_data_path, categories=categories, encoding=encoding)
-    elif model in BUILD_IN_MODELS:
-        data = _load_data_from_remote(model_data_path, categories=categories, encoding=encoding)
+    '''
+    Load data using `model` name
+    '''
+    path = os.path.join(DATA_DIR, model)
+    if os.path.exists(path):
+        return _load_data_from_local(path, model, categories=categories, encoding=encoding)
     else:
-        error = '{0} is not built in models and not found in dataset folder.'.format(model)
-        raise FilesNotFoundError(error)
-    return data
+        return _load_data_from_remote(model, categories=categories, encoding=encoding)
 
-def _load_data_from_local(path, categories=None, encoding=None):
-    bunch = load_files(path, categories=categories, encoding=encoding)
-    return bunch
+def _load_data_from_local(path, model, categories=None, encoding=None):
+    '''
+    1. Try to find local cache files
+    2. If we can't find the cache files
+           3.1 Try to create cache files using data files inside `dataset`.
+           2.2 Raise error if create cache files failed.
+    '''
+    cache_path = os.path.join(path, model + 'pkz')
+    if os.path.exists(cache_path):
+        try:
+            with open(cache_path, 'rb') as f:
+                compressed_content = f.read()
+            uncompressed_content = codecs.decode(
+                compressed_content, 'zlib_codec')
+            return pickle.loads(uncompressed_content)
+        except Exception as e:
+            # Can't load cache files
+            pass
+    return load_files(path, categories=categories, encoding=encoding)
 
 def _load_data_from_remote(model, categories=None, encoding=None):
-    info = BUILD_IN_MODELS[model]
-    _download_data(info.url, info.path, categories, encoding)
-    return _load_data_from_local(model)
+    try:
+        info = BUILD_IN_MODELS[model]
+    except KeyError:
+        error = '{0} is not built in models and not found in dataset folder.'.format(model)
+        raise FilesNotFoundError(error)
+    else:
+        _download_data(info[0], info[1], categories, encoding)
+    return _load_data_from_local(info[0], model)
 
 def _download_data(url, path, categories, encoding):
-    print("Trying to download model from {0} in local path {1}".format(url, path))
+    print("Trying to download {1} data files from {0}.".format(url, path))
     try:
         urlretrieve(url, path)
     except (urllib.error.URLError, urllib.error.HTTPError) as e:
         error = 'Can\' download model form {0}'.format(url)
         raise DownloadError(error)
-    return _load_data_from_local(path, categories, encoding)
 
 def write_file(self, path, data):
     '''
@@ -154,4 +180,3 @@ def get_clf(model, clf_method):
         raise MethodNotFoundError
     else:
         return method(**parameters)
-

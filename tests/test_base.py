@@ -9,16 +9,48 @@ from cherry.base import *
 
 class BaseTest(unittest.TestCase):
 
-    def test_stop_words(self):
-        self.assertIn("anyone", get_stop_words())
-        self.assertNotIn("human", get_stop_words())
+    @staticmethod
+    def _create_model(model_name):
+        dir_path = os.path.join(DATA_DIR, model_name)
+        os.mkdir(dir_path)
+        with open(os.path.join(dir_path, 'foo.pkz'), 'wb+') as f:
+            f.write(b'bar')
 
-    def test_load_data_not_found(self):
+    @staticmethod
+    def _delete_model(model_name):
+        dir_path = os.path.join(DATA_DIR, model_name)
+        shutil.rmtree(dir_path)
+
+    def test_stop_words(self):
+        self.assertIn('anyone', get_stop_words())
+        self.assertNotIn('human', get_stop_words())
+
+    def test_load_data_from_remote_not_build_in(self):
         with self.assertRaises(cherry.exceptions.FilesNotFoundError) as filesNotFoundError:
-            load_data("harmful")
+            _load_data_from_remote('foo')
         self.assertEqual(
             str(filesNotFoundError.exception),
-            'harmful is not built in models and not found in dataset folder.')
+            'foo is not built in models and not found in dataset folder.')
+
+
+    @mock.patch('cherry.base._load_data_from_local')
+    @mock.patch('cherry.base._download_data')
+    def test_load_data_from_remote_download(self, mock_download_data, mock_from_local):
+        res = _load_data_from_remote('harmful')
+        mock_from_local.return_value = 'foo'
+        mock_download_data.assert_called_once_with('abc.com', 'harmful', None, None)
+
+    @mock.patch('cherry.base._load_data_from_remote')
+    def test_load_data_from_remote(self, mock_load_files):
+        load_data('foo')
+        mock_load_files.assert_called_once_with('foo', categories=None, encoding=None)
+
+    @mock.patch('cherry.base._load_data_from_local')
+    def test_load_data_found(self, mock_load_files):
+        self._create_model('foo')
+        load_data('foo')
+        self._delete_model('foo')
+        mock_load_files.assert_called_once_with('/Users/windson/learn/cherry/cherry/datasets/foo', 'foo', categories=None, encoding=None)
 
     @mock.patch('cherry.base.load_files')
     def test_load_local_data_from_local_without_cache(self, mock_load_files):
@@ -28,14 +60,14 @@ class BaseTest(unittest.TestCase):
         mock_load_files.assert_called_once_with('foo', categories=None, encoding=None)
 
     def test_load_local_data_from_local_with_cache(self):
-        dir_path = os.path.join(DATA_DIR, 'foo')
-        os.mkdir(dir_path)
-        with open(os.path.join(dir_path, 'foo.pkz'),'wb+') as f:
-            f.write(b'bar')
+        self._create_model('foo')
         res = _load_data_from_local(os.path.join(DATA_DIR, 'foo'), 'foo')
+        self._delete_model('foo')
         self.assertEqual(res['data'], [])
-        shutil.rmtree(dir_path)
 
-    def test_load_data_from_remote_not_build_in(self):
-        pass
+    @mock.patch('cherry.base.urlretrieve')
+    def test_download_data(self, url_data):
+        url_data.side_effect = cherry.exceptions.FilesNotFoundError('not found')
+        with self.assertRaises(cherry.exceptions.FilesNotFoundError) as filesNotFoundError:
+            _download_data('abc.com', 'harmful', None, None)
 
