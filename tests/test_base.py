@@ -4,6 +4,7 @@ import unittest
 from unittest import mock
 import tempfile
 import cherry
+from cherry.datasets import BUILD_IN_MODELS
 from cherry.base import *
 
 class UseModel():
@@ -27,8 +28,9 @@ class BaseTest(unittest.TestCase):
         self.assertNotIn('human', get_stop_words())
 
     def test_load_data_from_remote_not_build_in(self):
+        target_path = os.path.join(DATA_DIR, 'foo')
         with self.assertRaises(cherry.exceptions.FilesNotFoundError) as filesNotFoundError:
-            _load_data_from_remote('foo')
+            _load_data_from_remote('foo', target_path)
         self.assertEqual(
             str(filesNotFoundError.exception),
             'foo is not built in models and not found in dataset folder.')
@@ -37,14 +39,19 @@ class BaseTest(unittest.TestCase):
     @mock.patch('cherry.base._load_data_from_local')
     @mock.patch('cherry.base._download_data')
     def test_load_data_from_remote_download(self, mock_download_data, mock_from_local):
-        res = _load_data_from_remote('harmful')
+        model = 'newsgroups'
+        model_path = os.path.join(DATA_DIR, model)
+        res = _load_data_from_remote(model, os.path.join(DATA_DIR, model))
         mock_from_local.return_value = 'foo'
-        mock_download_data.assert_called_once_with('abc.com', 'harmful', None, None)
+        mock_download_data.assert_called_once_with(
+            BUILD_IN_MODELS[model], model_path, None, None)
 
     @mock.patch('cherry.base._load_data_from_remote')
     def test_load_data_from_remote(self, mock_load_files):
         load_data('foo')
-        mock_load_files.assert_called_once_with('foo', categories=None, encoding=None)
+        model_path = os.path.join(DATA_DIR, 'foo')
+        mock_load_files.assert_called_once_with(
+            'foo', model_path, categories=None, encoding=None)
 
     @mock.patch('cherry.base._load_data_from_local')
     def test_load_data_found(self, mock_load_files):
@@ -76,5 +83,5 @@ class BaseTest(unittest.TestCase):
     def test_download_data(self, url_data):
         url_data.side_effect = cherry.exceptions.FilesNotFoundError('not found')
         with self.assertRaises(cherry.exceptions.FilesNotFoundError) as filesNotFoundError:
-            _download_data('abc.com', 'harmful', None, None)
+            _download_data(('abc.com', 'foo', 'abc'), '/User/example', None, None)
 

@@ -42,7 +42,10 @@ __all__ = ['DATA_DIR',
 
 def get_stop_words(language='English'):
     '''
-    There are several known issues in our provided ‘english’ stop word list. It does not aim to be a general, ‘one-size-fits-all’ solution as some tasks may require a more custom solution. See https://aclweb.org/anthology/W18-2502 for more details.
+    There are several known issues in our provided ‘english’ stop word list.
+    It does not aim to be a general, ‘one-size-fits-all’ solution as some
+    tasks may require a more custom solution.
+    See https://aclweb.org/anthology/W18-2502 for more details.
     TODO: add IDF after every stop word.
     '''
     if language == 'English':
@@ -57,20 +60,25 @@ def load_data(model, categories=None, encoding=None):
     '''
     Load data using `model` name
     '''
-    path = os.path.join(DATA_DIR, model)
-    if os.path.exists(path):
-        return _load_data_from_local(path, model, categories=categories, encoding=encoding)
+    target_path = os.path.join(DATA_DIR, model)
+    if os.path.exists(target_path):
+        return _load_data_from_local(
+            target_path, model,
+            categories=categories,
+            encoding=encoding)
     else:
-        return _load_data_from_remote(model, categories=categories, encoding=encoding)
+        return _load_data_from_remote(
+            model, target_path, categories=categories,
+            encoding=encoding)
 
-def _load_data_from_local(path, model, categories=None, encoding=None):
+def _load_data_from_local(target_path, model, categories=None, encoding=None):
     '''
     1. Try to find local cache files
     2. If we can't find the cache files
            3.1 Try to create cache files using data files inside `dataset`.
            2.2 Raise error if create cache files failed.
     '''
-    cache_path = os.path.join(path, model + '.pkz')
+    cache_path = os.path.join(target_path, model + '.pkz')
     if os.path.exists(cache_path):
         try:
             with open(cache_path, 'rb') as f:
@@ -80,27 +88,36 @@ def _load_data_from_local(path, model, categories=None, encoding=None):
             return pickle.loads(uncompressed_content)
         except Exception as e:
             # Can't load cache files
-            error = 'Can\'t load data from {0} cache files. Please try again after delete those cache files'.format(model)
+            error = 'Can\'t load data from {0} cache files.' + \
+                    'Please try again after delete those cache files'.format(model)
             raise NotSupportError(error)
-    return load_files(path, categories=categories, encoding=encoding)
+    return load_files(target_path, categories=categories, encoding=encoding)
 
-def _load_data_from_remote(model, categories=None, encoding=None):
+def _load_data_from_remote(model, target_path, categories=None, encoding=None):
     try:
         info = BUILD_IN_MODELS[model]
     except KeyError:
-        error = '{0} is not built in models and not found in dataset folder.'.format(model)
+        error = ('{0} is not built in models and not found '
+                'in dataset folder.').format(model)
         raise FilesNotFoundError(error)
-    else:
-        _download_data(info[0], info[1], categories, encoding)
-    return _load_data_from_local(info[0], model)
+    _download_data(info, target_path, categories, encoding)
+    return _load_data_from_local(info[1], model)
 
-def _download_data(url, path, categories, encoding):
-    print("Trying to download {1} data files from {0}.".format(url, path))
+def _download_data(info, target_path, categories, encoding):
+    url, filename, checksum = info
+    print("Trying to download data files from {0}.".format(url))
     try:
-        urlretrieve(url, path)
+        urlretrieve(url, target_path)
     except (urllib.error.URLError, urllib.error.HTTPError) as e:
         error = 'Can\' download model form {0}'.format(url)
         raise DownloadError(error)
+    _decompress_data(filename, target_path)
+
+def _decompress_data(filename, target_path):
+    file_path = os.path.join(target_path, filename)
+    logger.debug("Decompressing %s", file_path)
+    tarfile.open(file_path, "r:gz").extractall(path=target_path)
+    os.remove(file_path)
 
 def write_file(self, path, data):
     '''
