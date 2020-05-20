@@ -28,9 +28,9 @@ class BaseTest(unittest.TestCase):
         self.assertNotIn('human', get_stop_words())
 
     def test_load_data_from_remote_not_build_in(self):
-        target_path = os.path.join(DATA_DIR, 'foo')
+        model_path = os.path.join(DATA_DIR, 'foo')
         with self.assertRaises(cherry.exceptions.FilesNotFoundError) as filesNotFoundError:
-            _load_data_from_remote('foo', target_path)
+            _load_data_from_remote(model_path, 'foo')
         self.assertEqual(
             str(filesNotFoundError.exception),
             'foo is not built in models and not found in dataset folder.')
@@ -41,7 +41,7 @@ class BaseTest(unittest.TestCase):
     def test_load_data_from_remote_download(self, mock_download_data, mock_from_local):
         model = 'newsgroups'
         model_path = os.path.join(DATA_DIR, model)
-        res = _load_data_from_remote(model, os.path.join(DATA_DIR, model))
+        res = _load_data_from_remote(os.path.join(DATA_DIR, model), model)
         mock_from_local.return_value = 'foo'
         mock_download_data.assert_called_once_with(
             BUILD_IN_MODELS[model], model_path, None, None)
@@ -51,7 +51,7 @@ class BaseTest(unittest.TestCase):
         load_data('foo')
         model_path = os.path.join(DATA_DIR, 'foo')
         mock_load_files.assert_called_once_with(
-            'foo', model_path, categories=None, encoding=None)
+            model_path, 'foo', categories=None, encoding=None)
 
     @mock.patch('cherry.base._load_data_from_local')
     def test_load_data_found(self, mock_load_files):

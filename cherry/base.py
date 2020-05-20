@@ -9,9 +9,10 @@ Base method for cherry classify
 """
 import os
 import pickle
+import tarfile
 import codecs
 import urllib
-import numpy as np
+import logging
 
 from urllib.request import urlretrieve
 from .exceptions import *
@@ -22,7 +23,7 @@ from sklearn.feature_extraction.text import CountVectorizer, \
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import SGDClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-from sklearn.datasets.base import load_files
+from sklearn.datasets import load_files
 
 CHERRY_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'cherry')
@@ -60,25 +61,25 @@ def load_data(model, categories=None, encoding=None):
     '''
     Load data using `model` name
     '''
-    target_path = os.path.join(DATA_DIR, model)
-    if os.path.exists(target_path):
+    model_path = os.path.join(DATA_DIR, model)
+    if os.path.exists(model_path):
         return _load_data_from_local(
-            target_path, model,
+            model_path, model,
             categories=categories,
             encoding=encoding)
     else:
         return _load_data_from_remote(
-            model, target_path, categories=categories,
+            model_path, model, categories=categories,
             encoding=encoding)
 
-def _load_data_from_local(target_path, model, categories=None, encoding=None):
+def _load_data_from_local(model_path, model, categories=None, encoding=None):
     '''
     1. Try to find local cache files
     2. If we can't find the cache files
            3.1 Try to create cache files using data files inside `dataset`.
            2.2 Raise error if create cache files failed.
     '''
-    cache_path = os.path.join(target_path, model + '.pkz')
+    cache_path = os.path.join(model_path, model + '.pkz')
     if os.path.exists(cache_path):
         try:
             with open(cache_path, 'rb') as f:
@@ -91,32 +92,32 @@ def _load_data_from_local(target_path, model, categories=None, encoding=None):
             error = 'Can\'t load data from {0} cache files.' + \
                     'Please try again after delete those cache files'.format(model)
             raise NotSupportError(error)
-    return load_files(target_path, categories=categories, encoding=encoding)
+    return load_files(model_path, categories=categories, encoding=encoding)
 
-def _load_data_from_remote(model, target_path, categories=None, encoding=None):
+def _load_data_from_remote(model_path, model, categories=None, encoding=None):
     try:
         info = BUILD_IN_MODELS[model]
     except KeyError:
         error = ('{0} is not built in models and not found '
                 'in dataset folder.').format(model)
         raise FilesNotFoundError(error)
-    _download_data(info, target_path, categories, encoding)
+    _download_data(info, model_path, categories, encoding)
     return _load_data_from_local(info[1], model)
 
-def _download_data(info, target_path, categories, encoding):
+def _download_data(info, model_path, categories, encoding):
     url, filename, checksum = info
     print("Trying to download data files from {0}.".format(url))
     try:
-        urlretrieve(url, target_path)
+        urlretrieve(url, os.path.join(model_path, filename))
     except (urllib.error.URLError, urllib.error.HTTPError) as e:
         error = 'Can\' download model form {0}'.format(url)
         raise DownloadError(error)
-    _decompress_data(filename, target_path)
+    _decompress_data(filename, model_path)
 
-def _decompress_data(filename, target_path):
-    file_path = os.path.join(target_path, filename)
-    logger.debug("Decompressing %s", file_path)
-    tarfile.open(file_path, "r:gz").extractall(path=target_path)
+def _decompress_data(filename, model_path):
+    file_path = os.path.join(model_path, filename)
+    logging.debug("Decompressing %s", file_path)
+    tarfile.open(file_path, "r:gz").extractall(path=model_path)
     os.remove(file_path)
 
 def write_file(self, path, data):
@@ -182,7 +183,7 @@ def get_vectorizer(model, vectorizer_method):
     except KeyError:
         raise MethodNotFoundError
     else:
-        return method(tokenizer=tokenizer, stop_words=get_stop_words(model))
+        return method(tokenizer=tokenizer, stop_words=get_stop_words())
 
 def get_clf(model, clf_method):
     if not clf_method:
