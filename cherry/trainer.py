@@ -16,7 +16,7 @@ from .exceptions import *
 
 
 class Trainer:
-    def __init__(self, model, categories=None, encoding=None, **kwargs):
+    def __init__(self, model, train_test_split=True, categories=None, encoding=None, **kwargs):
         '''
         Data should be stored in a two levels folder structure such as the following:
 
@@ -45,7 +45,7 @@ class Trainer:
         # Start training data
         self.train(vectorizer, clf, bunch)
 
-    def train(self, vectorizer, clf, x_data, y_data):
+    def train(self, vectorizer, clf, bunch):
         '''
         Train bayes model with input data and decide which feature extraction method
         and classify method should use

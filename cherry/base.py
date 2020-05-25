@@ -3,17 +3,19 @@
 """
 cherry.base
 ~~~~~~~~~~~~
-Base method for cherry classify
-:copyright: (c) 2018-2019 by Windson Yang
+Base method for cherry
+:copyright: (c) 2018-2020 by Windson Yang
 :license: MIT License, see LICENSE for more details.
 """
 import os
 import pickle
 import tarfile
+import hashlib
 import codecs
 import urllib
 import logging
 
+from collections import namedtuple
 from urllib.request import urlretrieve
 from .exceptions import *
 from cherry.datasets import STOP_WORDS, BUILD_IN_MODELS
@@ -36,7 +38,6 @@ __all__ = ['DATA_DIR',
            'load_cache',
            '_load_data_from_local',
            '_load_data_from_remote',
-           '_download_data',
            'tokenizer',
            'get_vectorizer',
            'get_clf']
@@ -52,7 +53,7 @@ def get_stop_words(language='English'):
     if language == 'English':
         return ENGLISH_STOP_WORDS
     try:
-        stop_word = STOP_WORDS[language]
+        return STOP_WORDS[language]
     except KeyError:
         error = 'Cherry didn\'t support {0} at this moment.'.format(language)
         raise NotSupportError(error)
@@ -64,21 +65,21 @@ def load_data(model, categories=None, encoding=None):
     model_path = os.path.join(DATA_DIR, model)
     if os.path.exists(model_path):
         return _load_data_from_local(
-            model_path, model,
-            categories=categories,
+            model, categories=categories,
             encoding=encoding)
     else:
         return _load_data_from_remote(
-            model_path, model, categories=categories,
+            model, categories=categories,
             encoding=encoding)
 
-def _load_data_from_local(model_path, model, categories=None, encoding=None):
+def _load_data_from_local(model, categories=None, encoding=None):
     '''
     1. Try to find local cache files
     2. If we can't find the cache files
            3.1 Try to create cache files using data files inside `dataset`.
            2.2 Raise error if create cache files failed.
     '''
+    model_path = os.path.join(DATA_DIR, model)
     cache_path = os.path.join(model_path, model + '.pkz')
     if os.path.exists(cache_path):
         try:
@@ -94,25 +95,52 @@ def _load_data_from_local(model_path, model, categories=None, encoding=None):
             raise NotSupportError(error)
     return load_files(model_path, categories=categories, encoding=encoding)
 
-def _load_data_from_remote(model_path, model, categories=None, encoding=None):
+def _load_data_from_remote(model, categories=None, encoding=None):
     try:
         info = BUILD_IN_MODELS[model]
     except KeyError:
         error = ('{0} is not built in models and not found '
                 'in dataset folder.').format(model)
         raise FilesNotFoundError(error)
-    _download_data(info, model_path, categories, encoding)
-    return _load_data_from_local(info[1], model)
+    # The original data can be found at:
+    # https://people.csail.mit.edu/jrennie/20Newsgroups/20news-bydate.tar.gz
+    meta_data_c = namedtuple('meta_data_c', ['filename', 'url', 'checksum'])
+    # Create a nametuple
+    meta_data = meta_data_c(filename=info[0], url=info[1], checksum=info[2])
+    model_path = os.path.join(DATA_DIR, model)
+    if not os.path.exists(model_path):
+        os.makedirs(model_path)
+    _fetch_remote(meta_data, model_path)
+    _decompress_data(meta_data.filename, model_path)
+    return _load_data_from_local(model, categories=categories, encoding=encoding)
 
-def _download_data(info, model_path, categories, encoding):
-    url, filename, checksum = info
-    print("Trying to download data files from {0}.".format(url))
-    try:
-        urlretrieve(url, os.path.join(model_path, filename))
-    except (urllib.error.URLError, urllib.error.HTTPError) as e:
-        error = 'Can\' download model form {0}'.format(url)
-        raise DownloadError(error)
-    _decompress_data(filename, model_path)
+def _fetch_remote(remote, dirname=None):
+    """Helper function to download a remote dataset into path
+       Copy from sklearn.datasets.base
+    """
+
+    file_path = (remote.filename if dirname is None
+                 else os.path.join(dirname, remote.filename))
+    urlretrieve(remote.url, file_path)
+    checksum = _sha256(file_path)
+    if remote.checksum != checksum:
+        raise IOError("{} has an SHA256 checksum ({}) "
+                      "differing from expected ({}), "
+                      "file may be corrupted.".format(file_path, checksum,
+                                                      remote.checksum))
+    return file_path
+
+def _sha256(path):
+    """Calculate the sha256 hash of the file at path."""
+    sha256hash = hashlib.sha256()
+    chunk_size = 8192
+    with open(path, "rb") as f:
+        while True:
+            buffer = f.read(chunk_size)
+            if not buffer:
+                break
+            sha256hash.update(buffer)
+    return sha256hash.hexdigest()
 
 def _decompress_data(filename, model_path):
     file_path = os.path.join(model_path, filename)
