@@ -16,7 +16,7 @@ from .exceptions import *
 
 
 class Trainer:
-    def __init__(self, model, train_test_split=True, categories=None, encoding=None, **kwargs):
+    def __init__(self, model, categories=None, encoding=None, **kwargs):
         '''
         Data should be stored in a two levels folder structure such as the following:
 
@@ -28,24 +28,24 @@ class Trainer:
               file_43.txt file_44.txt …
         '''
         try:
-            bunch = load_data(model, categories=categories, encoding=encoding)
+            cache = load_data(model, categories=categories, encoding=encoding)
         except FilesNotFoundError:
             error = 'Please make sure your put the {0} data inside `dataset` folder or choose models inside BUILD_IN_MODELS.'.format(model)
             raise FilesNotFoundError(error)
         vectorizer = kwargs.get('vectorizer', None)
-        vectorizer_method = kwargs.get('vectorizer_method', None)
-        clf = kwargs.get('clf', None)
-        clf_method = kwargs.get('clf_method', None)
         # By default, Cherry will use CountVectorizer() if `vectorizer` is None
+        vectorizer_method = kwargs.get('vectorizer_method', None)
         if not vectorizer:
             vectorizer = get_vectorizer(model, vectorizer_method)
-        # By default, Cherry will use CountVectorizer() if `MultinomialNB` is None
+        # By default, Cherry will use CountVectorizer() if `clf` is None
+        clf = kwargs.get('clf', None)
+        clf_method = kwargs.get('clf_method', None)
         if not clf:
             clf = get_clf(model, clf_method)
         # Start training data
-        self.train(vectorizer, clf, bunch)
+        self.train(vectorizer, clf, cache)
 
-    def train(self, vectorizer, clf, bunch):
+    def train(self, vectorizer, clf, cache):
         '''
         Train bayes model with input data and decide which feature extraction method
         and classify method should use
@@ -54,4 +54,4 @@ class Trainer:
             ('vectorizer', vectorizer),
             ('clf', clf)])
         print('Training may take some time depending on your dataset')
-        text_clf.fit(x_data, y_data)
+        text_clf.fit(cache.data, cache.target)

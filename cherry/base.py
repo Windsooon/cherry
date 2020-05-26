@@ -14,6 +14,7 @@ import hashlib
 import codecs
 import urllib
 import logging
+import numpy as np
 
 from collections import namedtuple
 from urllib.request import urlretrieve
@@ -58,21 +59,28 @@ def get_stop_words(language='English'):
         error = 'Cherry didn\'t support {0} at this moment.'.format(language)
         raise NotSupportError(error)
 
-def load_data(model, categories=None, encoding=None):
+def load_data(model, preprocessing=None, categories=None, encoding=None, split=False):
     '''
     Load data using `model` name
     '''
     model_path = os.path.join(DATA_DIR, model)
     if os.path.exists(model_path):
+        try:
+            info = BUILD_IN_MODELS[model]
+        except KeyError:
+            pass
+        else:
+            if not encoding:
+                encoding = info[3]
         return _load_data_from_local(
-            model, categories=categories,
-            encoding=encoding)
+            model, preprocessing=preprocessing, categories=categories,
+            encoding=encoding, split=split)
     else:
         return _load_data_from_remote(
-            model, categories=categories,
-            encoding=encoding)
+            model, preprocessing=preprocessing, categories=categories,
+            encoding=encoding, split=split)
 
-def _load_data_from_local(model, categories=None, encoding=None):
+def _load_data_from_local(model, preprocessing=None, categories=None, encoding=None, split=False):
     '''
     1. Try to find local cache files
     2. If we can't find the cache files
@@ -87,15 +95,22 @@ def _load_data_from_local(model, categories=None, encoding=None):
                 compressed_content = f.read()
             uncompressed_content = codecs.decode(
                 compressed_content, 'zlib_codec')
-            return pickle.loads(uncompressed_content)
+            return pickle.loads(uncompressed_content)['all']
         except Exception as e:
             # Can't load cache files
             error = 'Can\'t load data from {0} cache files.' + \
                     'Please try again after delete those cache files'.format(model)
             raise NotSupportError(error)
-    return load_files(model_path, categories=categories, encoding=encoding)
+    cache = dict(all=load_files(
+        model_path, categories=categories, encoding=encoding))
+    compressed_content = codecs.encode(pickle.dumps(cache), 'zlib_codec')
+    with open(cache_path, 'wb') as f:
+        f.write(compressed_content)
+    if split:
+        return _train_test_split(cache)
+    return cache['all']
 
-def _load_data_from_remote(model, categories=None, encoding=None):
+def _load_data_from_remote(model, preprocessing=None, categories=None, encoding=None, split=False):
     try:
         info = BUILD_IN_MODELS[model]
     except KeyError:
@@ -104,15 +119,18 @@ def _load_data_from_remote(model, categories=None, encoding=None):
         raise FilesNotFoundError(error)
     # The original data can be found at:
     # https://people.csail.mit.edu/jrennie/20Newsgroups/20news-bydate.tar.gz
-    meta_data_c = namedtuple('meta_data_c', ['filename', 'url', 'checksum'])
+    meta_data_c = namedtuple('meta_data_c', ['filename', 'url', 'checksum', 'encoding'])
     # Create a nametuple
-    meta_data = meta_data_c(filename=info[0], url=info[1], checksum=info[2])
+    meta_data = meta_data_c(filename=info[0], url=info[1], checksum=info[2], encoding=info[3])
     model_path = os.path.join(DATA_DIR, model)
     if not os.path.exists(model_path):
         os.makedirs(model_path)
     _fetch_remote(meta_data, model_path)
     _decompress_data(meta_data.filename, model_path)
-    return _load_data_from_local(model, categories=categories, encoding=encoding)
+    return _load_data_from_local(
+        model, preprocessing=preprocessing,
+        categories=categories, encoding=meta_data_c.encoding,
+        split=split)
 
 def _fetch_remote(remote, dirname=None):
     """Helper function to download a remote dataset into path
@@ -129,6 +147,19 @@ def _fetch_remote(remote, dirname=None):
                       "file may be corrupted.".format(file_path, checksum,
                                                       remote.checksum))
     return file_path
+
+def _train_test_split(cache):
+    data_lst = list()
+    target = list()
+    filenames = list()
+    data = cache['all']
+    data_lst.extend(data.data)
+    target.extend(data.target)
+    filenames.extend(data.filenames)
+    data.data = data_lst
+    data.target = np.array(target)
+    data.filenames = np.array(filenames)
+    return train_test_split(data.data, data.target, test_size=0.2, random_state=0)
 
 def _sha256(path):
     """Calculate the sha256 hash of the file at path."""
