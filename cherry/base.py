@@ -37,9 +37,7 @@ __all__ = ['DATA_DIR',
            'load_data',
            'write_file',
            'load_cache',
-           '_load_data_from_local',
-           '_load_data_from_remote',
-           'tokenizer',
+           'get_tokenizer',
            'get_vectorizer',
            'get_clf']
 
@@ -133,8 +131,10 @@ def _load_data_from_remote(model, preprocessing=None, categories=None, encoding=
         split=split)
 
 def _fetch_remote(remote, dirname=None):
-    """Helper function to download a remote dataset into path
-       Copy from sklearn.datasets.base
+    """
+    Function from sklearn
+    Helper function to download a remote dataset into path
+    Copy from sklearn.datasets.base
     """
 
     file_path = (remote.filename if dirname is None
@@ -148,6 +148,30 @@ def _fetch_remote(remote, dirname=None):
                                                       remote.checksum))
     return file_path
 
+def _sha256(path):
+    """
+    Function from sklearn
+    Calculate the sha256 hash of the file at path.
+    """
+    sha256hash = hashlib.sha256()
+    chunk_size = 8192
+    with open(path, "rb") as f:
+        while True:
+            buffer = f.read(chunk_size)
+            if not buffer:
+                break
+            sha256hash.update(buffer)
+    return sha256hash.hexdigest()
+
+def _decompress_data(filename, model_path):
+    '''
+    Function from sklearn
+    '''
+    file_path = os.path.join(model_path, filename)
+    logging.debug("Decompressing %s", file_path)
+    tarfile.open(file_path, "r:gz").extractall(path=model_path)
+    os.remove(file_path)
+
 def _train_test_split(cache):
     data_lst = list()
     target = list()
@@ -160,24 +184,6 @@ def _train_test_split(cache):
     data.target = np.array(target)
     data.filenames = np.array(filenames)
     return train_test_split(data.data, data.target, test_size=0.2, random_state=0)
-
-def _sha256(path):
-    """Calculate the sha256 hash of the file at path."""
-    sha256hash = hashlib.sha256()
-    chunk_size = 8192
-    with open(path, "rb") as f:
-        while True:
-            buffer = f.read(chunk_size)
-            if not buffer:
-                break
-            sha256hash.update(buffer)
-    return sha256hash.hexdigest()
-
-def _decompress_data(filename, model_path):
-    file_path = os.path.join(model_path, filename)
-    logging.debug("Decompressing %s", file_path)
-    tarfile.open(file_path, "r:gz").extractall(path=model_path)
-    os.remove(file_path)
 
 def write_file(self, path, data):
     '''
@@ -216,23 +222,19 @@ def load_cache(model, path):
             'Can\'t find cache files')
         raise CacheNotFoundError(error)
 
-def tokenizer(text, language='English'):
-    '''
-    English: nltk
-    Chinese: jieba
-    '''
+def get_tokenizer(language):
     if language == 'English':
         from nltk.tokenize import word_tokenize
-        return [t.lower() for t in word_tokenize(text) if len(t) > 1]
+        return word_tokenize
     elif language == 'Chinese':
         import jieba
-        return [t for t in jieba.cut(text) if len(t) > 1]
+        return jieba.cut
     else:
-        raise
+        raise NotSupportError((
+            'You need to specify tokenizer function ' +
+            'when the language is nor English or Chinese.'))
 
-def get_vectorizer(model, language, vectorizer_method):
-    if not vectorizer_method:
-        vectorizer_method = 'Count'
+def get_vectorizer(language, vectorizer_method):
     mapping = {
         'Count': CountVectorizer,
         'Tfidf': TfidfVectorizer,
@@ -241,13 +243,12 @@ def get_vectorizer(model, language, vectorizer_method):
     try:
         method = mapping[vectorizer_method]
     except KeyError:
-        raise MethodNotFoundError
+        error = 'Please make sure vectorizer_method in "Count", "Tfidf" or "Hashing".'
+        raise MethodNotFoundError(error)
     else:
-        return method(tokenizer=tokenizer, language=language, stop_words=get_stop_words(language))
+        return method(tokenizer=get_tokenizer(language), stop_words=get_stop_words(language))
 
-def get_clf(model, clf_method):
-    if not clf_method:
-        clf_method = 'MNB'
+def get_clf(clf_method):
     mapping = {
         'MNB': (MultinomialNB, {'alpha': 0.1}),
         'SGD': (SGDClassifier, {'loss': 'hinge', 'penalty': 'l2', 'alpha': 1e-3, 'max_iter': 5, 'tol': None}),
@@ -257,6 +258,6 @@ def get_clf(model, clf_method):
     try:
         method, parameters = mapping[clf_method]
     except KeyError:
-        raise MethodNotFoundError
-    else:
-        return method(**parameters)
+        error = 'Please make sure clf_method in "MNB", "SGD", "RandomForest" or "AdaBoost".'
+        raise MethodNotFoundError(error)
+    return method(**parameters)

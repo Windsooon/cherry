@@ -32,21 +32,22 @@ class Trainer:
         except FilesNotFoundError:
             error = 'Please make sure your put the {0} data inside `dataset` folder or choose models inside BUILD_IN_MODELS.'.format(model)
             raise FilesNotFoundError(error)
-        vectorizer = kwargs.get('vectorizer', None)
-        # By default, Cherry will use CountVectorizer() if `vectorizer` is None
-        vectorizer_method = kwargs.get('vectorizer_method', None)
-        if not vectorizer:
-            vectorizer = get_vectorizer(model, language, vectorizer_method)
-        # By default, Cherry will use CountVectorizer() if `clf` is None
-        clf = kwargs.get('clf', None)
-        clf_method = kwargs.get('clf_method', None)
-        if not clf:
-            clf = get_clf(model, clf_method)
-        # Start training data
-        self.train(language, vectorizer, clf, cache)
+        vectorizer, clf = _get_vectorizer_and_clf(language, kwargs)
+        self.train(vectorizer, clf, cache)
         # TODO: If the cache files existed, ask user to comfirm.
         write_cache(model, vectorizer, 've.pkz')
         write_cache(model, clf, 'clf.pkz')
+
+    def _get_vectorizer_and_clf(self, language, kwargs):
+        vectorizer = kwargs.get('vectorizer', None)
+        if not vectorizer:
+            vectorizer_method = kwargs.get('vectorizer_method')
+            vectorizer = get_vectorizer(language, vectorizer_method)
+        clf = kwargs.get('clf', None)
+        if not clf:
+            clf_method = kwargs.get('clf_method')
+            clf = get_clf(model, clf_method)
+        return vectorizer, clf
 
     def train(self, vectorizer, clf, cache):
         '''
@@ -56,5 +57,5 @@ class Trainer:
         text_clf = Pipeline([
             ('vectorizer', vectorizer),
             ('clf', clf)])
-        print('Training may take some time depending on your dataset')
+        print('Depending on your dataset, training may take several minutes to several hours.')
         text_clf.fit(cache.data, cache.target)

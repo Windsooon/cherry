@@ -27,23 +27,23 @@ class CherryException(Exception):
 class NotSupportError(CherryException):
     '''Not support this feature'''
 
-class CacheNotFoundError(IOError):
+class CacheNotFoundError(CherryException):
     '''Cache files not found'''
 
-class FilesNotFoundError(IOError):
+class FilesNotFoundError(CherryException):
     '''Files not found'''
 
 class DownloadError(CherryException):
     '''Download data error'''
 
-class MethodNotFoundError(AttributeError):
+class MethodNotFoundError(CherryException):
     '''Method not found'''
 
-class TokenNotFoundError(CherryException, AttributeError):
+class TokenNotFoundError(CherryException):
     '''Token not found in training data'''
 
-class DataMismatchError(AttributeError):
+class DataMismatchError(CherryException):
     '''Data mismatch'''
 
-class UnicodeFileEncodeError(UnicodeEncodeError):
+class UnicodeFileEncodeError(CherryException):
     '''Unicode File Encode Error'''

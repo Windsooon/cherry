@@ -8,6 +8,8 @@ import tempfile
 import cherry
 from cherry.datasets import BUILD_IN_MODELS
 from cherry.base import *
+from sklearn.feature_extraction.text import CountVectorizer, \
+    TfidfVectorizer, HashingVectorizer
 
 class UseModel:
 
@@ -69,7 +71,7 @@ class BaseTest(unittest.TestCase):
     def test_load_local_data_from_local_without_cache(self, mock_load_files):
         mock_load_files.return_value = None
         with UseModel(self.foo_model, cache=False) as model:
-            res = _load_data_from_local(self.foo_model)
+            res = cherry.base._load_data_from_local(self.foo_model)
             self.assertEqual(res, None)
             mock_load_files.assert_called_once_with(self.foo_model_path, categories=None, encoding=None)
             # Create new cache files
@@ -78,13 +80,13 @@ class BaseTest(unittest.TestCase):
 
     def test_load_local_data_from_local_with_cache(self):
         with UseModel(self.foo_model) as model:
-            res = _load_data_from_local(self.foo_model)
+            res = cherry.base._load_data_from_local(self.foo_model)
         self.assertEqual(res['data'], 'bar')
 
     def test_load_local_data_from_local_with_cache_failed(self):
         with UseModel(self.foo_model, cache_problem=True) as model:
             with self.assertRaises(cherry.exceptions.NotSupportError) as notFoundError:
-                res = _load_data_from_local(self.foo_model)
+                res = cherry.base._load_data_from_local(self.foo_model)
             self.assertEqual(
                 str(notFoundError.exception),
                 'Can\'t load cached data from foo. Please try again after delete those cache files.')
@@ -98,7 +100,7 @@ class BaseTest(unittest.TestCase):
 
     def test_load_data_from_remote_not_build_in(self):
         with self.assertRaises(cherry.exceptions.FilesNotFoundError) as filesNotFoundError:
-            _load_data_from_remote(self.foo_model)
+            cherry.base._load_data_from_remote(self.foo_model)
         self.assertEqual(
             str(filesNotFoundError.exception),
             'foo is not built in models and not found in dataset folder.')
@@ -109,9 +111,47 @@ class BaseTest(unittest.TestCase):
     def test_load_data_from_remote_download(self, mock_fetch_remote, mock_decompress_data, mock_load_data_from_local):
         model_existed = os.path.exists(self.news_model_path)
         info = BUILD_IN_MODELS[self.news_model]
-        _load_data_from_remote(self.news_model)
+        cherry.base._load_data_from_remote(self.news_model)
         self.assertTrue(os.path.exists(self.news_model_path) is True)
         if not model_existed:
             shutil.rmtree(self.news_model_path)
         mock_load_data_from_local.assert_called_once_with(
             self.news_model, preprocessing=None, categories=None, encoding=info[3], split=False)
+
+    # get_tokenizer()
+    def test_get_tokenizer_function(self):
+        self.assertEqual(get_tokenizer('English').__name__, 'word_tokenize')
+        self.assertEqual(get_tokenizer('Chinese').__name__, 'cut')
+        with self.assertRaises(cherry.exceptions.NotSupportError) as notFoundError:
+            self.assertEqual(get_tokenizer('Foo').__name__, 'cut')
+        self.assertEqual(
+            str(notFoundError.exception),
+            'You need to specify tokenizer function when the language is nor English or Chinese.')
+
+    # get_vectorizer()
+    @mock.patch('cherry.base.get_stop_words')
+    @mock.patch('cherry.base.get_tokenizer')
+    def test_get_vectorizer_default(self, mock_get_tokenizer, mock_get_stop_words):
+        language_lst = ['English', 'Chinese']
+        for language in language_lst:
+            res = get_vectorizer(language, 'Count')
+            mock_get_tokenizer.assert_called_with(language)
+            mock_get_stop_words.assert_called_with(language)
+
+    @mock.patch('cherry.base.get_stop_words')
+    @mock.patch('cherry.base.get_tokenizer')
+    def test_get_vectorizer_failed(self, mock_get_tokenizer, mock_get_stop_words):
+        language = 'English'
+        with self.assertRaises(cherry.exceptions.MethodNotFoundError) as methodNotFoundError:
+            get_vectorizer(language, 'Foo')
+        self.assertEqual(
+            str(methodNotFoundError.exception),
+            'Please make sure vectorizer_method in "Count", "Tfidf" or "Hashing".')
+
+    # get_clf()
+    def test_get_clf_failed(self):
+        with self.assertRaises(cherry.exceptions.MethodNotFoundError) as methodNotFoundError:
+            get_clf('Foo')
+        self.assertEqual(
+            str(methodNotFoundError.exception),
+            'Please make sure clf_method in "MNB", "SGD", "RandomForest" or "AdaBoost".')
