@@ -26,7 +26,8 @@ def classify(model, text, N=20):
     '''
     return Classify(model=model, text=text, N=N)
 
-def train(model, vectorizer=None, vectorizer_method=None, clf=None, clf_method=None, x_data=None, y_data=None):
+def train(model, language='English', vectorizer=None,
+        vectorizer_method=None, clf=None, clf_method=None, x_data=None, y_data=None):
     '''
     Train the `model` inside data directory
 
@@ -37,7 +38,7 @@ def train(model, vectorizer=None, vectorizer_method=None, clf=None, clf_method=N
     y_data (array): training label
     '''
     return Trainer(
-            model, vectorizer=vectorizer, vectorizer_method=None,
+            model, language=language, vectorizer=vectorizer, vectorizer_method=None,
             clf=clf, clf_method=None, x_data=x_data, y_data=y_data)
 
 def performance(

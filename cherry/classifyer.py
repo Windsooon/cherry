@@ -34,8 +34,8 @@ class Classify:
         '''
         Load cache from pre-trained model
         '''
-        self.trained_model = load_cache(model, 'trained.pkl')
-        self.vector = load_cache(model, 've.pkl')
+        self.trained_model = load_cache(model, 'clf.pkz')
+        self.vector = load_cache(model, 've.pkz')
 
     def _classify(self, text, N):
         '''

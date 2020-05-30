@@ -4,19 +4,19 @@
 cherry.trainer
 ~~~~~~~~~~~~
 This module implements the cherry Trainer.
-:copyright: (c) 2018-2019 by Windson Yang
+:copyright: (c) 2018-2020 by Windson Yang
 :license: MIT License, see LICENSE for more details.
 """
 
 import os
 import pickle
 from sklearn.pipeline import Pipeline
-from .base import DATA_DIR, load_data, get_vectorizer, get_clf
+from .base import DATA_DIR, load_data, get_vectorizer, get_clf, write_cache
 from .exceptions import *
 
 
 class Trainer:
-    def __init__(self, model, categories=None, encoding=None, **kwargs):
+    def __init__(self, model, language=None, categories=None, encoding=None, **kwargs):
         '''
         Data should be stored in a two levels folder structure such as the following:
 
@@ -36,14 +36,17 @@ class Trainer:
         # By default, Cherry will use CountVectorizer() if `vectorizer` is None
         vectorizer_method = kwargs.get('vectorizer_method', None)
         if not vectorizer:
-            vectorizer = get_vectorizer(model, vectorizer_method)
+            vectorizer = get_vectorizer(model, language, vectorizer_method)
         # By default, Cherry will use CountVectorizer() if `clf` is None
         clf = kwargs.get('clf', None)
         clf_method = kwargs.get('clf_method', None)
         if not clf:
             clf = get_clf(model, clf_method)
         # Start training data
-        self.train(vectorizer, clf, cache)
+        self.train(language, vectorizer, clf, cache)
+        # TODO: If the cache files existed, ask user to comfirm.
+        write_cache(model, vectorizer, 've.pkz')
+        write_cache(model, clf, 'clf.pkz')
 
     def train(self, vectorizer, clf, cache):
         '''

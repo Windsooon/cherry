@@ -98,8 +98,8 @@ def _load_data_from_local(model, preprocessing=None, categories=None, encoding=N
             return pickle.loads(uncompressed_content)['all']
         except Exception as e:
             # Can't load cache files
-            error = 'Can\'t load data from {0} cache files.' + \
-                    'Please try again after delete those cache files'.format(model)
+            error = ('Can\'t load cached data from {0}. '
+                    'Please try again after delete those cache files.'.format(model))
             raise NotSupportError(error)
     cache = dict(all=load_files(
         model_path, categories=categories, encoding=encoding))
@@ -129,7 +129,7 @@ def _load_data_from_remote(model, preprocessing=None, categories=None, encoding=
     _decompress_data(meta_data.filename, model_path)
     return _load_data_from_local(
         model, preprocessing=preprocessing,
-        categories=categories, encoding=meta_data_c.encoding,
+        categories=categories, encoding=info[3],
         split=split)
 
 def _fetch_remote(remote, dirname=None):
@@ -186,39 +186,40 @@ def write_file(self, path, data):
     with open(path, 'w') as f:
         f.write(data)
 
-def write_cache(model, vectorizer, clf):
+def write_cache(model, content, path):
     '''
-    Write cache file under DATA_DIR
+    Write trained file under model DATA_DIR
     '''
-    cache_path = os.path.join(DATA_DIR, model + '/trained.pkl')
+    cache_path = os.path.join(DATA_DIR, model + '/' + path)
+    compressed_content = codecs.encode(pickle.dumps(content), 'zlib_codec')
     with open(cache_path, 'wb') as f:
-        pickle.dump(clf, f)
-    cache_path = os.path.join(DATA_DIR, model + '/ve.pkl')
-    with open(cache_path, 'wb') as f:
-        pickle.dump(vectorizer, f)
+        f.write(compressed_content)
 
-def load_cache(model):
+def load_cache(model, path):
     '''
     Load cache data from file
     '''
-    cache = None
-    cache_path = None
+    cache_path = os.path.join(DATA_DIR, model + '/' + path)
     if os.path.exists(cache_path):
         try:
             with open(cache_path, 'rb') as f:
                 compressed_content = f.read()
             uncompressed_content = codecs.decode(
                 compressed_content, 'zlib_codec')
-            cache = pickle.loads(uncompressed_content)
+            return pickle.loads(uncompressed_content)
         except Exception as e:
             error = (
                 'Cache loading failed.')
             raise CacheNotFoundError(error)
+    else:
+        error = (
+            'Can\'t find cache files')
+        raise CacheNotFoundError(error)
 
 def tokenizer(text, language='English'):
     '''
-    You can use your own tokenizer function here, by default,
-    this function work for English
+    English: nltk
+    Chinese: jieba
     '''
     if language == 'English':
         from nltk.tokenize import word_tokenize
@@ -229,7 +230,7 @@ def tokenizer(text, language='English'):
     else:
         raise
 
-def get_vectorizer(model, vectorizer_method):
+def get_vectorizer(model, language, vectorizer_method):
     if not vectorizer_method:
         vectorizer_method = 'Count'
     mapping = {
@@ -242,7 +243,7 @@ def get_vectorizer(model, vectorizer_method):
     except KeyError:
         raise MethodNotFoundError
     else:
-        return method(tokenizer=tokenizer, stop_words=get_stop_words())
+        return method(tokenizer=tokenizer, language=language, stop_words=get_stop_words(language))
 
 def get_clf(model, clf_method):
     if not clf_method:
