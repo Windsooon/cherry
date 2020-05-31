@@ -30,15 +30,17 @@ class Trainer:
         try:
             cache = load_data(model, categories=categories, encoding=encoding)
         except FilesNotFoundError:
-            error = 'Please make sure your put the {0} data inside `dataset` folder or choose models inside BUILD_IN_MODELS.'.format(model)
+            error = ('Please make sure your put the {0} data inside `dataset` '
+                    'folder or use model inside BUILD_IN_MODELS.'.format(model))
             raise FilesNotFoundError(error)
-        vectorizer, clf = _get_vectorizer_and_clf(language, kwargs)
-        self.train(vectorizer, clf, cache)
-        # TODO: If the cache files existed, ask user to comfirm.
+        vectorizer, clf = Trainer._get_vectorizer_and_clf(language, kwargs)
+        Trainer._train(vectorizer, clf, cache)
+        # TODO: If the cache files existed, ask user to comfirm overwrite.
         write_cache(model, vectorizer, 've.pkz')
         write_cache(model, clf, 'clf.pkz')
 
-    def _get_vectorizer_and_clf(self, language, kwargs):
+    @classmethod
+    def _get_vectorizer_and_clf(cls, language, kwargs):
         vectorizer = kwargs.get('vectorizer', None)
         if not vectorizer:
             vectorizer_method = kwargs.get('vectorizer_method')
@@ -46,10 +48,11 @@ class Trainer:
         clf = kwargs.get('clf', None)
         if not clf:
             clf_method = kwargs.get('clf_method')
-            clf = get_clf(model, clf_method)
+            clf = get_clf(clf_method)
         return vectorizer, clf
 
-    def train(self, vectorizer, clf, cache):
+    @classmethod
+    def _train(cls, vectorizer, clf, cache):
         '''
         Train bayes model with input data and decide which feature extraction method
         and classify method should use

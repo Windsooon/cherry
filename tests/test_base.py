@@ -137,13 +137,24 @@ class BaseTest(unittest.TestCase):
             res = get_vectorizer(language, 'Count')
             mock_get_tokenizer.assert_called_with(language)
             mock_get_stop_words.assert_called_with(language)
+            self.assertEqual(type(res), CountVectorizer)
+
+    @mock.patch('cherry.base.get_stop_words')
+    @mock.patch('cherry.base.get_tokenizer')
+    def test_get_vectorizer_tfidf(self, mock_get_tokenizer, mock_get_stop_words):
+        language_lst = ['English', 'Chinese']
+        for language in language_lst:
+            res = get_vectorizer(language, 'Tfidf')
+            mock_get_tokenizer.assert_called_with(language)
+            mock_get_stop_words.assert_called_with(language)
+            self.assertEqual(type(res), TfidfVectorizer)
 
     @mock.patch('cherry.base.get_stop_words')
     @mock.patch('cherry.base.get_tokenizer')
     def test_get_vectorizer_failed(self, mock_get_tokenizer, mock_get_stop_words):
         language = 'English'
         with self.assertRaises(cherry.exceptions.MethodNotFoundError) as methodNotFoundError:
-            get_vectorizer(language, 'Foo')
+            res = get_vectorizer(language, 'Foo')
         self.assertEqual(
             str(methodNotFoundError.exception),
             'Please make sure vectorizer_method in "Count", "Tfidf" or "Hashing".')
@@ -151,7 +162,7 @@ class BaseTest(unittest.TestCase):
     # get_clf()
     def test_get_clf_failed(self):
         with self.assertRaises(cherry.exceptions.MethodNotFoundError) as methodNotFoundError:
-            get_clf('Foo')
+            res = get_clf('Foo')
         self.assertEqual(
             str(methodNotFoundError.exception),
             'Please make sure clf_method in "MNB", "SGD", "RandomForest" or "AdaBoost".')
