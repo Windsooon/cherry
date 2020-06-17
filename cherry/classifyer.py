@@ -39,10 +39,12 @@ class Classify:
 
     def _classify(self, text, N):
         '''
-        1. Build vector using pre-trained vocabulary
-        2. Transform the input text to text vector
-        3. return the probability and word_list of the text
+        1. Build vector using pre-trained cache
+        2. Transform the input text into text vector
+        3. return the probability and word_list
         '''
+        if isinstance(text, str):
+            text = [text]
         try:
             text_vector = self.vector.transform(text)
         except NotFittedError:
