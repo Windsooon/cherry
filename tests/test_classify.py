@@ -10,28 +10,36 @@ class ClassifyTest(unittest.TestCase):
     def setUp(self):
         pass
 
+    # __init__()
     @mock.patch('cherry.classifyer.Classify._classify')
     @mock.patch('cherry.classifyer.Classify._load_cache')
+    def test_init(self, mock_load, mock_classify):
+        mock_classify.return_value = [1, 0], ['random', 'text']
+        res = cherry.classifyer.Classify(model='harmful', text=['random text'], N=20)
+        mock_load.assert_called_once_with('harmful')
+        mock_classify.assert_called_once_with(['random text'], 20)
+
+    # _load_cache()
+    @mock.patch('cherry.classifyer.Classify._classify')
+    @mock.patch('cherry.classifyer.load_cache')
     def test_load_cache(self, mock_load, mock_classify):
         mock_classify.return_value = [1, 0], ['random', 'text']
-        c = cherry.classifyer.Classify(model='harmful', text=['random text'], N=20)
-        mock_load.assert_called_once_with('harmful')
+        res = cherry.classifyer.Classify(model='harmful', text=['random text'], N=20)
+        mock_load.assert_called_with('harmful', 've.pkz')
 
     @mock.patch('cherry.classifyer.Classify._classify')
-    @mock.patch('cherry.classifyer.load_cache')
-    def test_load_base_cache(self, mock_load, mock_classify):
+    @mock.patch('cherry.classifyer.Classify._load_cache')
+    def test_get_word_list(self, mock_load, mock_classify):
         mock_classify.return_value = [1, 0], ['random', 'text']
-        c = cherry.classifyer.Classify(model='harmful', text=['random text'], N=20)
-        mock_load.assert_called_with('harmful', 've.pkl')
+        res = cherry.classifyer.Classify(model='harmful', text=['random text'], N=20)
+        self.assertEqual(res.word_list, ['random', 'text'])
 
     @mock.patch('cherry.classifyer.Classify._classify')
-    @mock.patch('cherry.classifyer.load_cache')
-    def test_classify(self, mock_load, mock_classify):
-        mock_load.return_value = 'random'
+    @mock.patch('cherry.classifyer.Classify._load_cache')
+    def test_get_probability(self, mock_load, mock_classify):
         mock_classify.return_value = [1, 0], ['random', 'text']
-        c = cherry.classifyer.Classify(model='harmful', text=['random text'], N=20)
-        self.assertEqual(c.probability, [1, 0])
-        self.assertEqual(c.word_list, ['random', 'text'])
+        res = cherry.classifyer.Classify(model='harmful', text=['random text'], N=20)
+        self.assertEqual(res.probability, [1, 0])
 
     @mock.patch('sklearn.feature_extraction.text.CountVectorizer.transform')
     @mock.patch('cherry.classifyer.load_cache')
@@ -40,7 +48,7 @@ class ClassifyTest(unittest.TestCase):
         mock_object.transform.side_effect = NotFittedError()
         mock_load.return_value = mock_object
         with self.assertRaises(cherry.exceptions.TokenNotFoundError) as token_error:
-            c = cherry.classifyer.Classify(model='harmful', text=['random text'], N=20)
+            res = cherry.classifyer.Classify(model='harmful', text=['random text'], N=20)
         self.assertEqual(
             str(token_error.exception),
             'Some of the tokens in text never appear in training data')

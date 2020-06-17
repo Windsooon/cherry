@@ -38,4 +38,3 @@ class ApiTest(unittest.TestCase):
         mock_display.assert_called_once_with(
             'harmful', clf=None, clf_method=None, vectorizer=None,
             vectorizer_method=None, x_data=None, y_data=None)
-
