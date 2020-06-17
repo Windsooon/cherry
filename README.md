@@ -11,6 +11,8 @@
 | Source    | https://github.com/Windsooon/cherry |
 | Keywords  | text classification |
 
+## Cherry 3.0 will be released in two weeks. With many powerful features and several built-in English and Chinese data models!
+
 ## Documentation
 - [**English Document**](#english-document)
 - [**中文文档**](#中文文档)
