@@ -37,6 +37,7 @@ __all__ = ['DATA_DIR',
            'load_data',
            'write_file',
            'load_cache',
+           'get_vectorizer_and_clf',
            'get_tokenizer',
            'get_vectorizer',
            'get_clf']
@@ -233,6 +234,14 @@ def get_tokenizer(language):
         raise NotSupportError((
             'You need to specify tokenizer function ' +
             'when the language is nor English or Chinese.'))
+
+def get_vectorizer_and_clf(
+    language, vectorizer, clf, vectorizer_method, clf_method):
+    if not vectorizer:
+        vectorizer = get_vectorizer(language, vectorizer_method)
+    if not clf:
+        clf = get_clf(clf_method)
+    return vectorizer, clf
 
 def get_vectorizer(language, vectorizer_method):
     mapping = {

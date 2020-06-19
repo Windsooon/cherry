@@ -11,14 +11,15 @@ This module implements the cherry Trainer.
 import os
 import pickle
 from sklearn.pipeline import Pipeline
-from .base import DATA_DIR, load_data, get_vectorizer, get_clf, write_cache
+from .base import DATA_DIR, load_data, get_vectorizer_and_clf, \
+    get_vectorizer, get_clf, write_cache
 from .exceptions import *
 
 
 class Trainer:
     def __init__(self, model, language=None, categories=None, encoding=None, **kwargs):
         '''
-        Data should be stored in a two levels folder structure such as the following:
+        Data should be stored in a two levels folder structure like this:
 
         dataset/
           model_name/
@@ -33,23 +34,15 @@ class Trainer:
             error = ('Please make sure your put the {0} data inside `dataset` '
                     'folder or use model inside BUILD_IN_MODELS.'.format(model))
             raise FilesNotFoundError(error)
-        vectorizer, clf = Trainer._get_vectorizer_and_clf(language, kwargs)
+        kw_vectorizer = kwargs.get('vectorizer', None)
+        kw_clf = kwargs.get('clf', None)
+        vectorizer, clf = get_vectorizer_and_clf(
+            language, kw_vectorizer, kw_clf,
+            kwargs['vectorizer_method'], kwargs['clf_method'])
         Trainer._train(vectorizer, clf, cache)
         # TODO: If the cache files existed, ask user to comfirm overwrite.
         write_cache(model, vectorizer, 've.pkz')
         write_cache(model, clf, 'clf.pkz')
-
-    @classmethod
-    def _get_vectorizer_and_clf(cls, language, kwargs):
-        vectorizer = kwargs.get('vectorizer', None)
-        if not vectorizer:
-            vectorizer_method = kwargs.get('vectorizer_method')
-            vectorizer = get_vectorizer(language, vectorizer_method)
-        clf = kwargs.get('clf', None)
-        if not clf:
-            clf_method = kwargs.get('clf_method')
-            clf = get_clf(clf_method)
-        return vectorizer, clf
 
     @classmethod
     def _train(cls, vectorizer, clf, cache):
