@@ -24,7 +24,7 @@ class TrainerTest(unittest.TestCase):
 
     @mock.patch('cherry.trainer.write_cache')
     @mock.patch('cherry.trainer.Trainer._train')
-    @mock.patch('cherry.trainer.Trainer._get_vectorizer_and_clf')
+    @mock.patch('cherry.trainer.get_vectorizer_and_clf')
     @mock.patch('cherry.trainer.load_data')
     def test_mock_init_call(self, mock_load_data, mock_get, mock_train, mock_write_cache):
         meta_data_c = namedtuple('meta_data_c', ['data', 'target'])
@@ -36,28 +36,13 @@ class TrainerTest(unittest.TestCase):
             t = Trainer(
                 model=self.foo_model, language=language,
                 vectorizer_method=vectorizer_method, clf_method=clf_method)
-            mock_load_data.assert_called_with(self.foo_model, categories=None, encoding=None)
+            mock_load_data.assert_called_with(
+                self.foo_model, categories=None, encoding=None)
             mock_get.assert_called_with(
-                language, {'vectorizer_method': vectorizer_method, 'clf_method': clf_method})
-            mock_train.assert_called_with('vectorizer', 'clf', meta_data_c(data=['random'], target=[2]))
+                language, None, None, vectorizer_method, clf_method)
+            mock_train.assert_called_with(
+                'vectorizer', 'clf', meta_data_c(data=['random'], target=[2]))
             mock_write_cache.assert_called_with('foo', 'clf', 'clf.pkz')
-
-    # _get_vectorizer_and_clf()
-    @mock.patch('cherry.trainer.get_clf')
-    @mock.patch('cherry.trainer.get_vectorizer')
-    def test_get_vectorizer_and_clf_default(self, mock_get_vectorizer, mock_get_clf):
-        t = Trainer._get_vectorizer_and_clf('English', {'vectorizer_method': 'Count', 'clf_method': 'MNB'})
-        mock_get_vectorizer.assert_called_with('English', 'Count')
-        mock_get_clf.assert_called_with('MNB')
-
-    @mock.patch('cherry.trainer.get_clf')
-    @mock.patch('cherry.trainer.get_vectorizer')
-    def test_get_vectorizer_and_clf_custom(self, mock_get_vectorizer, mock_get_clf):
-        data = {'vectorizer': 'random', 'clf': 'string', 'vectorizer_method': 'Count', 'clf_method': 'MNB'}
-        t = Trainer._get_vectorizer_and_clf('English', data)
-        mock_get_vectorizer.assert_not_called()
-        mock_get_clf.assert_not_called()
-        self.assertEqual(t, ('random', 'string'))
 
     # _train()
     @mock.patch('cherry.trainer.Pipeline.fit')

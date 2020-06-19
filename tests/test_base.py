@@ -128,6 +128,31 @@ class BaseTest(unittest.TestCase):
             str(notFoundError.exception),
             'You need to specify tokenizer function when the language is nor English or Chinese.')
 
+    # get_vectorizer_and_clf()
+    @mock.patch('cherry.base.get_clf')
+    @mock.patch('cherry.base.get_vectorizer')
+    def test_get_vectorizer_and_clf_default(self, mock_get_vectorizer, mock_get_clf):
+        mock_get_vectorizer.return_value = 'Count'
+        mock_get_clf.return_value = 'MNB'
+        candidates = [('English', 'Count', 'MNB'), ('Chinese', 'Tfidf', 'Random')]
+        for candidate in candidates:
+            language, vectorizer_method, clf_method = candidate
+            res = get_vectorizer_and_clf(
+                language, None, None, vectorizer_method, clf_method)
+            mock_get_vectorizer.assert_called_with(language, vectorizer_method)
+            mock_get_clf.assert_called_with(clf_method)
+            self.assertEqual(res, ('Count', 'MNB'))
+
+    @mock.patch('cherry.base.get_clf')
+    @mock.patch('cherry.base.get_vectorizer')
+    def test_get_vectorizer_and_clf_custom(self, mock_get_vectorizer, mock_get_clf):
+        candidates = ('English', 'Random', 'String', 'Count', 'MNB')
+        # language, vectorizer, clf, vectorizer_method, clf_method = candidate
+        res = get_vectorizer_and_clf(*candidates)
+        mock_get_vectorizer.assert_not_called()
+        mock_get_clf.assert_not_called()
+        self.assertEqual(res, ('Random', 'String'))
+
     # get_vectorizer()
     @mock.patch('cherry.base.get_stop_words')
     @mock.patch('cherry.base.get_tokenizer')
