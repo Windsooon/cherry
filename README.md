@@ -12,6 +12,7 @@
 | Keywords  | text classification |
 
 ## Cherry 3.0 will be released in two weeks. With many powerful features and several built-in English and Chinese data models!
+## Cherry 3.0 将在两周内发布，会有更加方便的使用方式以及更多内置模型，Cherry 2.0 将不会继续支持。
 
 ## Documentation
 - [**English Document**](#english-document)
