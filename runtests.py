@@ -11,6 +11,7 @@ suite = unittest.TestSuite()
 suite.addTests(unittest.makeSuite(BaseTest))
 suite.addTests(unittest.makeSuite(TrainerTest))
 suite.addTests(unittest.makeSuite(ClassifyTest))
+suite.addTests(unittest.makeSuite(PerformanceTest))
 # suite.addTests(unittest.makeSuite(ApiTest))
 # suite.addTests(unittest.makeSuite(DisplayTest))
 

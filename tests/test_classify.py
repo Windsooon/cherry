@@ -10,6 +10,12 @@ class ClassifyTest(unittest.TestCase):
     def setUp(self):
         pass
 
+    # api call
+    @mock.patch('cherry.api.Classify')
+    def test_api_call_model_text(self, mock_classify):
+        cherry.classify('foo', 'random text')
+        mock_classify.assert_called_with(model='foo', text='random text')
+
     # __init__()
     @mock.patch('cherry.classifyer.Classify._classify')
     @mock.patch('cherry.classifyer.Classify._load_cache')

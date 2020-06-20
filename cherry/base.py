@@ -36,6 +36,7 @@ __all__ = ['DATA_DIR',
            'get_stop_words',
            'load_data',
            'write_file',
+           'load_all',
            'load_cache',
            'get_vectorizer_and_clf',
            'get_tokenizer',
@@ -58,7 +59,24 @@ def get_stop_words(language='English'):
         error = 'Cherry didn\'t support {0} at this moment.'.format(language)
         raise NotSupportError(error)
 
-def load_data(model, preprocessing=None, categories=None, encoding=None):
+def load_all(model, language=None, preprocessing=None, categories=None, encoding=None, vectorizer=None,
+            vectorizer_method=None, clf=None, clf_method=None, x_data=None, y_data=None):
+    if not (x_data and y_data):
+        try:
+            cache = load_data(model, categories=categories, encoding=encoding)
+        except FilesNotFoundError:
+            error = ('Please make sure your put the {0} data inside `dataset` '
+                    'folder or use model inside BUILD_IN_MODELS.'.format(model))
+            raise FilesNotFoundError(error)
+        if preprocessing:
+            cache.data = [preprocessing(text) for text in cache.data]
+        x_data, y_data = cache.data, cache.target
+    vectorizer, clf = get_vectorizer_and_clf(
+        language, vectorizer, clf,
+        vectorizer_method, clf_method)
+    return x_data, y_data, vectorizer, clf
+
+def load_data(model, categories=None, encoding=None):
     '''
     Load data using `model` name
     '''
@@ -72,14 +90,13 @@ def load_data(model, preprocessing=None, categories=None, encoding=None):
             if not encoding:
                 encoding = info[3]
         return _load_data_from_local(
-            model, preprocessing=preprocessing, categories=categories, encoding=encoding)
+            model, categories=categories, encoding=encoding)
     else:
         return _load_data_from_remote(
-            model, preprocessing=preprocessing, categories=categories, encoding=encoding)
+            model, categories=categories, encoding=encoding)
 
 def _load_data_from_local(
-        model, preprocessing=None,
-        categories=None, encoding=None):
+        model, categories=None, encoding=None):
     '''
     1. Try to find local cache files
     2. If we can't find the cache files
@@ -107,7 +124,7 @@ def _load_data_from_local(
         f.write(compressed_content)
     return cache['all']
 
-def _load_data_from_remote(model, preprocessing=None, categories=None, encoding=None):
+def _load_data_from_remote(model, categories=None, encoding=None):
     try:
         info = BUILD_IN_MODELS[model]
     except KeyError:
@@ -125,8 +142,7 @@ def _load_data_from_remote(model, preprocessing=None, categories=None, encoding=
     _fetch_remote(meta_data, model_path)
     _decompress_data(meta_data.filename, model_path)
     return _load_data_from_local(
-        model, preprocessing=preprocessing,
-        categories=categories, encoding=info[3])
+        model, categories=categories, encoding=info[3])
 
 def _fetch_remote(remote, dirname=None):
     """

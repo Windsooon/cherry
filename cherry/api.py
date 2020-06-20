@@ -26,30 +26,32 @@ def classify(model, text):
     '''
     return Classify(model=model, text=text)
 
-def train(model, language='English', vectorizer=None,
-        vectorizer_method='Count', clf=None, clf_method='MNB', x_data=None, y_data=None):
+def train(model, language='English', preprocessing=None, categories=None, encoding=None,
+        vectorizer=None, vectorizer_method='Count', clf=None, clf_method='MNB', x_data=None, y_data=None):
     '''
     Train the `model` inside data directory
 
-    model (string): model name of the training dataset (e.g. 'harmful')
+    *model (string): model name of the training dataset (e.g. 'harmful')
+    language (string): The language of the data
     vectorizer (BaseEstimator object): feature extraction method, CountVectorizer, TfidfVectorizer, HashingVectorizer etc.
     clf (Classifier object): Classifier object, DecisionTreeClassifier, RandomForestClassifier, AdaBoostClassifier etc.
     x_data (array): training data
     y_data (array): training label
     '''
     return Trainer(
-            model, language=language, vectorizer=vectorizer, vectorizer_method=vectorizer_method,
+            model, language=language, preprocessing=preprocessing, encoding=encoding,
+            categories=categories, vectorizer=vectorizer, vectorizer_method=vectorizer_method,
             clf=clf, clf_method=clf_method, x_data=x_data, y_data=y_data)
 
-def performance(
-        model, language='English', vectorizer=None, vectorizer_method='Count',
-        clf=None, clf_method='MNB', x_data=None,
+def performance(model, language='English', preprocessing=None, categories=None, encoding=None,
+        vectorizer=None, vectorizer_method='Count', clf=None, clf_method='MNB', x_data=None,
         y_data=None, n_splits=10, output='Stdout'):
     '''
     Calculate scores from the models
     '''
     return Performance(
-            model, language=language, vectorizer=vectorizer, vectorizer_method=vectorizer_method,
+            model, language=language, preprocessing=preprocessing, encoding=encoding,
+            categories=categories, vectorizer=vectorizer, vectorizer_method=vectorizer_method,
             clf=clf, clf_method=clf_method, x_data=x_data, y_data=y_data,
             n_splits=n_splits, output=output)
 

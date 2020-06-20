@@ -17,6 +17,21 @@ class TrainerTest(unittest.TestCase):
         self.foo_model_path = os.path.join(DATA_DIR, self.foo_model)
         self.news_model_path = os.path.join(DATA_DIR, self.news_model)
 
+    # api call
+    @mock.patch('cherry.api.Trainer')
+    def test_api_call_only_model(self, mock_trainer):
+        cherry.train('foo')
+        mock_trainer.assert_called_with(
+            'foo', preprocessing=None, categories=None, encoding=None, clf=None, clf_method='MNB', language='English',
+            vectorizer=None, vectorizer_method='Count', x_data=None, y_data=None)
+
+    @mock.patch('cherry.api.Trainer')
+    def test_api_call_model_clf_vectorizer(self, mock_trainer):
+        cherry.train('foo', clf='clf', vectorizer='vectorizer')
+        mock_trainer.assert_called_with(
+            'foo', preprocessing=None, categories=None, encoding=None, clf='clf', clf_method='MNB', language='English',
+            vectorizer='vectorizer', vectorizer_method='Count', x_data=None, y_data=None)
+
     # __init__()
     def test_cache_not_found(self):
         with self.assertRaises(cherry.exceptions.FilesNotFoundError) as filesNotFoundError:
@@ -24,8 +39,8 @@ class TrainerTest(unittest.TestCase):
 
     @mock.patch('cherry.trainer.write_cache')
     @mock.patch('cherry.trainer.Trainer._train')
-    @mock.patch('cherry.trainer.get_vectorizer_and_clf')
-    @mock.patch('cherry.trainer.load_data')
+    @mock.patch('cherry.base.get_vectorizer_and_clf')
+    @mock.patch('cherry.base.load_data')
     def test_mock_init_call(self, mock_load_data, mock_get, mock_train, mock_write_cache):
         meta_data_c = namedtuple('meta_data_c', ['data', 'target'])
         mock_load_data.return_value = meta_data_c(data=['random'], target=[2])
@@ -41,13 +56,12 @@ class TrainerTest(unittest.TestCase):
             mock_get.assert_called_with(
                 language, None, None, vectorizer_method, clf_method)
             mock_train.assert_called_with(
-                'vectorizer', 'clf', meta_data_c(data=['random'], target=[2]))
+                'vectorizer', 'clf', ['random'], [2])
             mock_write_cache.assert_called_with('foo', 'clf', 'clf.pkz')
 
     # _train()
     @mock.patch('cherry.trainer.Pipeline.fit')
     def test_train_default(self, mock_fix):
-        meta_data_c = namedtuple('meta_data_c', ['data', 'target'])
-        mock_data = meta_data_c(data=['random'], target=[2])
-        t = Trainer._train(CountVectorizer, MultinomialNB, mock_data)
+        x_data, y_data = ['random'], [2]
+        t = Trainer._train(CountVectorizer, MultinomialNB, x_data, y_data)
         mock_fix.assert_called_with(['random'], [2])

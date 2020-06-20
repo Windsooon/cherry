@@ -56,7 +56,7 @@ class BaseTest(unittest.TestCase):
         with UseModel(self.foo_model) as model:
             load_data(self.foo_model)
         mock_load_files.assert_called_once_with(
-            self.foo_model, preprocessing=None, categories=None, encoding=None)
+            self.foo_model, categories=None, encoding=None)
 
     @mock.patch('cherry.base._load_data_from_local')
     def test_load_data_not_found(self, mock_load_files):
@@ -96,7 +96,7 @@ class BaseTest(unittest.TestCase):
     def test_load_data_from_remote(self, mock_load_files):
         load_data(self.foo_model)
         mock_load_files.assert_called_once_with(
-            self.foo_model, preprocessing=None, categories=None, encoding=None)
+            self.foo_model, categories=None, encoding=None)
 
     def test_load_data_from_remote_not_build_in(self):
         with self.assertRaises(cherry.exceptions.FilesNotFoundError) as filesNotFoundError:
@@ -116,7 +116,7 @@ class BaseTest(unittest.TestCase):
         if not model_existed:
             shutil.rmtree(self.news_model_path)
         mock_load_data_from_local.assert_called_once_with(
-            self.news_model, preprocessing=None, categories=None, encoding=info[3])
+            self.news_model, categories=None, encoding=info[3])
 
     # get_tokenizer()
     def test_get_tokenizer_function(self):
