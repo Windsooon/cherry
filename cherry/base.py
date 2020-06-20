@@ -58,7 +58,7 @@ def get_stop_words(language='English'):
         error = 'Cherry didn\'t support {0} at this moment.'.format(language)
         raise NotSupportError(error)
 
-def load_data(model, preprocessing=None, categories=None, encoding=None, split=False):
+def load_data(model, preprocessing=None, categories=None, encoding=None):
     '''
     Load data using `model` name
     '''
@@ -72,14 +72,14 @@ def load_data(model, preprocessing=None, categories=None, encoding=None, split=F
             if not encoding:
                 encoding = info[3]
         return _load_data_from_local(
-            model, preprocessing=preprocessing, categories=categories,
-            encoding=encoding, split=split)
+            model, preprocessing=preprocessing, categories=categories, encoding=encoding)
     else:
         return _load_data_from_remote(
-            model, preprocessing=preprocessing, categories=categories,
-            encoding=encoding, split=split)
+            model, preprocessing=preprocessing, categories=categories, encoding=encoding)
 
-def _load_data_from_local(model, preprocessing=None, categories=None, encoding=None, split=False):
+def _load_data_from_local(
+        model, preprocessing=None,
+        categories=None, encoding=None):
     '''
     1. Try to find local cache files
     2. If we can't find the cache files
@@ -105,11 +105,9 @@ def _load_data_from_local(model, preprocessing=None, categories=None, encoding=N
     compressed_content = codecs.encode(pickle.dumps(cache), 'zlib_codec')
     with open(cache_path, 'wb') as f:
         f.write(compressed_content)
-    if split:
-        return _train_test_split(cache)
     return cache['all']
 
-def _load_data_from_remote(model, preprocessing=None, categories=None, encoding=None, split=False):
+def _load_data_from_remote(model, preprocessing=None, categories=None, encoding=None):
     try:
         info = BUILD_IN_MODELS[model]
     except KeyError:
@@ -128,8 +126,7 @@ def _load_data_from_remote(model, preprocessing=None, categories=None, encoding=
     _decompress_data(meta_data.filename, model_path)
     return _load_data_from_local(
         model, preprocessing=preprocessing,
-        categories=categories, encoding=info[3],
-        split=split)
+        categories=categories, encoding=info[3])
 
 def _fetch_remote(remote, dirname=None):
     """
@@ -173,7 +170,7 @@ def _decompress_data(filename, model_path):
     tarfile.open(file_path, "r:gz").extractall(path=model_path)
     os.remove(file_path)
 
-def _train_test_split(cache):
+def _train_test_split(cache, test_size=0.1):
     data_lst = list()
     target = list()
     filenames = list()
@@ -184,7 +181,7 @@ def _train_test_split(cache):
     data.data = data_lst
     data.target = np.array(target)
     data.filenames = np.array(filenames)
-    return train_test_split(data.data, data.target, test_size=0.2, random_state=0)
+    return train_test_split(data.data, data.target, test_size=test_size, random_state=0)
 
 def write_file(self, path, data):
     '''

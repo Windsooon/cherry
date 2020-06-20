@@ -18,9 +18,8 @@ from .exceptions import TokenNotFoundError
 class Classify:
     def __init__(self, model, **kwargs):
         text = kwargs['text']
-        N = kwargs['N']
         self._load_cache(model)
-        self.probability, self.word_list = self._classify(text, N)
+        self.probability, self.word_list = self._classify(text)
 
     @property
     def get_word_list(self):
@@ -37,7 +36,7 @@ class Classify:
         self.trained_model = load_cache(model, 'clf.pkz')
         self.vector = load_cache(model, 've.pkz')
 
-    def _classify(self, text, N):
+    def _classify(self, text):
         '''
         1. Build vector using pre-trained cache
         2. Transform the input text into text vector
@@ -53,6 +52,6 @@ class Classify:
         word_list = []
         for tv in text_vector.toarray():
             feature_names = np.asarray(self.vector.get_feature_names())
-            word_list.append(sorted([word for word in list(zip(tv, feature_names)) if word[0] != 0.0][:N], reverse=True))
+            word_list.append(sorted([word for word in list(zip(tv, feature_names)) if word[0] != 0.0], reverse=True))
         probability = self.trained_model.predict_proba(text_vector)
         return probability, np.asarray(word_list)

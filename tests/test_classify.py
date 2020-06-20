@@ -15,9 +15,9 @@ class ClassifyTest(unittest.TestCase):
     @mock.patch('cherry.classifyer.Classify._load_cache')
     def test_init(self, mock_load, mock_classify):
         mock_classify.return_value = [1, 0], ['random', 'text']
-        res = cherry.classifyer.Classify(model='harmful', text=['random text'], N=20)
+        res = cherry.classifyer.Classify(model='harmful', text=['random text'])
         mock_load.assert_called_once_with('harmful')
-        mock_classify.assert_called_once_with(['random text'], 20)
+        mock_classify.assert_called_once_with(['random text'])
 
     # _load_cache()
     @mock.patch('cherry.classifyer.Classify._classify')

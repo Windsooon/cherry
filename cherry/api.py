@@ -16,7 +16,7 @@ from .search import Search
 from .displayer import Display
 
 
-def classify(model, text, N=20):
+def classify(model, text):
     '''
     Return a Classify object which contains *probability* and *word_list*
 
@@ -24,7 +24,7 @@ def classify(model, text, N=20):
            number of word list (int): how many word should be list in the word list
     output: Classify (Classify object)
     '''
-    return Classify(model=model, text=text, N=N)
+    return Classify(model=model, text=text)
 
 def train(model, language='English', vectorizer=None,
         vectorizer_method='Count', clf=None, clf_method='MNB', x_data=None, y_data=None):
@@ -42,19 +42,20 @@ def train(model, language='English', vectorizer=None,
             clf=clf, clf_method=clf_method, x_data=x_data, y_data=y_data)
 
 def performance(
-        model, vectorizer=None, vectorizer_method=None,
-        clf=None, clf_method=None, x_data=None,
-        y_data=None, n_splits=5, output='Stdout'):
+        model, language='English', vectorizer=None, vectorizer_method='Count',
+        clf=None, clf_method='MNB', x_data=None,
+        y_data=None, n_splits=10, output='Stdout'):
     '''
     Calculate scores from the models
     '''
     return Performance(
-            model, vectorizer=vectorizer, vectorizer_method=None,
-            clf=clf, clf_method=None, x_data=x_data, y_data=y_data,
+            model, language=language, vectorizer=vectorizer, vectorizer_method=vectorizer_method,
+            clf=clf, clf_method=clf_method, x_data=x_data, y_data=y_data,
             n_splits=n_splits, output=output)
 
 def search(model, parameters, vectorizer=None, vectorizer_method=None,
-        clf=None, clf_method=None, x_data=None, y_data=None, method='RandomizedSearchCV', cv=3, iid=False, n_jobs=1):
+        clf=None, clf_method=None, x_data=None, y_data=None,
+        method='RandomizedSearchCV', cv=3, iid=False, n_jobs=1):
     '''
     Search the best parameters
     '''
