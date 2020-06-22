@@ -1,24 +1,19 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import learning_curve
 from sklearn.model_selection import ShuffleSplit
-from .base import load_data, get_vectorizer, get_clf
+from .base import load_all, load_data, get_vectorizer, get_clf
 
 
 class Display:
-    def __init__(self, model, **kwargs):
-        x_data = kwargs['x_data']
-        y_data = kwargs['y_data']
-        if not (x_data and y_data):
-            x_data, y_data = load_data(model)
-        vectorizer = kwargs['vectorizer']
-        vectorizer_method = kwargs['vectorizer_method']
-        clf_method = kwargs['clf_method']
-        clf = kwargs['clf']
-        if not vectorizer:
-            vectorizer = get_vectorizer(model, vectorizer_method)
-        if not clf:
-            clf = get_clf(model, clf_method)
+    def __init__(self, model, language=None, preprocessing=None, categories=None, encoding=None, vectorizer=None,
+            vectorizer_method=None, clf=None, clf_method=None, x_data=None, y_data=None):
+        x_data, y_data, vectorizer, clf = load_all(
+            model, language=language, preprocessing=preprocessing,
+            categories=categories, encoding=encoding, vectorizer=vectorizer,
+            vectorizer_method=vectorizer_method, clf=clf,
+            clf_method=clf_method, x_data=x_data, y_data=y_data)
         text_clf = Pipeline([
             ('vectorizer', vectorizer),
             ('clf', clf)])
@@ -31,7 +26,8 @@ class Display:
 
     def plot_learning_curve(self, estimator, title, X, y, ylim=None, cv=None,
                             n_jobs=None, train_sizes=np.linspace(.1, 1.0, 5)):
-        import matplotlib.pyplot as plt
+        # From https://scikit-learn.org/stable/auto_examples/model_selection/plot_learning_curve.html
+        print('Drawing curve, depending on your dataset size, this may take several minutes to several hours.')
         plt.figure()
         plt.title(title)
         if ylim is not None:

@@ -19,8 +19,8 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='cherry',
-    version='0.5.2',
-    description='easy text classification using machine learning',
+    version='0.5.6',
+    description='text classification without machine learning knowledge',
     long_description_content_type='text/markdown',
     long_description=long_description,
     url='https://github.com/Windsooon/cherry',
@@ -32,18 +32,15 @@ setup(
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
     keywords='data classify content filter',
     install_requires=[
         'numpy>=1.13.3',
         'scikit-learn>=0.21.3',
         'matplotlib>=2.2.2',
-        'jieba>=0.39',
-        'pytest>=5.1.2'
         ],
     packages=['cherry'],
     package_data={

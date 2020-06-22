@@ -17,8 +17,10 @@ from .exceptions import *
 
 
 class Trainer:
-    def __init__(self, model, language=None, preprocessing=None, categories=None, encoding=None, vectorizer=None,
-            vectorizer_method=None, clf=None, clf_method=None, x_data=None, y_data=None):
+    def __init__(
+            self, model, language=None, preprocessing=None, categories=None,
+            encoding=None, vectorizer=None, vectorizer_method=None,
+            clf=None, clf_method=None, x_data=None, y_data=None):
         '''
         Data should be stored in a two levels folder structure like this:
 

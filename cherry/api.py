@@ -66,12 +66,12 @@ def search(model, parameters, vectorizer=None, vectorizer_method=None,
             vectorizer_method=vectorizer_method, clf=clf, clf_method=clf_method,
             method=method, x_data=x_data, y_data=y_data, cv=cv, iid=iid, n_jobs=n_jobs)
 
-def display(
-        model, vectorizer=None, vectorizer_method=None,
-        clf=None, clf_method=None, x_data=None, y_data=None):
+def display(model, language='English', preprocessing=None, categories=None, encoding=None,
+        vectorizer=None, vectorizer_method='Count', clf=None, clf_method='MNB', x_data=None, y_data=None):
     '''
     Display the learning curve
     '''
     return Display(
-            model, vectorizer=vectorizer, vectorizer_method=vectorizer_method,
+            model, language=language, preprocessing=preprocessing, encoding=encoding,
+            categories=categories, vectorizer=vectorizer, vectorizer_method=vectorizer_method,
             clf=clf, clf_method=clf_method, x_data=x_data, y_data=y_data)

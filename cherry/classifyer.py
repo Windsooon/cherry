@@ -19,15 +19,18 @@ class Classify:
     def __init__(self, model, **kwargs):
         text = kwargs['text']
         self._load_cache(model)
-        self.probability, self.word_list = self._classify(text)
+        self._classify(text)
 
-    @property
     def get_word_list(self):
-        return self.word_list
+        word_list = []
+        for tv in self.text_vector.toarray():
+            feature_names = np.asarray(self.vector.get_feature_names())
+            word_list.append(sorted(
+                [word for word in list(zip(tv, feature_names)) if word[0] != 0.0], reverse=True))
+        return word_list
 
-    @property
     def get_probability(self):
-        return self.probability
+        return self.trained_model.predict_proba(self.text_vector)
 
     def _load_cache(self, model):
         '''
@@ -45,13 +48,7 @@ class Classify:
         if isinstance(text, str):
             text = [text]
         try:
-            text_vector = self.vector.transform(text)
+            self.text_vector = self.vector.transform(text)
         except NotFittedError:
             error = 'Some of the tokens in text never appear in training data'
             raise TokenNotFoundError(error)
-        word_list = []
-        for tv in text_vector.toarray():
-            feature_names = np.asarray(self.vector.get_feature_names())
-            word_list.append(sorted([word for word in list(zip(tv, feature_names)) if word[0] != 0.0], reverse=True))
-        probability = self.trained_model.predict_proba(text_vector)
-        return probability, np.asarray(word_list)
