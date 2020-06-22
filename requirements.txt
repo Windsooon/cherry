@@ -1,10 +1,9 @@
-click==7.1.2
-coverage==5.1
 importlib-metadata==1.6.0
 jieba==0.42.1
 joblib==0.14.1
 nltk==3.5
 numpy==1.18.4
+matplotlib==3.2.2
 regex==2020.5.14
 scikit-learn==0.23.1
 scipy==1.4.1
