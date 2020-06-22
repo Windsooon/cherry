@@ -24,7 +24,7 @@ class Classify:
     def get_word_list(self):
         word_list = []
         for tv in self.text_vector.toarray():
-            feature_names = np.asarray(self.vector.get_feature_names())
+            feature_names = self.vector.get_feature_names()
             word_list.append(sorted(
                 [word for word in list(zip(tv, feature_names)) if word[0] != 0.0], reverse=True))
         return word_list

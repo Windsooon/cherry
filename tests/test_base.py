@@ -120,8 +120,8 @@ class BaseTest(unittest.TestCase):
 
     # get_tokenizer()
     def test_get_tokenizer_function(self):
-        self.assertEqual(get_tokenizer('English').__name__, 'word_tokenize')
-        self.assertEqual(get_tokenizer('Chinese').__name__, 'cut')
+        self.assertEqual(get_tokenizer('English').__name__, 'english_tokenizer_wrapper')
+        self.assertEqual(get_tokenizer('Chinese').__name__, 'chinese_tokenizer_wrapper')
         with self.assertRaises(cherry.exceptions.NotSupportError) as notFoundError:
             self.assertEqual(get_tokenizer('Foo').__name__, 'cut')
         self.assertEqual(

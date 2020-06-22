@@ -236,13 +236,19 @@ def load_cache(model, path):
             'Can\'t find cache files')
         raise CacheNotFoundError(error)
 
+def english_tokenizer_wrapper(text):
+    from nltk.tokenize import word_tokenize
+    return [t for t in word_tokenize(text) if len(t) > 1]
+
+def chinese_tokenizer_wrapper(text):
+    import jieba
+    return [t for t in jieba.cut(text) if len(t) > 1]
+
 def get_tokenizer(language):
     if language == 'English':
-        from nltk.tokenize import word_tokenize
-        return word_tokenize
+        return english_tokenizer_wrapper
     elif language == 'Chinese':
-        import jieba
-        return jieba.cut
+        return chinese_tokenizer_wrapper
     else:
         raise NotSupportError((
             'You need to specify tokenizer function ' +
