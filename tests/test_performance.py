@@ -18,12 +18,3 @@ class PerformanceTest(unittest.TestCase):
             encoding=None, language='English', n_splits=10,
             output='Stdout', preprocessing=None, vectorizer=None,
             vectorizer_method='Count', x_data=None, y_data=None)
-
-    @mock.patch('cherry.api.Performance')
-    def test_api_call_model_clf_vectorizer(self, mock_performance):
-        cherry.performance('foo', clf='clf', vectorizer='vectorizer')
-        mock_performance.assert_called_with(
-            'foo', categories=None, clf='clf', clf_method='MNB',
-            encoding=None, language='English', n_splits=10,
-            output='Stdout', preprocessing=None, vectorizer='vectorizer',
-            vectorizer_method='Count', x_data=None, y_data=None)

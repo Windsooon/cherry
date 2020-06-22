@@ -17,14 +17,6 @@ class TrainerTest(unittest.TestCase):
         self.foo_model_path = os.path.join(DATA_DIR, self.foo_model)
         self.news_model_path = os.path.join(DATA_DIR, self.news_model)
 
-    # api call
-    @mock.patch('cherry.api.Trainer')
-    def test_api_call_only_model(self, mock_trainer):
-        cherry.train('foo')
-        mock_trainer.assert_called_with(
-            'foo', preprocessing=None, categories=None, encoding=None, clf=None, clf_method='MNB', language='English',
-            vectorizer=None, vectorizer_method='Count', x_data=None, y_data=None)
-
     @mock.patch('cherry.api.Trainer')
     def test_api_call_model_clf_vectorizer(self, mock_trainer):
         cherry.train('foo', clf='clf', vectorizer='vectorizer')

@@ -14,19 +14,27 @@ from sklearn.exceptions import NotFittedError
 from .base import load_cache
 from .exceptions import TokenNotFoundError
 
+CACHE = None
 
 class Classify:
-    def __init__(self, model, **kwargs):
-        text = kwargs['text']
-        self._load_cache(model)
+    def __init__(self, model, text=None):
+        # Only load cache once
+        global CACHE
+        if not text:
+            error = 'Some of the tokens in text never appear in training data'
+            raise TokenNotFoundError(error)
+        if not CACHE:
+            self.trained_model, self.vector = self._load_cache(model)
+            CACHE = (self.trained_model, self.vector)
+        else:
+            self.trained_model, self.vector = CACHE
         self._classify(text)
 
     def get_word_list(self):
         word_list = []
         for tv in self.text_vector.toarray():
-            feature_names = self.vector.get_feature_names()
             word_list.append(sorted(
-                [word for word in list(zip(tv, feature_names)) if word[0] != 0.0], reverse=True))
+                [word for word in list(zip(tv, self.vector.get_feature_names())) if word[0] != 0.0], reverse=True))
         return word_list
 
     def get_probability(self):
@@ -36,8 +44,9 @@ class Classify:
         '''
         Load cache from pre-trained model
         '''
-        self.trained_model = load_cache(model, 'clf.pkz')
-        self.vector = load_cache(model, 've.pkz')
+        trained_model = load_cache(model, 'clf.pkz')
+        vector = load_cache(model, 've.pkz')
+        return trained_model, vector
 
     def _classify(self, text):
         '''
