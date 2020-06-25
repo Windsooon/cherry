@@ -14,13 +14,13 @@ class Display:
             categories=categories, encoding=encoding, vectorizer=vectorizer,
             vectorizer_method=vectorizer_method, clf=clf,
             clf_method=clf_method, x_data=x_data, y_data=y_data)
+        self.display_learning_curve(vectorizer, clf, x_data, y_data)
+
+    def display_learning_curve(self, vectorizer, clf, x_data, y_data):
+        title = "Learning Curves"
         text_clf = Pipeline([
             ('vectorizer', vectorizer),
             ('clf', clf)])
-        self.display_learning_curve(text_clf, x_data, y_data)
-
-    def display_learning_curve(self, estimator, x_data, y_data):
-        title = "Learning Curves"
         cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=0)
         self.plot_learning_curve(estimator, title, x_data, y_data, ylim=(0.7, 1.01), cv=cv, n_jobs=-1)
 

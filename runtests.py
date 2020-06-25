@@ -12,8 +12,9 @@ suite.addTests(unittest.makeSuite(BaseTest))
 suite.addTests(unittest.makeSuite(TrainerTest))
 suite.addTests(unittest.makeSuite(ClassifyTest))
 suite.addTests(unittest.makeSuite(PerformanceTest))
-# suite.addTests(unittest.makeSuite(ApiTest))
-# suite.addTests(unittest.makeSuite(DisplayTest))
+suite.addTests(unittest.makeSuite(DisplayTest))
+suite.addTests(unittest.makeSuite(ApiTest))
+suite.addTests(unittest.makeSuite(SearchTest))
 
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(suite)

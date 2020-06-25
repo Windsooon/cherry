@@ -11,8 +11,8 @@ This module implements the cherry API.
 from .base import load_data
 from .trainer import Trainer
 from .classifyer import Classify
-from .performance import Performance
-from .search import Search
+from .performancer import Performance
+from .searcher import Search
 from .displayer import Display
 
 
@@ -26,7 +26,7 @@ def classify(model, text):
     '''
     return Classify(model=model, text=text)
 
-def train(model, language='English', preprocessing=None, categories=None, encoding=None,
+def train(model, language='English', preprocessing=None, categories=None, encoding='utf-8',
         vectorizer=None, vectorizer_method='Count', clf=None, clf_method='MNB', x_data=None, y_data=None):
     '''
     Train the `model` inside data directory
@@ -43,7 +43,7 @@ def train(model, language='English', preprocessing=None, categories=None, encodi
             categories=categories, vectorizer=vectorizer, vectorizer_method=vectorizer_method,
             clf=clf, clf_method=clf_method, x_data=x_data, y_data=y_data)
 
-def performance(model, language='English', preprocessing=None, categories=None, encoding=None,
+def performance(model, language='English', preprocessing=None, categories=None, encoding='utf-8',
         vectorizer=None, vectorizer_method='Count', clf=None, clf_method='MNB', x_data=None,
         y_data=None, n_splits=10, output='Stdout'):
     '''
@@ -55,18 +55,19 @@ def performance(model, language='English', preprocessing=None, categories=None, 
             clf=clf, clf_method=clf_method, x_data=x_data, y_data=y_data,
             n_splits=n_splits, output=output)
 
-def search(model, parameters, vectorizer=None, vectorizer_method=None,
-        clf=None, clf_method=None, x_data=None, y_data=None,
-        method='RandomizedSearchCV', cv=3, iid=False, n_jobs=1):
+def search(model, parameters, language='English', preprocessing=None, categories=None, encoding='utf-8',
+        vectorizer=None, vectorizer_method='Count', clf=None, clf_method='MNB', x_data=None,
+        y_data=None, method='RandomizedSearchCV', cv=3, n_jobs=-1):
     '''
     Search the best parameters
     '''
     return Search(
-            model, parameters=parameters, vectorizer=vectorizer,
+            model, parameters, language=language, preprocessing=preprocessing, encoding=encoding,
+            categories=categories, vectorizer=vectorizer,
             vectorizer_method=vectorizer_method, clf=clf, clf_method=clf_method,
-            method=method, x_data=x_data, y_data=y_data, cv=cv, iid=iid, n_jobs=n_jobs)
+            method=method, x_data=x_data, y_data=y_data, cv=cv, n_jobs=n_jobs)
 
-def display(model, language='English', preprocessing=None, categories=None, encoding=None,
+def display(model, language='English', preprocessing=None, categories=None, encoding='utf-8',
         vectorizer=None, vectorizer_method='Count', clf=None, clf_method='MNB', x_data=None, y_data=None):
     '''
     Display the learning curve
