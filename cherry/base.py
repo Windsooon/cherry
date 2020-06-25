@@ -19,7 +19,7 @@ import numpy as np
 from collections import namedtuple
 from urllib.request import urlretrieve
 from .exceptions import *
-from cherry.datasets import STOP_WORDS, BUILD_IN_MODELS
+from .common import *
 from sklearn.feature_extraction._stop_words import ENGLISH_STOP_WORDS
 from sklearn.feature_extraction.text import CountVectorizer, \
     TfidfVectorizer, HashingVectorizer
@@ -192,11 +192,11 @@ def _train_test_split(cache, test_size=0.1):
     data.filenames = np.array(filenames)
     return train_test_split(data.data, data.target, test_size=test_size, random_state=0)
 
-def write_file(self, path, data):
+def write_file(path, data):
     '''
     Write data to path
     '''
-    with open(path, 'w') as f:
+    with open(path, 'a+') as f:
         f.write(data)
 
 def write_cache(model, content, path):

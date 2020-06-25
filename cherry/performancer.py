@@ -6,7 +6,7 @@ This module implements the cherry performance.
 :copyright: (c) 2018-2019 by Windson Yang
 :license: MIT License, see LICENSE for more details.
 """
-
+import os
 import operator
 import numpy as np
 from sklearn.model_selection import KFold
@@ -30,12 +30,12 @@ class Performance:
 
     def get_score(self):
         # TODO:  operator.itemgetter maybe is not the best solution
+        print('Calculating score, depending on your dataset size, this may take several minutes to several hours.')
         for train_index, test_index in KFold(
                 n_splits=self.n_splits, shuffle=True).split(self.y_data):
             x_train = operator.itemgetter(*train_index)(self.x_data)
             x_test = operator.itemgetter(*test_index)(self.x_data)
             y_train, y_test = self.y_data[train_index], self.y_data[test_index]
-            print('Calculating score, depending on your dataset size, this may take several minutes to several hours.')
             self._score(self.vectorizer, self.clf, x_train, y_train, x_test, y_test, self.output)
 
     def _score(self, vectorizer, clf, x_train, y_train, x_test, y_test, output):
@@ -44,11 +44,11 @@ class Performance:
             ('clf', clf)])
         text_clf.fit(x_train, y_train)
         predicted = text_clf.predict(x_test)
+        report = metrics.classification_report(y_test, predicted)
         if output == 'Stdout':
             for index, (input, prediction, label) in enumerate(zip (x_test, predicted, y_test)):
                 if prediction != label:
                     print('Text:', input, 'has been classified as:', prediction, 'should be:', label)
-            report = metrics.classification_report(y_test, predicted)
             print(report)
         else:
-            self.write_file(output, report)
+            write_file(os.path.join(os.getcwd(), 'report'), report)
