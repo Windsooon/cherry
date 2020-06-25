@@ -19,8 +19,8 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='cherry',
-    version='0.5.6',
-    description='text classification without machine learning knowledge',
+    version='3.0',
+    description='text classification without machine learning knowledge needed',
     long_description_content_type='text/markdown',
     long_description=long_description,
     url='https://github.com/Windsooon/cherry',
@@ -36,16 +36,11 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    keywords='data classify content filter',
+    keywords='text classification',
     install_requires=[
         'numpy>=1.13.3',
         'scikit-learn>=0.21.3',
         'matplotlib>=2.2.2',
         ],
     packages=['cherry'],
-    package_data={
-        'cherry': [
-            'data/harmful/trained.pkl', 'data/harmful/ve.pkl',
-            'data/news/trained.pkl', 'data/news/ve.pkl']
-    },
 )

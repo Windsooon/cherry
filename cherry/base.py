@@ -30,7 +30,7 @@ from sklearn.datasets import load_files
 
 CHERRY_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'cherry')
-DATA_DIR = os.path.join(CHERRY_DIR, 'datasets')
+DATA_DIR = os.path.join(os.getcwd(), 'datasets')
 
 __all__ = ['DATA_DIR',
            'get_stop_words',
@@ -61,12 +61,13 @@ def get_stop_words(language='English'):
 
 def load_all(model, language=None, preprocessing=None, categories=None, encoding=None, vectorizer=None,
             vectorizer_method=None, clf=None, clf_method=None, x_data=None, y_data=None):
+    # If user didn't pass x_data and y_data, try to load data from local or remote
     if not (x_data and y_data):
         try:
             cache = load_data(model, categories=categories, encoding=encoding)
         except FilesNotFoundError:
             error = ('Please make sure your put the {0} data inside `dataset` '
-                    'folder or use model inside BUILD_IN_MODELS.'.format(model))
+                    'folder or use model inside "email", "review" or "newsgroups".'.format(model))
             raise FilesNotFoundError(error)
         if preprocessing:
             cache.data = [preprocessing(text) for text in cache.data]
@@ -82,13 +83,6 @@ def load_data(model, categories=None, encoding=None):
     '''
     model_path = os.path.join(DATA_DIR, model)
     if os.path.exists(model_path):
-        try:
-            info = BUILD_IN_MODELS[model]
-        except KeyError:
-            pass
-        else:
-            if not encoding:
-                encoding = info[3]
         return _load_data_from_local(
             model, categories=categories, encoding=encoding)
     else:
@@ -98,7 +92,7 @@ def load_data(model, categories=None, encoding=None):
 def _load_data_from_local(
         model, categories=None, encoding=None):
     '''
-    1. Try to find local cache files
+    1. Find local cache files
     2. If we can't find the cache files
            3.1 Try to create cache files using data files inside `dataset`.
            2.2 Raise error if create cache files failed.
@@ -115,7 +109,7 @@ def _load_data_from_local(
         except Exception as e:
             # Can't load cache files
             error = ('Can\'t load cached data from {0}. '
-                    'Please try again after delete those cache files.'.format(model))
+                    'Please try again after delete cache files.'.format(model))
             raise NotSupportError(error)
     cache = dict(all=load_files(
         model_path, categories=categories, encoding=encoding))
@@ -128,8 +122,7 @@ def _load_data_from_remote(model, categories=None, encoding=None):
     try:
         info = BUILD_IN_MODELS[model]
     except KeyError:
-        error = ('{0} is not built in models and not found '
-                'in dataset folder.').format(model)
+        error = ('{0} is not in BUILD_IN_MODELS.').format(model)
         raise FilesNotFoundError(error)
     # The original data can be found at:
     # https://people.csail.mit.edu/jrennie/20Newsgroups/20news-bydate.tar.gz
@@ -208,7 +201,7 @@ def write_file(self, path, data):
 
 def write_cache(model, content, path):
     '''
-    Write trained file under model DATA_DIR
+    Write cached file under model dir
     '''
     cache_path = os.path.join(DATA_DIR, model + '/' + path)
     compressed_content = codecs.encode(pickle.dumps(content), 'zlib_codec')
@@ -229,7 +222,7 @@ def load_cache(model, path):
             return pickle.loads(uncompressed_content)
         except Exception as e:
             error = (
-                'Cache loading failed.')
+                'Can\'t load cached files.')
             raise CacheNotFoundError(error)
     else:
         error = (
