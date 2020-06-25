@@ -15,10 +15,12 @@ class UseModel:
 
     def __init__(self, model, cache=True, cache_problem=False):
         self.dir_path = os.path.join(DATA_DIR, model)
+        self.datasets_path = os.path.join(os.getcwd(), 'datasets')
         self.cache = cache
         self.cache_problem = cache_problem
 
     def __enter__(self):
+        os.mkdir(os.path.join(os.getcwd(), 'datasets'))
         os.mkdir(self.dir_path)
         if self.cache:
             # Create cache files with wrong format
@@ -33,7 +35,7 @@ class UseModel:
             return f
 
     def __exit__(self, *args):
-        shutil.rmtree(self.dir_path)
+        shutil.rmtree(self.datasets_path)
 
 class BaseTest(unittest.TestCase):
 
@@ -42,6 +44,7 @@ class BaseTest(unittest.TestCase):
         self.news_model = 'newsgroups'
         self.foo_model_path = os.path.join(DATA_DIR, self.foo_model)
         self.news_model_path = os.path.join(DATA_DIR, self.news_model)
+        self.datasets_path = os.path.join(os.getcwd(), 'datasets')
 
     # get_stop_words()
     def test_stop_words(self):
@@ -64,7 +67,7 @@ class BaseTest(unittest.TestCase):
             load_data(self.foo_model)
         self.assertEqual(
             str(filesNotFoundError.exception),
-            'foo is not built in models and not found in dataset folder.')
+            'foo is not in BUILD_IN_MODELS.')
 
     # _load_data_from_local()
     @mock.patch('cherry.base.load_files')
@@ -89,7 +92,7 @@ class BaseTest(unittest.TestCase):
                 res = cherry.base._load_data_from_local(self.foo_model)
             self.assertEqual(
                 str(notFoundError.exception),
-                'Can\'t load cached data from foo. Please try again after delete those cache files.')
+                'Can\'t load cached data from foo. Please try again after delete cache files.')
 
     # _load_data_from_remote()
     @mock.patch('cherry.base._load_data_from_remote')
@@ -103,18 +106,19 @@ class BaseTest(unittest.TestCase):
             cherry.base._load_data_from_remote(self.foo_model)
         self.assertEqual(
             str(filesNotFoundError.exception),
-            'foo is not built in models and not found in dataset folder.')
+            'foo is not in BUILD_IN_MODELS.')
 
     @mock.patch('cherry.base._load_data_from_local')
     @mock.patch('cherry.base._decompress_data')
     @mock.patch('cherry.base._fetch_remote')
     def test_load_data_from_remote_download(self, mock_fetch_remote, mock_decompress_data, mock_load_data_from_local):
         model_existed = os.path.exists(self.news_model_path)
+        self.assertTrue(model_existed is False)
         info = BUILD_IN_MODELS[self.news_model]
         cherry.base._load_data_from_remote(self.news_model)
         self.assertTrue(os.path.exists(self.news_model_path) is True)
         if not model_existed:
-            shutil.rmtree(self.news_model_path)
+            shutil.rmtree(self.datasets_path)
         mock_load_data_from_local.assert_called_once_with(
             self.news_model, categories=None, encoding=info[3])
 

@@ -6,15 +6,12 @@ from cherry.base import DATA_DIR, load_data
 
 class PerformanceTest(unittest.TestCase):
 
-    def setUp(self):
-        pass
-
-    # api call
-    @mock.patch('cherry.api.Performance')
-    def test_api_call_only_model(self, mock_performance):
-        cherry.performance('foo')
-        mock_performance.assert_called_with(
-            'foo', categories=None, clf=None, clf_method='MNB',
-            encoding=None, language='English', n_splits=10,
-            output='Stdout', preprocessing=None, vectorizer=None,
-            vectorizer_method='Count', x_data=None, y_data=None)
+    # __init__()
+    @mock.patch('cherry.performancer.load_all')
+    def test_init(self, mock_load):
+        mock_load.return_value = ([1], [0], 'vectorizer', 'clf')
+        cherry.performancer.Performance('foo')
+        mock_load.assert_called_with(
+            'foo', categories=None, clf=None, clf_method=None,
+            encoding=None, language=None, preprocessing=None,
+            vectorizer=None, vectorizer_method=None, x_data=None, y_data=None)

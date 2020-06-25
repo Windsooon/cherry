@@ -17,13 +17,6 @@ class TrainerTest(unittest.TestCase):
         self.foo_model_path = os.path.join(DATA_DIR, self.foo_model)
         self.news_model_path = os.path.join(DATA_DIR, self.news_model)
 
-    @mock.patch('cherry.api.Trainer')
-    def test_api_call_model_clf_vectorizer(self, mock_trainer):
-        cherry.train('foo', clf='clf', vectorizer='vectorizer')
-        mock_trainer.assert_called_with(
-            'foo', preprocessing=None, categories=None, encoding=None, clf='clf', clf_method='MNB', language='English',
-            vectorizer='vectorizer', vectorizer_method='Count', x_data=None, y_data=None)
-
     # __init__()
     def test_cache_not_found(self):
         with self.assertRaises(cherry.exceptions.FilesNotFoundError) as filesNotFoundError:
