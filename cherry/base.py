@@ -119,6 +119,7 @@ def _load_data_from_local(
     return cache['all']
 
 def _load_data_from_remote(model, categories=None, encoding=None):
+    print('Trying to load data from the internet')
     try:
         info = BUILD_IN_MODELS[model]
     except KeyError:
@@ -130,10 +131,8 @@ def _load_data_from_remote(model, categories=None, encoding=None):
     # Create a nametuple
     meta_data = meta_data_c(filename=info[0], url=info[1], checksum=info[2], encoding=info[3])
     model_path = os.path.join(DATA_DIR, model)
-    if not os.path.exists(model_path):
-        os.makedirs(model_path)
     _fetch_remote(meta_data, model_path)
-    _decompress_data(meta_data.filename, model_path)
+    _decompress_data(meta_data.filename, DATA_DIR)
     return _load_data_from_local(
         model, categories=categories, encoding=info[3])
 
@@ -146,6 +145,7 @@ def _fetch_remote(remote, dirname=None):
 
     file_path = (remote.filename if dirname is None
                  else os.path.join(dirname, remote.filename))
+    print('Downloading data from {0}'.format(remote.url))
     urlretrieve(remote.url, file_path)
     checksum = _sha256(file_path)
     if remote.checksum != checksum:

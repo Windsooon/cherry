@@ -14,11 +14,11 @@ from sklearn.exceptions import NotFittedError
 from .base import load_cache
 from .exceptions import TokenNotFoundError
 
+# Only load cache once
 CACHE = None
 
 class Classify:
     def __init__(self, model, text=None):
-        # Only load cache once
         global CACHE
         if not text:
             error = 'Some of the tokens in text never appear in training data'

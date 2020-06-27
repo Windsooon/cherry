@@ -14,9 +14,9 @@ BUILD_IN_MODELS = {
         'latin1',
         ),
     'email': (
-        '20news-bydate.tar.gz',
-        'https://ndownloader.figshare.com/files/5975967',
-        '8f1b2514ca22a5ade8fbb9cfa5727df95fa587f4c87b786e15c759fa66d95610',
+        'email.tar.gz',
+        'https://1drv.ms/u/s!AprP55D3BKwuj3XeECj20bOBtl0N?e=KAnhzy',
+        '901d7c5721ec4f72ad39bcf245c52c214a9d96ad96604ddaac86605bf9f910e2',
         'latin1',
         )
 }
