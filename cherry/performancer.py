@@ -30,7 +30,7 @@ class Performance:
 
     def get_score(self):
         # TODO:  operator.itemgetter maybe is not the best solution
-        print('Calculating score, depending on your dataset size, this may take several minutes to several hours.')
+        print('Calculating score, depending on your datasets size, this may take several minutes to several hours.')
         for train_index, test_index in KFold(
                 n_splits=self.n_splits, shuffle=True).split(self.y_data):
             x_train = operator.itemgetter(*train_index)(self.x_data)

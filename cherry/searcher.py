@@ -14,11 +14,11 @@ from .exceptions import MethodNotFoundError
 
 class Search:
     def __init__(self, model, parameters, language=None, preprocessing=None, categories=None, encoding=None, method=None,
-            vectorizer=None, n_splits=None, cv=None, n_jobs=None, vectorizer_method=None, clf=None, clf_method=None,
+            vectorizer=None, cv=None, n_jobs=None, vectorizer_method=None, clf=None, clf_method=None,
             x_data=None, y_data=None):
         '''
         1. Build pipeline
-        2. Run  RandomizedSearchCV or GridSearchCV
+        2. Run RandomizedSearchCV or GridSearchCV
         3. Display the best score
         '''
         x_data, y_data, vectorizer, clf = load_all(
@@ -28,7 +28,7 @@ class Search:
             clf_method=clf_method, x_data=x_data, y_data=y_data)
         self._search(vectorizer, clf, method, parameters, x_data, y_data, cv, n_jobs)
 
-    def _search(self, clf, method, parameters, x_data, y_data, cv, n_jobs):
+    def _search(self, vectorizer, clf, method, parameters, x_data, y_data, cv, n_jobs):
         text_clf = Pipeline([
             ('vectorizer', vectorizer),
             ('clf', clf)])

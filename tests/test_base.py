@@ -52,6 +52,11 @@ class BaseTest(unittest.TestCase):
         self.assertNotIn('你好', get_stop_words(language='Chinese'))
         self.assertNotIn('human', get_stop_words())
 
+    def test_stop_words_non_exist(self):
+        with self.assertRaises(cherry.exceptions.NotSupportError) \
+            as notSupportError:
+            self.assertIn('的', get_stop_words(language='Other'))
+
     # load_data()
     @mock.patch('cherry.base._load_data_from_local')
     def test_load_data_found(self, mock_load_files):
@@ -62,7 +67,8 @@ class BaseTest(unittest.TestCase):
 
     @mock.patch('cherry.base._load_data_from_local')
     def test_load_data_not_found(self, mock_load_files):
-        with self.assertRaises(cherry.exceptions.FilesNotFoundError) as filesNotFoundError:
+        with self.assertRaises(cherry.exceptions.FilesNotFoundError) \
+            as filesNotFoundError:
             load_data(self.foo_model)
         self.assertEqual(
             str(filesNotFoundError.exception),

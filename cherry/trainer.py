@@ -24,12 +24,15 @@ class Trainer:
         '''
         Data should be stored in a two levels folder structure like this:
 
-        dataset/
+        datasets/
           model_name/
             category1/
-              file_1.txt file_2.txt … file_42.txt
+              file_1.txt
+              file_2.txt
+              file_42.txt
             category2/
-              file_43.txt file_44.txt …
+              file_43.txt
+              file_44.txt
         '''
         x_data, y_data, vectorizer, clf = load_all(
             model, language=language, preprocessing=preprocessing,
@@ -50,5 +53,5 @@ class Trainer:
         text_clf = Pipeline([
             ('vectorizer', vectorizer),
             ('clf', clf)])
-        print('Depending on your dataset size, this may take several minutes to several hours.')
+        print('Depending on your datasets size, this may take several minutes to several hours.')
         text_clf.fit(x_data, y_data)

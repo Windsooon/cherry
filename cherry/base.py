@@ -66,7 +66,7 @@ def load_all(model, language=None, preprocessing=None, categories=None, encoding
         try:
             cache = load_data(model, categories=categories, encoding=encoding)
         except FilesNotFoundError:
-            error = ('Please make sure your put the {0} data inside `dataset` '
+            error = ('Please make sure your put the {0} data inside `datasets` '
                     'folder or use model inside "email", "review" or "newsgroups".'.format(model))
             raise FilesNotFoundError(error)
         if preprocessing:
@@ -94,7 +94,7 @@ def _load_data_from_local(
     '''
     1. Find local cache files
     2. If we can't find the cache files
-           3.1 Try to create cache files using data files inside `dataset`.
+           3.1 Try to create cache files using data files inside `datasets`.
            2.2 Raise error if create cache files failed.
     '''
     model_path = os.path.join(DATA_DIR, model)
@@ -119,7 +119,6 @@ def _load_data_from_local(
     return cache['all']
 
 def _load_data_from_remote(model, categories=None, encoding=None):
-    print('Trying to load data from the internet')
     try:
         info = BUILD_IN_MODELS[model]
     except KeyError:
@@ -130,8 +129,7 @@ def _load_data_from_remote(model, categories=None, encoding=None):
     meta_data_c = namedtuple('meta_data_c', ['filename', 'url', 'checksum', 'encoding'])
     # Create a nametuple
     meta_data = meta_data_c(filename=info[0], url=info[1], checksum=info[2], encoding=info[3])
-    model_path = os.path.join(DATA_DIR, model)
-    _fetch_remote(meta_data, model_path)
+    _fetch_remote(meta_data, DATA_DIR)
     _decompress_data(meta_data.filename, DATA_DIR)
     return _load_data_from_local(
         model, categories=categories, encoding=info[3])
@@ -139,13 +137,14 @@ def _load_data_from_remote(model, categories=None, encoding=None):
 def _fetch_remote(remote, dirname=None):
     """
     Function from sklearn
-    Helper function to download a remote dataset into path
+    Helper function to download a remote datasets into path
     Copy from sklearn.datasets.base
     """
 
     file_path = (remote.filename if dirname is None
                  else os.path.join(dirname, remote.filename))
     print('Downloading data from {0}'.format(remote.url))
+    breakpoint()
     urlretrieve(remote.url, file_path)
     checksum = _sha256(file_path)
     if remote.checksum != checksum:

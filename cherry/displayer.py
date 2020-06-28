@@ -22,12 +22,12 @@ class Display:
             ('vectorizer', vectorizer),
             ('clf', clf)])
         cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=0)
-        self.plot_learning_curve(estimator, title, x_data, y_data, ylim=(0.7, 1.01), cv=cv, n_jobs=-1)
+        self.plot_learning_curve(text_clf, title, x_data, y_data, ylim=(0.7, 1.01), cv=cv, n_jobs=-1)
 
     def plot_learning_curve(self, estimator, title, X, y, ylim=None, cv=None,
                             n_jobs=None, train_sizes=np.linspace(.1, 1.0, 5)):
         # From https://scikit-learn.org/stable/auto_examples/model_selection/plot_learning_curve.html
-        print('Drawing curve, depending on your dataset size, this may take several minutes to several hours.')
+        print('Drawing curve, depending on your datasets size, this may take several minutes to several hours.')
         plt.figure()
         plt.title(title)
         if ylim is not None:
