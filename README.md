@@ -93,13 +93,13 @@ Cherry has three built in models, `email`, `review` and `newsgroups`. For instan
 
 > This is an extremely entertaining and often insightful collection by Nobel physicist Richard Feynman drawn from slices of his life experiences. Some might believe that the telling of a physicist’s life would be droll fare for anyone other than a fellow scientist, but in this instance, nothing could be further from the truth.
 
-After finish [Installation](#installation):
+After finish [Installation](#installation), in your project path run `cherry.train('review')`
     
     # You only need to run this line of code at the first time.
-    # This line of code will
+    # This line of code will:
     # 1. Download `review` datasets from remote server (User in China may need use VPN)
     # 2. Train datasets using default settings ([Countvectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html) and [MultinomialNB](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html))
-    >>> res = cherry.train('review')
+    >>> cherry.train('review')
 
 Then you can use `classify()` to predict the rating now.
 
