@@ -24,13 +24,13 @@ Cherry - Text classification with no machine learning knowledge needed
 - [Feature](#feature)
 - [Requirements](#requirements)
 - [Install](#install)
-- [Built in model](#builtinmodel)
+- [Built in model](#built-in-model)
 - [Example](#example)
-- [Quickstart](#quickstart)
+- [Quickstart](#quick-start)
 - [API](#api)
   - [Performance](#performance)
   - [Search](#search)
-  - [Visualization](#visualization)
+  - [Display](#display)
 
 ### Feature
 
@@ -40,7 +40,7 @@ Cherry - Text classification with no machine learning knowledge needed
 
 #### Three built in models to play with.
 
-  Cherry has three built in English models, you can use them before use your dataset. For more info, checkout [Built in model](#builtinmodel)
+  Cherry has three built in English models, you can use them before use your dataset. For more info, checkout [Built in model](#built-in-model).
     
 #### Easy to optimize and optimize performance
 
@@ -57,6 +57,7 @@ Install using `pip`
     pip install cherry
     # Cherry use nltk for text tokenizer 
     pip install nltk
+    # After install nltk, You need to download punkt
     >>> import nltk
     >>> nltk.download('punkt')
 
@@ -92,20 +93,25 @@ Cherry has three built in models, `email`, `review` and `newsgroups`. For instan
 
 > This is an extremely entertaining and often insightful collection by Nobel physicist Richard Feynman drawn from slices of his life experiences. Some might believe that the telling of a physicist’s life would be droll fare for anyone other than a fellow scientist, but in this instance, nothing could be further from the truth.
 
-After finish [Installation](#installation), first is to train the model:
+After finish [Installation](#installation):
     
-    # 1. Download `review` datasets from remote server (Chinese user may need use VPN)
-    # 2. Train datasets using default settings (Countvectorizer and MultinomialNB)
-    # 3. You only need to run `train` at the first time
+    # You only need to run this line of code at the first time.
+    # This line of code will
+    # 1. Download `review` datasets from remote server (User in China may need use VPN)
+    # 2. Train datasets using default settings ([Countvectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html) and [MultinomialNB](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html))
     >>> res = cherry.train('review')
 
 Then you can use `classify()` to predict the rating now.
 
-    >>> res = cherry.classify('review', text='This is an extremely entertaining and often insightful collection by Nobel physicist Richard Feynman drawn from slices of his life experiences. Some might believe that the telling of a physicist’s life would be droll fare for anyone other than a fellow scientist, but in this instance, nothing could be further from the truth.')
+    >>> res = cherry.classify('review', text='This is an extremely entertaining and often
+    insightful collection by Nobel physicist Richard Feynman drawn from slices of his life
+    experiences. Some might believe that the telling of a physicist’s life would be droll
+    fare for anyone other than a fellow scientist, but in this instance, nothing could be
+    further from the truth.')
 
 The return `res` is a Classify object has two built-in method. `get_probability()` will return an array contains the probability of each category. The order of the return array depend on category name, in this case would be 0, 1, 2, 3, 4.
 
-    # The probability of this book review has 4 points is 99.6%
+    # The probability of this review had been rating as 4 points is 99.6%
 	>>> res.get_probability()
 	array([[6.99908424e-11, 2.48677319e-11, 6.17978214e-06, 3.39472694e-03,
         9.96313288e-01, 2.85805135e-04]])
@@ -118,7 +124,7 @@ Another method `get_word_list()` return a list that contains words that Cherry u
 As you can see, some of the words in the review didin't show up here. There are two reasons for this 1) The training data didn't contain that word. For instance, The word `Backend` and `Engineer` never show up in training data. 2) the word is a [stop word](https://en.wikipedia.org/wiki/Stop_words). 'you', 'your' are stop words by default, you can find all stop words Cherry use at [here]().
 
 #### Use your own data
-Create a folder under datasets in project path
+Create a folder `your_model_name `under datasets in project path
 
     ├── project path
     │   ├── datasets
@@ -132,16 +138,17 @@ Create a folder under datasets in project path
     |   |   │     ├── file_11
     |   |   │     ├── …
 
-You can train you datasets now.
+Train you datasets:
 
     # By default, encoding will be utf-8,
     # You only need to run `train` at the first time
     >>> cherry.train('your_model_name', encoding='your_encoding')
+    # Classify text, `text` can be a list of text too.
     >>> res = cherry.classify('your_model_name', text='text to be classified')
 
 ### Quick Start
     
-Let's build an email classifier from sketch, this classifier can predict an email is spam or not.
+Let's build an email classifier from sketch, cherry will use this model to predict an email is spam or not.
 
 #### Project setup
 
@@ -155,15 +162,17 @@ Let's build an email classifier from sketch, this classifier can predict an emai
     # Install cherry and nltk
     pip install cherry
     pip install nltk
+    >>> import nltk
+    >>> nltk.download('punkt')
 
     # Create a new folder for email dataset
     mkdir -p datasets/email_tutorial
 
 #### Prepare dataset
 
-1. Download the datasets from [SMS Spam Collection v. 1](http://www.dt.fee.unicamp.br/~tiago/smsspamcollection/) then unzip it and put it inside `tutorial/datasets/email_tutorial ` folder, now you got a file named `SMSSpamCollection.txt` which contains lots of emails.
+1. Download the datasets from [SMS Spam Collection v. 1](http://www.dt.fee.unicamp.br/~tiago/smsspamcollection/) then unzip it and put it inside `tutorial/datasets/email_tutorial` folder, now you got a file named `SMSSpamCollection.txt` which contains lots of emails.
 2. Create a folder name `ham` and `spam` inside `email_tutorial` dir.
-3. Create a script `email.py` in the same folder using code below to extract the email and group them by category. every file would only contain text content.
+3. Create a script `email.py` in the same folder using code below to extract the email content and group them by category. every file would only contain text.
 
         import os
         import json
@@ -184,29 +193,25 @@ Let's build an email classifier from sketch, this classifier can predict an emai
                             _, text = line.split('spam', 1)
                             nf.write(text.strip())
 
-4. Run python email.py
-5. Delete `SMSSpamCollection.txt` and `email.py`
-6. Now your folder structure should look like this:
+4. Now your folder structure should look like this:
 
         tutorial
            ├── dataset
            │   ├── email_tutorial
+           |   |   ├── email.py
+           |   |   ├── SMSSpamCollection.txt
            │   │   ├── ham
-           |   |   │     ├── 1
-           |   |   │     ├── 2
-           |   |   │     ├── …
            │   │   ├── spam
-           |   |   │     ├── 1
-           |   |   │     ├── 2
-           |   |   │     ├── …
-           
-7. cd tutorial
-6. Go back to `tutorial`, `cd tutorial` then train the email model:
+ 
+5. Run `python email.py`
+6. Delete `SMSSpamCollection.txt` and `email.py`
+7. Back to the path of `tutorial`, Like `cd path_to/tutorial`
+6. Train the email model:
         
         >>> import cherry
         >>> cherry.train('email_tutorial', encoding='latin1')
 
-7. Inside `email_tutorial` you can find `clf.pkz`, `ve.pkz`, `email_tutorial.pkz` which Cherry will use them for classify later.
+7. Inside `email_tutorial` folder you can find `clf.pkz`, `ve.pkz`, `email_tutorial.pkz` which Cherry will use them for classify later.
 
          >>> res = cherry.classify('email_tutorial', 'Thank you for your interest in cherry! We wanted to let you'
               'know we received your application for Backend Engineer, and we are delighted that you'
@@ -220,7 +225,6 @@ Let's build an email classifier from sketch, this classifier can predict an emai
 
 8. If you want to know good your model did, you can use [performance()]() which will use k-fold cross validation (By default, K equals to 10):
    
-
  		 >>> res = cherry.performance('email_tutorial', encoding='latin1', output='files')
          >>> res.get_score()
  		  
@@ -245,14 +249,15 @@ Let's build an email classifier from sketch, this classifier can predict an emai
          ...
 
 9. To display the graph, you can use
-    >>> res.display('email_tutorial', encoding='latin1')
 
-    ![img](https://github.com/Windsooon/cherry/blob/master/imgs/display.png?raw=true)
+        >>> res.display('email_tutorial', encoding='latin1')
+
+   ![img](https://github.com/Windsooon/cherry/blob/master/imgs/display.png?raw=true)
 
 10. If you want to improve your model, you can use search method. 
 
-    >>> parameters = {'clf__alpha': [0.1, 0.5, 1],'clf__fit_prior': [True, False]}
-    >>> cherry.search('email_tutorial', parameters)
+        >>> parameters = {'clf__alpha': [0.1, 0.5, 1],'clf__fit_prior': [True, False]}
+        >>> cherry.search('email_tutorial', parameters)
  
 ### API
 
