@@ -6,7 +6,7 @@ https://github.com/pypa/sampleproject
 """
 
 # Always prefer setuptools over distutils
-from setuptools import setup
+from setuptools import setup, find_packages
 # To use a consistent encoding
 from codecs import open
 from os import path
@@ -28,7 +28,7 @@ setup(
     author_email='wiwindson@outlook.com',
     license='MIT',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'License :: OSI Approved :: MIT License',
@@ -42,5 +42,6 @@ setup(
         'scikit-learn>=0.21.3',
         'matplotlib>=2.2.2',
         ],
-    packages=['cherry'],
+    packages=find_packages(include=['cherry'], exclude=['datasets']),
+    python_requires='>=3.6',
 )

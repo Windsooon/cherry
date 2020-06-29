@@ -1,751 +1,259 @@
-# cherry
+# Cherry
+
+![logo](text.png)
 
 [![image](https://travis-ci.org/Windsooon/cherry.svg?branch=master)](https://travis-ci.org/Windsooon/cherry)
 [![image](https://img.shields.io/pypi/v/cherry.svg)](https://pypi.python.org/pypi/cherry)
 [![image](https://img.shields.io/pypi/l/cherry.svg)](https://pypi.python.org/pypi/cherry)
 [![image](https://img.shields.io/pypi/pyversions/cherry.svg)](https://pypi.python.org/pypi/cherry)
 
-|  cherry   | Windson  |
+Cherry - Text classification with no machine learning knowledge needed
+
+|  Cherry   | Windson  |
 |  ----     | ----  |
 | Download  | https://pypi.python.org/pypi/cherry |
 | Source    | https://github.com/Windsooon/cherry |
 | Keywords  | text classification |
 
-## Cherry 3.0 will be released in two weeks. With many powerful features and several built-in English and Chinese data models!
-## Cherry 3.0 将在两周内发布，会有更加方便的使用方式以及更多内置模型，Cherry 2.0 将不会继续支持。
 
-## Documentation
-- [**English Document**](#english-document)
-- [**中文文档**](#中文文档)
+- [Document](#document)
+- [中文文档](#中文文档)
 
-### English Document
+## Document
 
 - [Feature](#feature)
+- [Requirements](#requirements)
 - [Install](#install)
+- [Built in model](#builtinmodel)
+- [Example](#example)
 - [Quickstart](#quickstart)
-- [Custom](#custom)
-  - [Dataset](#dataset)
-  - [Stopwords](#stopwords)
-  - [Settings](#settings)
-  - [Training](#training)
-- [Advance Usage](#advance-usage)
-  - [Classify](#classify)
+- [API](#api)
   - [Performance](#performance)
   - [Search](#search)
   - [Visualization](#visualization)
 
 ### Feature
 
-- **No machine learning knowledge needed, easy to customize**
+#### Easy to use, no machine learning knowledge needed
 
-    cherry comes with two built-in Chinese models. We only need one line of code to classify text using pre-trained models. No more than 10 lines of code to train your dataset. Moreover, cherry supports custom tokenizer methods, classify methods and stop words.
+  Text classification in 5 minutes, no machine learning knowledge needed. We also provide extra features for users who want to imporve their model.
+
+#### Three built in models to play with.
+
+  Cherry has three built in English models, you can use them before use your dataset. For more info, checkout [Built in model](#builtinmodel)
     
-- **High accuracy, recall rate**
+#### Easy to optimize and optimize performance
 
-    On average, the small data set (1000 data contains 4 categories) achieved an accuracy of 96% and a recall rate. In large data sets (50,000 data contains 7 categories, data from [here](http://thuctc.thunlp.org/)) averaged 97% accuracy and recall rate.
+  Cherry provide [performence()](#performance) and [display()](#display) api to help you debug and improve the model.
 
-- **Support multiple methods**
+### Requirements
 
-    Support all [feature extraction method](https://scikit-learn.org/stable/modules/feature_extraction.html) and [classify method](https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html) in sklearn. you can use `search()` to find the optimal algorithm and parameters of a specific data set.
+    - Python (3.6, 3.7, 3.8)
+
+### Installation
+
+Install using `pip`
     
-- **Visualization**
+    pip install cherry
+    # Cherry use nltk for text tokenizer 
+    pip install nltk
+    >>> import nltk
+    >>> nltk.download('punkt')
 
-    Draw a learning curve image to determine if the model is over-fitting or under-fitting with `display()`
+or clone the project from github.
 
+    git clone git@github.com:Windsooon/cherry.git
 
-### Install
+### Built in model
 
-    pip install -U cherry
+- [The 20 Newsgroups dataset](http://qwone.com/~jason/20Newsgroups/)
     
-### Quickstart
+    These datasets contain 11,315 news. they were organized into 20 different newsgroups, each corresponding to one of the below topic:
 
-#### Use pre-trained model
-Because the training data is too large, cherry library does not contain any training data, so the pre-trained models only support the `classify()` method. The pre-trained models contain two datasets, respectively
+        - alt.atheism, comp.graphics, comp.os.ms-windows.misc, comp.sys.ibm.pc.hardware
+        - comp.sys.mac.hardware, comp.windows.x, misc.forsale, rec.autos
+        - rec.motorcycles, rec.sport.baseball, rec.sport.hockey, sci.crypt
+        - sci.electronics, sci.med, sci.space, soc.religion.christian
+        - talk.politics.guns, talk.politics.mideast, talk.politics.misc, talk.religion.misc
+        
+- [Comics & Graphic book review](https://sites.google.com/eng.ucsd.edu/ucsdbookgraph/home)
 
-1. Gamble / Normal / Political / Porn (1000 chinese text data contains 4 categories which model name is 'harmful'.)
-2. Lottery ticket / Finance / Estate / Home / Tech / Society / Sport / Game / Entertainment (50000 chinese news contains 7 categories which model name is 'news'，)
+    These datasets contain 108,463 reviews from the Goodreads book review website, Every book review also has rating from 0 point to 5 points.
+	   
+- [SMS Spam Collection](http://www.dt.fee.unicamp.br/~tiago/smsspamcollection/)
 
-Using the pre-trained model for text classification is simple. You can specify two parameters in `classify()`. `text` is a list of text to be classified. The `models` is the model name (Like `harmful`, `news`).
+    These datasets contain 5,578 SMS messages manually extracted from the Grumbletext Web site and randomly chosen ham messages of the NUS SMS Corpus (NSC).
 
-    >>> res = cherry.classify(model='harmful', text=['她们对计算机很有热情，也希望学习到数据分析，网络爬虫，人工智能等方面的知识，从而运用在她们工作上'])
-    >>> res.word_list
-    [(2, '她们'), (1, '网络'), (1, '热情'), (1, '方面'), (1, '数据分析'), (1, '希望'), (1, '工作'), (1, '学习'), (1, '从而')]
-    >>> res.probability
-    # The probabilities of the text from different categories
-    array([[4.43336608e-03, 9.95215198e-01, 3.51419231e-04, 1.68657851e-08]])
+### Example
 
-`res` object contains `word_list` and `probability`. `word_list` contains the first 20 words in the text to be classified (in descending order of appearance frequency), and `probability` contains the probability under the corresponding category index (the index is consistent with the last category of each training data).
+#### Use built-in model
 
-### Custom
-There are two ways to use a custom dataset. First, you can pass the training data and its label to the `train()` API. For more details, checkout out [Training](#training). Second, you can use your own dataset for training as shown below.
+Cherry has three built in models, `email`, `review` and `newsgroups`. For instance, in the [Comics & Graphic book review](https://sites.google.com/eng.ucsd.edu/ucsdbookgraph/home) datasets, every book review also has rating from 0 point to 5 points. If you want to predict rating based on the book review:
 
-#### Dataset
-The dataset should include two files (just like the example in `example/data_example`)
+> This is an extremely entertaining and often insightful collection by Nobel physicist Richard Feynman drawn from slices of his life experiences. Some might believe that the telling of a physicist’s life would be droll fare for anyone other than a fellow scientist, but in this instance, nothing could be further from the truth.
 
-1. training data `data.xxx`（file name begins with `data`)
-2. stop words `stop_words.xxx`（file name begin with `stop_words`)
-
-#### data.xxx
-Each row in the `data.xxx` represents a training data, it should end with ',' + 'category index':
-
-    This is a training data,0
-    This is another training data,1
-    ...
-
-cherry will extract the last index (0, 1, etc.) of each row as an index for the output of `res.probability`
-
-#### stop_words.xxx
-Each row in the `stop_words.xxx` should include a stop word like this:
-
-    because
-    before
-    both
-    ...
-
-#### Put it together
-
-1. Create a new folder `your_folder` inside the `data` folder, your data, stop words file and cache will be stored in this folder.
-2. Put `data.xxx` and `stop_words.xxx` into `your_folder`, `your_folder` is the model name you will use later in all of the APIs.
-
-#### Settings
-Before training, you can use a custom tokenizer function. cherry uses `jieba` to support Chinese tokenizer by default (under `base.py/tokenizer()`). The tokenizer function should accept the text as input and return a list that includes all the tokens. For English, you can use nltk by uncommenting the code inside `base.py`:
-
-    # base.py
+After finish [Installation](#installation), first is to train the model:
     
-    def tokenizer(text):
-    '''
-    You can use your tokenizer function here, by default,
-    this function only works for Chinese
-    '''
-        # For English:
-        # from nltk.tokenize import word_tokenize
-        # return [t.lower() for t in word_tokenize(text) if len(t) > 1]
-        return [t for t in jieba.cut(text) if len(t) > 1]
+    # 1. Download `review` datasets from remote server
+    # 2. Train datasets using default settings (Countvectorizer and MultinomialNB)
+    # 3. You only need to run `train` at the first time
+    >>> res = cherry.train('review')
 
-#### Training
+Then you can use `classify()` to predict the rating now.
 
-    >>> cherry.train(model='your_folder_name')
+    >>> res = cherry.classify('review', text='This is an extremely entertaining and often insightful collection by Nobel physicist Richard Feynman drawn from slices of his life experiences. Some might believe that the telling of a physicist’s life would be droll fare for anyone other than a fellow scientist, but in this instance, nothing could be further from the truth.')
+
+The return `res` is a Classify object has two built-in method. `get_probability()` will return an array contains the probability of each category. The order of the return array depend on category name, in this case would be 0, 1, 2, 3, 4.
+
+    # The probability of this book review has 4 points is 99.6%
+	>>> res.get_probability()
+	array([[6.99908424e-11, 2.48677319e-11, 6.17978214e-06, 3.39472694e-03,
+        9.96313288e-01, 2.85805135e-04]])
+	
+Another method `get_word_list()` return a list that contains words that Cherry use for classifying. 
+
+    >>> res.get_word_list()
+    [[(2, 'physicist'), (2, 'life'), (1, 'truth'), (1, 'telling'), (1, 'slices'), (1, 'scientist'), (1, 'richard'), (1, 'nobel'), (1, 'instance'), (1, 'insightful'), (1, 'feynman'), (1, 'fellow'), (1, 'fare'), (1, 'extremely'), (1, 'experiences'), (1, 'entertaining'), (1, 'droll'), (1, 'drawn'), (1, 'collection'), (1, 'believe')]]
+
+As you can see, some of the words in the review didin't show up here. There are two reasons for this 1) The training data didn't contain that word. For instance, The word `Backend` and `Engineer` never show up in training data. 2) the word is a [stop word](https://en.wikipedia.org/wiki/Stop_words). 'you', 'your' are stop words by default, you can find all stop words Cherry use at [here]().
+
+#### Use your own data
+Create a folder under datasets in project path
+
+    ├── project path
+    │   ├── datasets
+    |   │   ├── your_model_name
+    |   │   │   ├── category1
+    |   |   │     ├── file_1
+    |   |   │     ├── file_2
+    |   |   │     ├── …
+    |   │   │   ├── category2
+    |   |   │     ├── file_10
+    |   |   │     ├── file_11
+    |   |   │     ├── …
+
+You can train you datasets now.
+
+    # By default, encoding will be utf-8,
+    # You only need to run `train` at the first time
+    >>> cherry.train('your_model_name', encoding='your_encoding')
+    >>> res = cherry.classify('your_model_name', text='text to be classified')
+
+### Quick Start
     
-That is it，You can also pass the data to the `train()` function. For instance, 
+Let's build an email classifier from sketch, this classifier can predict an email is spam or not.
 
-    >>> from sklearn import datasets
-    >>> iris = datasets.load_iris()
-    >>> x_data, y_data = iris.data, iris.target
-    >>> cherry.train(model='your_folder_name', x_data=x_data, y_data=y_data)
-    
-You still have to create `your_folder` to store the cache files.  By default, cherry will use [CountVectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html) for feature extraction and [MultinomialNB](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html) for text classification. You can also pass the feature extraction function and classify function to the `train()` API if you are familiar with `sklearn`.
+#### Project setup
 
-    >>> from sklearn import datasets
-    >>> iris = datasets.load_iris()
-    >>> x_data, y_data = iris.data, iris.target
-    >>> cherry.train(model='your_folder_name', clf_method='SGD', vectorizer_method ='Tfidf ', x_data=x_data, y_data=y_data)
+    mkdir tutorial
+    cd tutorial
 
-For more details, you can have a look at [API](#api). For unbalanced dataset you can custome priori probability.
+    # Create a virtual environment to isolate our package dependencies locally
+    python3 -m venv env
+    source env/bin/activate  # On Windows use `env\Scripts\activate`
 
-    >>> from sklearn.naive_bayes import MultinomialNB
-    >>> mnb = MultinomialNB(class_prior=[0.4, 0.15, 0.15, 0.15, 0.15, 0.1])
-    >>> cherry.train(model='your_folder')
-    >>> res = cherry.classify(model='your_data_name', text=['your text'])
+    # Install cherry and nltk
+    pip install cherry
+    pip install nltk
 
-> In order to save memory, you can use [HashingVectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.HashingVectorizer.html) or [TfidfVectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html) for feature extraction for big dataset.
+    # Create a new folder for email dataset
+    mkdir -p datasets/email_tutorial
 
-#### Classify
-After training, cherry will create cache files under `your_folder`. You can classify your data use `classify()`:
+#### Prepare dataset
 
-    >>> res = cherry.classify(model='harmful', text=['她们对计算机很有热情，也希望学习到数据分析，网络爬虫，人工智能等方面的知识，从而运用在她们工作上'])
-    >>> res.word_list
-    [(2, '她们'), (1, '网络'), (1, '热情'), (1, '方面'), (1, '数据分析'), (1, '希望'), (1, '工作'), (1, '学习'), (1, '从而')]
-    >>> res.probability
-    # The probabilities
-    array([[4.43336608e-03, 9.95215198e-01, 3.51419231e-04, 1.68657851e-08]])
+1. Download the datasets from [SMS Spam Collection v. 1](http://www.dt.fee.unicamp.br/~tiago/smsspamcollection/) then unzip it and put it inside `tutorial/datasets/email_tutorial ` folder, now you got a file named `SMSSpamCollection.txt` which contains lots of emails.
+2. Create a folder name `ham` and `spam` inside `email_tutorial` dir.
+3. Create a script `email.py` in the same folder using code below to extract the email and group them by category. every file would only contain text content.
 
-## Advance Usage
+        import os
+        import json
 
-### Performance
-`performance()` calculates the CV score after splitting the training data into `n_splits`
+        ham_counter = 0
+        spam_counter = 0
 
-    >>> cherry.performance(model='harmful', n_splits=5)
-    
-                  precision    recall  f1-score   support
+        with open('SMSSpamCollection.txt', 'r') as f:
+            for line in f.readlines():
+                if line.startswith('ham'):
+                    ham_counter += 1
+                    with open(os.path.join('ham', str(ham_counter)), 'w') as nf:
+                            _, text = line.split('ham', 1)
+                            nf.write(text.strip())
+                else:
+                    spam_counter += 1
+                    with open(os.path.join('spam', str(spam_counter)), 'w') as nf:
+                            _, text = line.split('spam', 1)
+                            nf.write(text.strip())
 
-           0       0.98      1.00      0.99        44
-           1       0.96      0.88      0.92        52
-           2       0.90      0.96      0.93        49
-           3       1.00      1.00      1.00        45
+4. Run python email.py
+5. Delete `SMSSpamCollection.txt` and `email.py`
+6. Now your folder structure should look like this:
 
-    accuracy                           0.96       190
-    macro avg       0.96      0.96     0.96       190
-    weighted avg    0.96      0.96     0.96       190
+        tutorial
+           ├── dataset
+           │   ├── email_tutorial
+           │   │   ├── ham
+           |   |   │     ├── 1
+           |   |   │     ├── 2
+           |   |   │     ├── …
+           │   │   ├── spam
+           |   |   │     ├── 1
+           |   |   │     ├── 2
+           |   |   │     ├── …
+           
+7. cd tutorial
+6. Go back to `tutorial`, `cd tutorial` then train the email model:
+        
+        >>> import cherry
+        >>> cherry.train('email_tutorial', encoding='latin1')
 
-### Display
-You can use the`display()` API to display the learning curve using different feature extraction functions and classify functions. 
+7. Inside `email_tutorial` you can find `clf.pkz`, `ve.pkz`, `email_tutorial.pkz` which Cherry will use them for classify later.
 
-    >>> cherry.display(model='harmful', clf_method='SGD')
-    
-<img src="https://raw.githubusercontent.com/Windsooon/cherry/master/imgs/MNB.png" alt="" height="500">
-<img src="https://raw.githubusercontent.com/Windsooon/cherry/master/imgs/SGD.png" alt="" height="500">
-<img src="https://raw.githubusercontent.com/Windsooon/cherry/master/imgs/RandomForest.png" alt="" height="500">
-    
-### Search
-You can pass the parameters you want to search, then calculate its best score
+         >>> res = cherry.classify('email_tutorial', 'Thank you for your interest in cherry! We wanted to let you'
+              'know we received your application for Backend Engineer, and we are delighted that you'
+              'would consider joining our team.')
+         # 99.9% is a ham email
+         >>> res.get_probability()
+         array([[9.99985571e-01, 1.44288379e-05]])
+         >>> res.get_word_list()
+         [[(1, 'wanted'), (1, 'thank'), (1, 'team'), (1, 'received'), (1, 'let'),
+         (1, 'joining'), (1, 'consider'), (1, 'application')]]
 
-    >>> parameters = {
-    ...     'clf__alpha': [0.1, 0.5, 1],
-    ...     'clf__fit_prior': [True, False]
-    ... }
+8. If you want to know good your model did, you can use [performance()]() which will use k-fold cross validation (By default, K equals to 10):
+   
 
-    >>> cherry.search(model='harmful', parameters)
-    
-    score is 0.9199693815090905
-    clf__alpha: 0.1
-    clf__fit_prior: True
-    
+ 		 >>> res = cherry.performance('email_tutorial', encoding='latin1', output='files')
+         >>> res.get_score()
+ 		  
+   The report will be save in `report` files, you can find the precision, recall, and f1-score.
 
+                     precision    recall  f1-score   support
+
+               0       0.99      1.00      0.99       485
+               1       0.97      0.95      0.96        73
+
+        accuracy                           0.99       558
+       macro avg       0.98      0.97      0.98       558
+    weighted avg       0.99      0.99      0.99       558
+ 	
+   If you want to know which text had been clasiify wrong:
+ 	
+ 	     >>> res = cherry.performance('email_tutorial', encoding='latin1')
+         >>> res.get_score()
+         Text: Dhoni have luck to win some big title.so we will win:) has been classified as: 1 should be: 0
+         Text: Back 2 work 2morro half term over! Can U C me 2nite 4 some sexy passion B4 I have 2 go back? Chat NOW 09099726481 Luv DENA Calls Â£1/minMobsmoreLKPOBOX177HP51FL has been classified as: 0 should be: 1
+         Text: Latest News! Police station toilet stolen, cops have nothing to go on! has been classified as: 0 should be: 1
+         ...
+
+9. To display the graph, you can use
+    >>> res.display('email_tutorial', encoding='latin1')
+
+    ![img]()
+
+10. If you want to improve your model, you can use search method. 
+
+    >>> parameters = {'clf__alpha': [0.1, 0.5, 1],'clf__fit_prior': [True, False]}
+    >>> cherry.search('email_tutorial', parameters)
+ 
 ### API
 
-### def train(model, vectorizer=None, vectorizer\_method=None, clf=None, clf\_method=None, x\_data=None, y\_data=None)
-
-- model (string)
-    
-    training model, default None, include `harmful` and `news`
-
-- vectorizer (sklearn object)
-
-    feature extraction function，default `CountVectorizer()`. You can pass [feature extraction function](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.feature_extraction.text) from sklearn.
- 
-   > Short text suggests using `CountVectorizer()`，long text suggests using `TfidfVectorizer()`，big dataset can use  `HashingVectorizer()` to save memory.
-   
-- vectorizer_method (string)
-
-    cherry supports use shortcut to set up feature extraction function (only when `vectorizer` is `None`). Shortcut `Count` correspond `CountVectorizer(tokenizer=tokenizer, stop_words=get_stop_words(model))`, `tokenizer` is the tokenizer function in  `base.py`. `Tfidf` correspond `TfidfVectorizer` and `Hashing` correspond `HashingVectorizer`.
-    
-- clf (sklearn object)
-
-    classify function, you can pass [classify function](https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html) from sklearn, by default is `MultinomialNB()`
- 
-- clf_method (string)
-
-    cherry supports use shortcut to set up classify function (only when `clf` is `None`), `MNB` correspond `MultinomialNB(alpha=0.1)`, `SGD` correspond `SGDClassifier`, `RandomForest` correspond `RandomForestClassifier`, `AdaBoost` correspond `AdaBoostClassifier`.
-
-- x_data (numpy array)
-
-    training text data, if `x_data` and `y_data` is None, cherry will try to find the text files data in `model`
-
-- y_data (numpy array)
-
-    correspond labels data, if `x_data` and `y_data` is None, cherry will try to find the text files data in `model`
-    
-### def classify(text, model, N=20)
-
-- text (list)
-    
-    text data to be classified
-    
-- model
-    
-    `model` to be used，pre-trained models include `harmful` and `news`.
-    
-- N
-
-    the token number in the `word_list`
-    
-**Object return from classify**
-
-- word_list
-
-    The top N most common tokens in the classified text
-    
-
-- probability
-
-    Correspond probabilities from the classified text
-    
-        array([[4.43336608e-03, 9.95215198e-01, 3.51419231e-04, 1.68657851e-08]])
-	
-### def performance(model, vectorizer=None, vectorizer\_method=None, clf=None, clf\_method=None, x\_data=None, y\_data=None, n\_splits=5, output='Stdout')
-        
-- model (string)
-    
-    `model` to be used，pre-trained model includes `harmful` and `news`.
-
-- vectorizer (sklearn object)
-
-    feature extraction function，default `CountVectorizer()`. You can pass [feature extraction function](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.feature_extraction.text) from sklearn.
- 
-   > Short text suggests using `CountVectorizer()`，long text suggests using `TfidfVectorizer()`，big dataset can use  `HashingVectorizer()` to save memory.
-   
-- vectorizer_method (string)
-
-    cherry supports use shortcut to set up feature extraction function (only when `vectorizer` is `None`). Shortcut `Count` correspond `CountVectorizer(tokenizer=tokenizer, stop_words=get_stop_words(model))`, `tokenizer` is the tokenizer function in  `base.py`. `Tfidf` correspond `TfidfVectorizer` and `Hashing` correspond `HashingVectorizer`.
-    
-- clf (sklearn object)
-
-    classify function, you can pass [classify function](https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html) from sklearn, by default is `MultinomialNB()`
- 
-- clf_method (string)
-
-    cherry supports use shortcut to set up classify function (only when `clf` is `None`), `MNB` correspond `MultinomialNB(alpha=0.1)`, `SGD` correspond `SGDClassifier`, `RandomForest` correspond `RandomForestClassifier`, `AdaBoost` correspond `AdaBoostClassifier`.
-
-- x_data (numpy array)
-
-    training text data, if `x_data` and `y_data` is None, cherry will try to find the text files data in `model`
-
-- y_data (numpy array)
-
-    correspond labels data, if `x_data` and `y_data` is None, cherry will try to find the text files data in `model`
-    
-- n_splits (int)
-
-    K to use when using Kfold for cross validation
-    
-- output (file path)
-
-    The file path include all the export data, by default is terminal.
-    
-### def search(model, parameters, vectorizer=None, vectorizer\_method=None, clf=None, clf\_method=None, x\_data=None, y\_data=None, method='RandomizedSearchCV', cv=3, iid=False, n_jobs=1)
-        
-- model (string)
-    
-    `model` to be used，pre-trained model includes `harmful` and `news`.
-
-- vectorizer (sklearn object)
-
-    feature extraction function，default `CountVectorizer()`. You can pass [feature extraction function](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.feature_extraction.text) from sklearn.
- 
-   > Short text suggests using `CountVectorizer()`，long text suggests using `TfidfVectorizer()`，big dataset can use  `HashingVectorizer()` to save memory.
-   
-- vectorizer_method (string)
-
-    cherry supports use shortcut to set up feature extraction function (only when `vectorizer` is `None`). Shortcut `Count` correspond `CountVectorizer(tokenizer=tokenizer, stop_words=get_stop_words(model))`, `tokenizer` is the tokenizer function in  `base.py`. `Tfidf` correspond `TfidfVectorizer` and `Hashing` correspond `HashingVectorizer`.
-    
-- clf (sklearn object)
-
-    classify function, you can pass [classify function](https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html) from sklearn, by default is `MultinomialNB()`
- 
-- clf_method (string)
-
-    cherry supports use shortcut to set up classify function (only when `clf` is `None`), `MNB` correspond `MultinomialNB(alpha=0.1)`, `SGD` correspond `SGDClassifier`, `RandomForest` correspond `RandomForestClassifier`, `AdaBoost` correspond `AdaBoostClassifier`.
-
-- x_data (numpy array)
-
-    training text data, if `x_data` and `y_data` is None, cherry will try to find the text files data in `model`
-
-- y_data (numpy array)
-
-    correspond labels data, if `x_data` and `y_data` is None, cherry will try to find the text files data in `model`
-    
-- method (string)
-
-    'RandomizedSearchCV' or 'GridSearchCV' from sklearn, default it 'RandomizedSearchCV'
-    
-- cv (int)
-
-    K to use when using Kfold for cross validation
-    
-- iid （boolean)
-
-    checkout out [here](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html
-
-- n_jobs (int)
-
-	Number of processors to use
-
-
-### def display(model, vectorizer=None, vectorizer\_method=None, clf=None, clf\_method=None, x\_data=None, y\_data=None) 
-
-- model (string)
-    
-    `model` to be used，pre-trained model includes `harmful` and `news`.
-
-- vectorizer (sklearn object)
-
-    feature extraction function，default `CountVectorizer()`. You can pass [feature extraction function](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.feature_extraction.text) from sklearn.
- 
-   > Short text suggests using `CountVectorizer()`，long text suggests using `TfidfVectorizer()`，big dataset can use  `HashingVectorizer()` to save memory.
-   
-- vectorizer_method (string)
-
-    cherry supports use shortcut to set up feature extraction function (only when `vectorizer` is `None`). Shortcut `Count` correspond `CountVectorizer(tokenizer=tokenizer, stop_words=get_stop_words(model))`, `tokenizer` is the tokenizer function in  `base.py`. `Tfidf` correspond `TfidfVectorizer` and `Hashing` correspond `HashingVectorizer`.
-    
-- clf (sklearn object)
-
-    classify function, you can pass [classify function](https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html) from sklearn, by default is `MultinomialNB()`
- 
-- clf_method (string)
-
-    cherry supports use shortcut to set up classify function (only when `clf` is `None`), `MNB` correspond `MultinomialNB(alpha=0.1)`, `SGD` correspond `SGDClassifier`, `RandomForest` correspond `RandomForestClassifier`, `AdaBoost` correspond `AdaBoostClassifier`.
-
-- x_data (numpy array)
-
-    training text data, if `x_data` and `y_data` is None, cherry will try to find the text files data in `model`
-
-- y_data (numpy array)
-
-    correspond labels data, if `x_data` and `y_data` is None, cherry will try to find the text files data in `model`
-
-### 中文文档
-
-- [特性](#特性)
-- [安装](#安装)
-- [快速开始](#快速开始)
-- [定制](#定制)
-  - [数据集](#数据集)
-  - [停止词](#停止词)
-  - [设置](#设置)
-  - [训练](#训练)
-- [高级用法](#高级用法)
-  - [分类](#分类)
-  - [效果](#效果)
-  - [搜索](#搜索)
-  - [可视化](#可视化)
-
-### 特性
-
-- **无需机器学习知识，开箱即用，定制简单**
-
-    cherry 自带两个预训练模型，使用预训练模型进行分类只需一行代码。使用自己的数据集进行定制训练也只需要十行代码。同时 cherry 支持自定义分词算法，分类算法以及 stop words 词库。
-    
-- **高精确率，召回率**
-
-    在小型数据集（4个类别 共 1000条 数据）平均达到 96% 精确率以及召回率。在大型数据集（7个类别 共 5万条 数据，数据来自[这里](http://thuctc.thunlp.org/)）平均达到 97% 精确率以及召回率。
-
-- **支持多种自定义算法**
-
-	定制模式下，支持 sklearn 中所有[特征工程函数](https://scikit-learn.org/stable/modules/feature_extraction.html)以及[分类器](https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html)。并可以通过 `search()` 找出特定数据集的最优算法以及参数。
-	
-- **可视化**
-
-    轻松绘制学习曲线图像，判断模型是否过拟合或者欠拟合。
-
-
-### 安装
-
-    pip install -U cherry
-    
-### 快速开始
-
-由于数据量过大，cherry 库并没有包含训练数据，所以预训练模型只支持 `classify()` 方法，使用其他方法需使用自定义数据集。 预训练模型包含 2个 数据集，分别是：
-
-1. 赌博 / 正常 / 政治 / 色情 (`model='harmful'`，4个 类别包含约 1000条 中文句子)
-2. 彩票 / 科技 / 财经 / 房产 / 社会 / 体育 / 娱乐 (`model=news`，7个 类别包含约 45000条 中文新闻)
-
-使用预训练模型进行文本分类非常简单，只需要直接调用 `classify()` 方法，可以指定两个参数，`text` 是由待分类文本组成的列表，`models` 是训练时指定的文件夹名。
-
-	>>> res = cherry.classify(model='harmful', text=['她们对计算机很有热情，也希望学习到数据分析，网络爬虫，人工智能等方面的知识，从而运用在她们工作上'])
-    >>> res.word_list
-    [(2, '她们'), (1, '网络'), (1, '热情'), (1, '方面'), (1, '数据分析'), (1, '希望'), (1, '工作'), (1, '学习'), (1, '从而')]
-    >>> res.probability
-    # 返回结果分别对应 赌博，正常，政治，色情 4个 类别的概率
-    array([[4.43336608e-03, 9.95215198e-01, 3.51419231e-04, 1.68657851e-08]])
-
-返回的 `res` 对象包含 `word_list` 以及 `probability`。其中 `word_list` 包含待分类文本中前 20个 词语（按出现频率降序排列），`probability` 包含对应类别索引下的概率（索引与每一条训练数据最后的类别一致）。
-
-### 定制
-有两种方法使用自定义数据集。第一，你可以直接把数据以及对应参数直接传给 `train()` API，具体方式请参考[训练](#训练)。第二，通过文本文件进行训练。
-
-#### 数据集
-数据集需要包含两个文件（参考 `example/data_example` 文件夹）
-
-1. 数据集 `data.xxx`（需命名为 `data`开头，任意后缀的文件）
-2. 停止词 `stop_words.xxx`（需命名为 `stop_words`开头，任意后缀的文件，停止词可直接拷贝 `example` 文件夹中自带的 `stop_words.txt`）
-
-### 数据集
-
-数据集中每一行代表一条数据，数据结束后需要添加 ',' 以及对应的分类类别（不需要空格），例如：
-
-    这是一条正常数据,0
-    这是赌博相关数据,1
-
-cherry 会提取每一行数据最后的类别作为标签进行训练。
-
-#### 停止词
-`stop_words.xxx` 文件每行包含一个停止词，例如
-
-    或者
-    不只
-    而且
-    还有
-    即使
-    接着
-
-具体步骤
-
-1. 在 data 文件夹内新建 `your_folder` 文件夹，你的模型所有数据以及生成的缓存都会存放在此文件夹中。
-2. 把 `data.xxx` 以及 `stop_words.xxx` 放在文件夹中（可参考例子）。`your_folder` 用作调用 APIs 时需要的 `model` 参数。
-
-#### 设置
-在开始训练前，你可以自定义分词函数，cherry 默认使用 jieba 进行中文分词，你也可以使用其他第三方库或者自行实现。此函数接受输入待分类文本，并返回分词后词语组成的列表。它位于 `base.py` 中的 `tokenizer()`
-
-	# base.py
-	
-	def tokenizer(text):
-    '''
-    You can use your own tokenizer function here, by default,
-    this function only work for chinese
-    '''
-        # For English:
-        # from nltk.tokenize import word_tokenize
-        # return [t.lower() for t in word_tokenize(text) if len(t) > 1]
-        return [t for t in jieba.cut(text) if len(t) > 1]
-
-#### 训练
-
-	>>> cherry.train(model='your_folder')
-	
-训练就是那么简单，你也可以把测试数据传到 `train()` 函数进行训练，这里以 sklearn 中的 iris 数据集为例
-
-    >>> from sklearn import datasets
-    >>> iris = datasets.load_iris()
-    >>> x_data, y_data = iris.data, iris.target
-    >>> cherry.train(model='your_data_name', x_data=x_data, y_data=y_data)   
-    
-注意，你依然需要新建 `your_folder` 文件夹用来存放缓存文件，cherry 默认会使用 [CountVectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html) 进行特征提取，使用 [MultinomialNB](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html) 进行训练。如果你熟悉 `sklearn`，你也可以自定义特征函数以及分类函数
-
-    >>> from sklearn import datasets
-    >>> iris = datasets.load_iris()
-    >>> x_data, y_data = iris.data, iris.target
-    >>> cherry.train(model='your_folder_name', clf_method='SGD', vectorizer_method ='Tfidf ', x_data=x_data, y_data=y_data)
-
-具体使用方法可以参考 [API](#api)。非均衡数据集可以自定义先验概率：
-
-    >>> from sklearn.naive_bayes import MultinomialNB
-    >>> mnb = MultinomialNB(class_prior=[0.4, 0.15, 0.15, 0.15, 0.15, 0.1])
-    >>> cherry.train(model='your_data_name')
-    >>> res = cherry.classify(model='your_data_name', text=['your text'])
-
-> 在大型数据集中，可以使用 [HashingVectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.HashingVectorizer.html) 和 [TfidfVectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html) 以节省内存。
-
-#### 分类
-训练完之后，cherry 会在 `your_folder` 下生成训练模型缓存，调用 `classify()` 就能直接使用模型进行分类了，
-
-	>>> res = cherry.classify(model='harmful', text=['她们对计算机很有热情，也希望学习到数据分析，网络爬虫，人工智能等方面的知识，从而运用在她们工作上'])
-    >>> res.word_list
-    [(2, '她们'), (1, '网络'), (1, '热情'), (1, '方面'), (1, '数据分析'), (1, '希望'), (1, '工作'), (1, '学习'), (1, '从而')]
-    >>> res.probability
-    # 返回结果分别对应 赌博，正常，政治，色情四个类别的概率
-    array([[4.43336608e-03, 9.95215198e-01, 3.51419231e-04, 1.68657851e-08]])
-
-## 高级用法
-
-### 效果
-`performance()` 方法能够计算出输入模型分成 `n_splits` 份后交叉检验得出的分数
-
-	>>> cherry.performance(model='harmful', n_splits=5)
-	
-	              precision    recall  f1-score   support
-
-           0       0.98      1.00      0.99        44
-           1       0.96      0.88      0.92        52
-           2       0.90      0.96      0.93        49
-           3       1.00      1.00      1.00        45
-
-    accuracy                           0.96       190
-    macro avg       0.96      0.96     0.96       190
-    weighted avg    0.96      0.96     0.96       190
-
-### 可视化
-使用 `display()` API 可以得出不同特征函数以及分类器下的学习曲线，以下为使用默认 `MNB, SGD, RandomForest` 方法下的默认参数的学习曲线图像
-
-	>>> cherry.display(model='harmful', clf_method='SGD')
-	
-<img src="https://raw.githubusercontent.com/Windsooon/cherry/master/imgs/MNB.png" alt="" height="500">
-<img src="https://raw.githubusercontent.com/Windsooon/cherry/master/imgs/SGD.png" alt="" height="500">
-<img src="https://raw.githubusercontent.com/Windsooon/cherry/master/imgs/RandomForest.png" alt="" height="500">
-	
-### 搜索
-通过把传人需要搜索的参数范围，可以得出最佳参数。
-
-    >>> parameters = {
-    ...     'clf__alpha': [0.1, 0.5, 1],
-    ...     'clf__fit_prior': [True, False]
-    ... }
-
-    >>> cherry.search(model='harmful', parameters)
-    
-    score is 0.9199693815090905
-    clf__alpha: 0.1
-    clf__fit_prior: True
-    
-
-### API
-
-### def train(model, vectorizer=None, vectorizer\_method=None, clf=None, clf\_method=None, x\_data=None, y\_data=None)
-
-- model (string)
-    
-    使用的训练模型，默认模型包括 `harmful`, `news` 和 `spam`
-
-- vectorizer (sklearn object)
-
-    特征函数，可以直接传入 sklearn 的 [特征函数](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.feature_extraction.text)，默认使用 `CountVectorizer()`，
- 
-   > 短文本建议使用 `CountVectorizer()`，长文本建议使用 `TfidfVectorizer()`，大型数据集可以使用 `HashingVectorizer()` 节省内存。
-   
-- vectorizer_method (string)
-
-    cherry 支持使用缩写来设置特征函数（仅当 `vectorizer` 为 `None` 时会被调用），'Count' 会调用 `CountVectorizer(tokenizer=tokenizer, stop_words=get_stop_words(model))`，`tokenizer` 对应 `base.py` 中定义的分词函数。`Tfidf` 对应 `TfidfVectorizer`，`Hashing` 对应 `HashingVectorizer`。
-    
-- clf (sklearn object)
-
-    分类函数，可以直接传入 sklearn 的 [分类函数](https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html)，默认使用 `MultinomialNB()`。
- 
-- clf_method (string)
-
-    cherry 支持使用缩写来设置常用分类函数（包含常用参数）（仅当 `clf` 为 `None` 时会被调用），`MNB` 会调用 `MultinomialNB(alpha=0.1)`, `SGD` 对应 `SGDClassifier`, `RandomForest` 对应 `RandomForestClassifier`, `AdaBoost` 对应 `AdaBoostClassifier`。
-
-- x_data (numpy array)
-
-    `train()` 支持直接传入文本数据进行训练，`x_data` 包含全部训练文本。
-
-- y_data (numpy array)
-
-    `train()` 支持直接传入文本数据进行训练，`y_data` 包含全部训练文本对应的类别。
-    
-
-### def classify(text, model, N=20)
-
-- text (list)
-    
-    需要训练的文本列表内容
-    
-- model
-    
-    使用的训练模型，默认模型包括 `harmful`, `news` 和 `spam`
-    
-- N
-
-	`word_list`属性 中 输出的词语数量，默认为 20
-	
-**返回对象的属性**
-
-- word_list
-
-    包含待分类文本中前 N个 词语
-    
-
-- probability
-
-    输入文本的对应的每个类别的概率，例如
-    
-        array([[4.43336608e-03, 9.95215198e-01, 3.51419231e-04, 1.68657851e-08]])
-	
-### def performance(model, vectorizer=None, vectorizer\_method=None, clf=None, clf\_method=None, x\_data=None, y\_data=None, n\_splits=5, output='Stdout')
-        
-- model (string)
-    
-    使用的训练模型，默认模型包括 `harmful`, `news` 和 `spam`
-
-- vectorizer (sklearn object)
-
-    特征函数，可以直接传入 sklearn 的 [特征函数](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.feature_extraction.text)，默认使用 `CountVectorizer()`，
- 
-   > 短文本建议使用 `CountVectorizer()`，长文本建议使用 `TfidfVectorizer()`，大型数据集可以使用 `HashingVectorizer()` 节省内存。
-   
-- vectorizer_method (string)
-
-    cherry 支持使用缩写来设置特征函数（仅当 `vectorizer` 为 `None` 时会被调用），'Count' 会调用 `CountVectorizer(tokenizer=tokenizer, stop_words=get_stop_words(model))`，`tokenizer` 对应 `base.py` 中定义的分词函数。`Tfidf` 对应 `TfidfVectorizer`，`Hashing` 对应 `HashingVectorizer`。
-    
-- clf (sklearn object)
-
-    分类函数，可以直接传入 sklearn 的 [分类函数](https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html)，默认使用 `MultinomialNB()`。
- 
-- clf_method (string)
-
-    cherry 支持使用缩写来设置常用分类函数（包含常用参数）（仅当 `clf` 为 `None` 时会被调用），`MNB` 会调用 `MultinomialNB(alpha=0.1)`, `SGD` 对应 `SGDClassifier`, `RandomForest` 对应 `RandomForestClassifier`, `AdaBoost` 对应 `AdaBoostClassifier`。
-
-- x_data (numpy array)
-
-    `train()` 支持直接传入文本数据进行训练，`x_data` 包含全部训练文本。
-
-- y_data (numpy array)
-
-    `train()` 支持直接传入文本数据进行训练，`y_data` 包含全部训练文本对应的类别。
-    
-- n_splits (int)
-
-    使用 Kfold 进行交叉检验时，K 的值。
-    
-- output (file path)
-
-    输出结果，默认输出到终端，这里可以指定输出的文件名。
-    
-### def search(model, parameters, vectorizer=None, vectorizer\_method=None, clf=None, clf\_method=None, x\_data=None, y\_data=None, method='RandomizedSearchCV', cv=3, iid=False, n_jobs=1)
-        
-- model (string)
-    
-    使用的训练模型，默认模型包括 `harmful`, `news` 和 `spam`
-
-- vectorizer (sklearn object)
-
-    特征函数，可以直接传入 sklearn 的 [特征函数](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.feature_extraction.text)，默认使用 `CountVectorizer()`，
- 
-   > 短文本建议使用 `CountVectorizer()`，长文本建议使用 `TfidfVectorizer()`，大型数据集可以使用 `HashingVectorizer()` 节省内存。
-   
-- vectorizer_method (string)
-
-    cherry 支持使用缩写来设置特征函数（仅当 `vectorizer` 为 `None` 时会被调用），'Count' 会调用 `CountVectorizer(tokenizer=tokenizer, stop_words=get_stop_words(model))`，`tokenizer` 对应 `base.py` 中定义的分词函数。`Tfidf` 对应 `TfidfVectorizer`，`Hashing` 对应 `HashingVectorizer`。
-    
-- clf (sklearn object)
-
-    分类函数，可以直接传入 sklearn 的 [分类函数](https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html)，默认使用 `MultinomialNB()`。
- 
-- clf_method (string)
-
-    cherry 支持使用缩写来设置常用分类函数（包含常用参数）（仅当 `clf` 为 `None` 时会被调用），`MNB` 会调用 `MultinomialNB(alpha=0.1)`, `SGD` 对应 `SGDClassifier`, `RandomForest` 对应 `RandomForestClassifier`, `AdaBoost` 对应 `AdaBoostClassifier`。
-
-- x_data (numpy array)
-
-    `train()` 支持直接传入文本数据进行训练，`x_data` 包含全部训练文本。
-
-- y_data (numpy array)
-
-    `train()` 支持直接传入文本数据进行训练，`y_data` 包含全部训练文本对应的类别。
-    
-- method (string)
-
-    可以选择 'RandomizedSearchCV' 或者 'GridSearchCV' 方法
-    
-- cv (int)
-
-    使用 Kfold 进行交叉检验时，K 的值。
-    
-- iid （boolean)
-
-    默认为 False，返回 Kfold 检验的平均分数，如果为 真，则在此基础上，按照不同类别样本数进行加权，详情可以参考[这里](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html
-
-- n_jobs (int)
-
-	运行 `search()` 时使用的处理器数量
-
-
-### def display(model, vectorizer=None, vectorizer\_method=None, clf=None, clf\_method=None, x\_data=None, y\_data=None) 
-
-- model (string)
-    
-    使用的训练模型，默认模型包括 `harmful`, `news` 和 `spam`
-
-- vectorizer (sklearn object)
-
-    特征函数，可以直接传入 sklearn 的 [特征函数](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.feature_extraction.text)，默认使用 `CountVectorizer()`，
- 
-   > 短文本建议使用 `CountVectorizer()`，长文本建议使用 `TfidfVectorizer()`，大型数据集可以使用 `HashingVectorizer()` 节省内存。
-   
-- vectorizer_method (string)
-
-    cherry 支持使用缩写来设置特征函数（仅当 `vectorizer` 为 `None` 时会被调用），'Count' 会调用 `CountVectorizer(tokenizer=tokenizer, stop_words=get_stop_words(model))`，`tokenizer` 对应 `base.py` 中定义的分词函数。`Tfidf` 对应 `TfidfVectorizer`，`Hashing` 对应 `HashingVectorizer`。
-    
-- clf (sklearn object)
-
-    分类函数，可以直接传入 sklearn 的 [分类函数](https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html)，默认使用 `MultinomialNB()`。
- 
-- clf_method (string)
-
-    cherry 支持使用缩写来设置常用分类函数（包含常用参数）（仅当 `clf` 为 `None` 时会被调用），`MNB` 会调用 `MultinomialNB(alpha=0.1)`, `SGD` 对应 `SGDClassifier`, `RandomForest` 对应 `RandomForestClassifier`, `AdaBoost` 对应 `AdaBoostClassifier`。
-
-- x_data (numpy array)
-
-    `train()` 支持直接传入文本数据进行训练，`x_data` 包含全部训练文本。
-
-- y_data (numpy array)
-
-    `train()` 支持直接传入文本数据进行训练，`y_data` 包含全部训练文本对应的类别。
+### TODO
