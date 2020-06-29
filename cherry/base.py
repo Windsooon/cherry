@@ -62,6 +62,8 @@ def get_stop_words(language='English'):
 def load_all(model, language=None, preprocessing=None, categories=None, encoding=None, vectorizer=None,
             vectorizer_method=None, clf=None, clf_method=None, x_data=None, y_data=None):
     # If user didn't pass x_data and y_data, try to load data from local or remote
+    if not os.path.exists(DATA_DIR):
+        os.mkdir(DATA_DIR)
     if not (x_data and y_data):
         try:
             cache = load_data(model, categories=categories, encoding=encoding)
