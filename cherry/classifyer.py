@@ -59,5 +59,5 @@ class Classify:
         try:
             self.text_vector = self.vector.transform(text)
         except NotFittedError:
-            error = 'Some of the tokens in text never appear in training data'
+            error = 'None of the word exist in training data'
             raise TokenNotFoundError(error)

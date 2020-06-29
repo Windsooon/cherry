@@ -53,5 +53,5 @@ class Trainer:
         text_clf = Pipeline([
             ('vectorizer', vectorizer),
             ('clf', clf)])
-        print('Depending on your datasets size, this may take several minutes to several hours.')
+        print('Training data, depending on your datasets size, this may take several minutes to several hours.')
         text_clf.fit(x_data, y_data)
