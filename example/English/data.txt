@@ -1,2 +1,0 @@
-This is a training data,0
-This is another training data,1
