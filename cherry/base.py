@@ -144,7 +144,6 @@ def _fetch_remote(remote, dirname=None):
     file_path = (remote.filename if dirname is None
                  else os.path.join(dirname, remote.filename))
     print('Downloading data from {0}'.format(remote.url))
-    breakpoint()
     urlretrieve(remote.url, file_path)
     checksum = _sha256(file_path)
     if remote.checksum != checksum:

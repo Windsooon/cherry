@@ -2,14 +2,14 @@ STOP_WORDS = {'Chinese': frozenset(['的'])}
 
 BUILD_IN_MODELS = {
     'newsgroups': (
-        '20news-bydate.tar.gz',
-        'https://ndownloader.figshare.com/files/5975967',
-        '8f1b2514ca22a5ade8fbb9cfa5727df95fa587f4c87b786e15c759fa66d95610',
+        'newsgroups.tar.gz',
+        'https://raw.githubusercontent.com/Windsooon/cherry_datasets/master/newsgroups.tar.gz',
+        '25952d9167b86d96503356d8272860d38d3929a31284bbb83d2737f50d23015e',
         'latin1',
         ),
     'review': (
         'review.tar.gz',
-        'https://1drv.ms/u/s!AprP55D3BKwuj3dSrRfnqtLo7Qoq?e=b8Uxcb',
+        'https://raw.githubusercontent.com/Windsooon/cherry_datasets/master/review.tar.gz',
         '9c46684a48054b1ffb6d74f0b0bfff7cda538c7e097f7a4f8e3d20b1f1e561db',
         'latin1',
         ),

@@ -6,6 +6,8 @@ import pickle
 from unittest import mock
 import tempfile
 import cherry
+
+from collections import namedtuple
 from cherry.base import *
 from cherry.common import *
 from sklearn.feature_extraction.text import CountVectorizer, \
@@ -59,11 +61,30 @@ class BaseTest(unittest.TestCase):
 
     # load_data()
     @mock.patch('cherry.base._load_data_from_local')
+    @mock.patch('cherry.base._load_data_from_remote')
+    def test_load_data_para(self, mock_load_remote, mock_load_local):
+        load_data(self.news_model, categories='foo', encoding='bar')
+        model_path = os.path.join(DATA_DIR, self.news_model)
+        if os.path.exists(model_path):
+            mock_load_local.assert_called_once_with(
+                self.news_model, categories='foo', encoding='bar')
+        else:
+            mock_load_remote.assert_called_once_with(
+                self.news_model, categories='foo', encoding='bar')
+
+    @mock.patch('cherry.base._load_data_from_local')
     def test_load_data_found(self, mock_load_files):
         with UseModel(self.foo_model) as model:
             load_data(self.foo_model)
         mock_load_files.assert_called_once_with(
             self.foo_model, categories=None, encoding=None)
+
+    @mock.patch('cherry.base._load_data_from_remote')
+    def test_load_data_in_built_in(self, mock_load_files):
+        if not os.path.exists(os.path.join(DATA_DIR, self.news_model)):
+            load_data(self.news_model)
+            mock_load_files.assert_called_once_with(
+                self.news_model, categories=None, encoding=None)
 
     @mock.patch('cherry.base._load_data_from_local')
     def test_load_data_not_found(self, mock_load_files):
@@ -119,7 +140,9 @@ class BaseTest(unittest.TestCase):
     def test_load_data_from_remote_download(self, mock_fetch_remote, mock_decompress_data, mock_load_data_from_local):
         info = BUILD_IN_MODELS[self.news_model]
         cherry.base._load_data_from_remote(self.news_model)
-        self.assertTrue(os.path.exists(self.news_model_path) is True)
+        meta_data_c = namedtuple('meta_data_c', ['filename', 'url', 'checksum', 'encoding'])
+        meta_data = meta_data_c(filename=info[0], url=info[1], checksum=info[2], encoding=info[3])
+        mock_fetch_remote.assert_called_with(meta_data, DATA_DIR)
         mock_load_data_from_local.assert_called_once_with(
             self.news_model, categories=None, encoding=info[3])
 
