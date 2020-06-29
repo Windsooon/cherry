@@ -36,7 +36,7 @@ Cherry - Text classification with no machine learning knowledge needed
 
 #### Easy to use, no machine learning knowledge needed
 
-  Text classification in 5 minutes, no machine learning knowledge needed. We also provide extra features for users who want to imporve their model.
+  Text classification in 5 minutes, no machine learning knowledge needed. We also provide extra features for users who want to improve their model.
 
 #### Three built in models to play with.
 
