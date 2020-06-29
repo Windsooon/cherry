@@ -1,6 +1,6 @@
 # Cherry
 
-![logo](text.png)
+![logo](https://github.com/Windsooon/cherry/blob/master/imgs/text.png?raw=true)
 
 [![image](https://travis-ci.org/Windsooon/cherry.svg?branch=master)](https://travis-ci.org/Windsooon/cherry)
 [![image](https://img.shields.io/pypi/v/cherry.svg)](https://pypi.python.org/pypi/cherry)
@@ -94,7 +94,7 @@ Cherry has three built in models, `email`, `review` and `newsgroups`. For instan
 
 After finish [Installation](#installation), first is to train the model:
     
-    # 1. Download `review` datasets from remote server
+    # 1. Download `review` datasets from remote server (Chinese user may need use VPN)
     # 2. Train datasets using default settings (Countvectorizer and MultinomialNB)
     # 3. You only need to run `train` at the first time
     >>> res = cherry.train('review')
@@ -247,7 +247,7 @@ Let's build an email classifier from sketch, this classifier can predict an emai
 9. To display the graph, you can use
     >>> res.display('email_tutorial', encoding='latin1')
 
-    ![img]()
+    ![img](https://github.com/Windsooon/cherry/blob/master/imgs/display.png?raw=true)
 
 10. If you want to improve your model, you can use search method. 
 
@@ -257,3 +257,7 @@ Let's build an email classifier from sketch, this classifier can predict an emai
 ### API
 
 ### TODO
+
+### Tests
+
+    >>> python runtests.py
