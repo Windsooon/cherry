@@ -261,7 +261,61 @@ Let's build an email classifier from sketch, cherry will use this model to predi
  
 ### API
 
-### TODO
+#### def train(model, language='English', preprocessing=None, categories=None, encoding='utf-8', vectorizer=None, vectorizer\_method='Count', clf=None, clf\_method='MNB', x_data=None, y_data=None):
+
+- model (String)
+    
+    The name of the model, you can use build-in models `email`, `review` and `newsgroups`, or pass
+    the folder name of your dataset.
+
+- language (String)
+
+    The language of the training dataset. Cherry supports `English` and `Chinese`.
+
+- preprocessing (function)
+
+    The function will be called once for every input data before training.
+
+- categories (List)
+
+    Specify the training directory, for instance ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc'].
+
+- encoding (String)
+    
+    The encoding of the dataset.
+
+- vectorizer (Sklearn object)
+
+    Feature extraction function use to convert the data into vertcor，by default is `CountVectorizer()`.
+    you can pass [different feature extraction function](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.feature_extraction.text) from Sklearn.
+ 
+   > For some long texts you can use `TfidfVectorizer()`，If you need to save memory you can use  `HashingVectorizer()`, (get\_word\_list() function wouldn't work at this case)
+   
+- vectorizer_method (string)
+
+    Cherry supports shortcut to set up feature extraction function when `vectorizer` is `None`.
+    `Count` corresponds to `CountVectorizer(tokenizer=tokenizer, stop_words=get_stop_words(model))`,
+    `Tfidf` corresponds to `TfidfVectorizer` and `Hashing` corresponds to `HashingVectorizer`.
+    
+- clf (sklearn object)
+
+    Classify function, by default is `MultinomialNB()`. You can pass [classify function](https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html) from Sklearn.
+ 
+- clf_method (string)
+
+    Cherry supports shortcut to set up classify function when `clf` is `None`,
+    `MNB` corresponds to `MultinomialNB(alpha=0.1)`,
+    `SGD` corresponds to `SGDClassifier`,
+    `RandomForest` corresponds to `RandomForestClassifier`,
+    `AdaBoost` corresponds to `AdaBoostClassifier`.
+
+- x_data (numpy array)
+
+    training text data, if `x_data` and `y_data` is None, cherry will try to find the text files data in `model`
+
+- y_data (numpy array)
+
+    correspond labels data, if `x_data` and `y_data` is None, cherry will try to find the text files data in `model`
 
 ### Tests
 
