@@ -328,9 +328,9 @@ Let's build an email classifier from sketch, cherry will use this model to predi
 
     the text to be classify.
 
-##### def performance(model, language='English', preprocessing=None, categories=None, encoding='utf-8', vectorizer=None, vectorizer\_method='Count', clf=None, clf\_method='MNB', x\_data=None, y\_data=None, n\_splits=10, output='Stdout')
+#### def performance(model, language='English', preprocessing=None, categories=None, encoding='utf-8', vectorizer=None, vectorizer\_method='Count', clf=None, clf\_method='MNB', x\_data=None, y\_data=None, n\_splits=10, output='Stdout')
 
-Most of the parameter just as same as `train()` API
+Just as same as `train()` API
 
 - n_splits (Integer)
 
@@ -339,6 +339,14 @@ Most of the parameter just as same as `train()` API
 - output ('Stdout' or 'Files')
 
     'Stdout' will print the scores to standerd output and 'Files' will store the scores into a local file named 'report'.
+
+#### def search(model, parameters, language='English', preprocessing=None, categories=None, encoding='utf-8', vectorizer=None, vectorizer\_method='Count', clf=None, clf\_method='MNB', x\_data=None, y\_data=None, method='RandomizedSearchCV', cv=3, n\_jobs=-1):
+
+##### TODO
+
+#### def display(model, language='English', preprocessing=None, categories=None, encoding='utf-8', vectorizer=None, vectorizer\_method='Count', clf=None, clf\_method='MNB', x\_data=None, y\_data=None)
+
+Just as same as `train()` API
 
 ### Tests
 
