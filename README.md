@@ -261,7 +261,7 @@ Let's build an email classifier from sketch, cherry will use this model to predi
  
 ### API
 
-#### def train(model, language='English', preprocessing=None, categories=None, encoding='utf-8', vectorizer=None, vectorizer\_method='Count', clf=None, clf\_method='MNB', x_data=None, y_data=None):
+#### def train(model, language='English', preprocessing=None, categories=None, encoding='utf-8', vectorizer=None, vectorizer\_method='Count', clf=None, clf\_method='MNB', x_data=None, y_data=None)
 
 - model (String)
     
@@ -291,17 +291,17 @@ Let's build an email classifier from sketch, cherry will use this model to predi
  
    > For some long texts you can use `TfidfVectorizer()`，If you need to save memory you can use  `HashingVectorizer()`, (get\_word\_list() function wouldn't work at this case)
    
-- vectorizer_method (string)
+- vectorizer_method (String)
 
     Cherry supports shortcut to set up feature extraction function when `vectorizer` is `None`.
     `Count` corresponds to `CountVectorizer(tokenizer=tokenizer, stop_words=get_stop_words(model))`,
     `Tfidf` corresponds to `TfidfVectorizer` and `Hashing` corresponds to `HashingVectorizer`.
     
-- clf (sklearn object)
+- clf (Sklearn object)
 
     Classify function, by default is `MultinomialNB()`. You can pass [classify function](https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html) from Sklearn.
  
-- clf_method (string)
+- clf_method (String)
 
     Cherry supports shortcut to set up classify function when `clf` is `None`,
     `MNB` corresponds to `MultinomialNB(alpha=0.1)`,
@@ -316,6 +316,29 @@ Let's build an email classifier from sketch, cherry will use this model to predi
 - y_data (numpy array)
 
     correspond labels data, if `x_data` and `y_data` is None, cherry will try to find the text files data in `model`
+
+#### def classify(model, text)
+
+- model (String)
+
+    The name of the model, you can use build-in models `email`, `review` and `newsgroups`, or pass
+    the folder name of your dataset.
+
+- text (List / String)
+
+    the text to be classify.
+
+##### def performance(model, language='English', preprocessing=None, categories=None, encoding='utf-8', vectorizer=None, vectorizer\_method='Count', clf=None, clf\_method='MNB', x\_data=None, y\_data=None, n\_splits=10, output='Stdout')
+
+Most of the parameter just as same as `train()` API
+
+- n_splits (Integer)
+
+    number of folds. Must be at least 2.
+
+- output ('Stdout' or 'Files')
+
+    'Stdout' will print the scores to standerd output and 'Files' will store the scores into a local file named 'report'.
 
 ### Tests
 
