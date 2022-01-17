@@ -7,17 +7,14 @@
 [![image](https://img.shields.io/pypi/l/cherry.svg)](https://pypi.python.org/pypi/cherry)
 [![image](https://img.shields.io/pypi/pyversions/cherry.svg)](https://pypi.python.org/pypi/cherry)
 
-Cherry - Text classification with no machine learning knowledge needed
+## Cherry - Text classification with no machine learning knowledge needed
 
 |  Cherry   | Windson  |
 |  ----     | ----  |
 | Download  | https://pypi.python.org/pypi/cherry |
 | Source    | https://github.com/Windsooon/cherry |
-| Keywords  | text classification |
+| Keywords  | machine learning, text classification |
 
-
-- [Document](#document)
-- [中文文档](#中文文档)
 
 ## Document
 
@@ -25,32 +22,28 @@ Cherry - Text classification with no machine learning knowledge needed
 - [Requirements](#requirements)
 - [Install](#install)
 - [Built in model](#built-in-model)
-- [Example](#example)
 - [Quickstart](#quick-start)
+- [Example](#example)
 - [API](#api)
   - [Performance](#performance)
   - [Search](#search)
   - [Display](#display)
 
-### Feature
+## Feature
 
-#### Easy to use, no machine learning knowledge needed
+#### Text classification in five minutes
 
-  Text classification in 5 minutes, no machine learning knowledge needed. We also provide extra features for users who want to improve their model.
+Even though you had never learned about machine learning. You can use Cherry to train your text classification model in 5 minutes with over 80% accuracy (check out the example models). Cherry also provides extra features for users who want to improve their model.
 
-#### Three built in models to play with.
-
-  Cherry has three built in English models, you can use them before use your dataset. For more info, checkout [Built in model](#built-in-model).
-    
 #### Easy to optimize and optimize performance
 
-  Cherry provide [performence()](#performance) and [display()](#display) api to help you debug and improve the model.
+  Cherry provide [performence()](#performance) and [display()](#display) api to help you debug and improve your model.
 
-### Requirements
+## Requirements
 
-    - Python (3.6, 3.7, 3.8)
+    - Python (above 3.6)
 
-### Installation
+## Installation
 
 Install using `pip`
     
@@ -65,17 +58,19 @@ or clone the project from github.
 
     git clone git@github.com:Windsooon/cherry.git
 
-### Built in model
+## Built in model
+
+Cherry has three built in models,`newsgroups`,  `review` and `email`:
 
 - [The 20 Newsgroups dataset](http://qwone.com/~jason/20Newsgroups/)
     
     These datasets contain 11,315 news. they were organized into 20 different newsgroups, each corresponding to one of the below topic:
 
-        - alt.atheism, comp.graphics, comp.os.ms-windows.misc, comp.sys.ibm.pc.hardware
-        - comp.sys.mac.hardware, comp.windows.x, misc.forsale, rec.autos
-        - rec.motorcycles, rec.sport.baseball, rec.sport.hockey, sci.crypt
-        - sci.electronics, sci.med, sci.space, soc.religion.christian
-        - talk.politics.guns, talk.politics.mideast, talk.politics.misc, talk.religion.misc
+    - alt.atheism, comp.graphics, comp.os.ms-windows.misc, comp.sys.ibm.pc.hardware
+    - comp.sys.mac.hardware, comp.windows.x, misc.forsale, rec.autos
+    - rec.motorcycles, rec.sport.baseball, rec.sport.hockey, sci.crypt
+    - sci.electronics, sci.med, sci.space, soc.religion.christian
+    - talk.politics.guns, talk.politics.mideast, talk.politics.misc, talk.religion.misc
         
 - [Comics & Graphic book review](https://sites.google.com/eng.ucsd.edu/ucsdbookgraph/home)
 
@@ -85,11 +80,11 @@ or clone the project from github.
 
     These datasets contain 5,578 SMS messages manually extracted from the Grumbletext Web site and randomly chosen ham messages of the NUS SMS Corpus (NSC).
 
-### Example
+## Quick Start
 
-#### Use built-in model
+### Use built-in model
 
-Cherry has three built in models, `email`, `review` and `newsgroups`. For instance, in the [Comics & Graphic book review](https://sites.google.com/eng.ucsd.edu/ucsdbookgraph/home) datasets, every book review also has rating from 0 point to 5 points. If you want to predict rating based on the book review:
+In the [Comics & Graphic book review](https://sites.google.com/eng.ucsd.edu/ucsdbookgraph/home) datasets, every book review also has rating from 0 point to 5 points. If you want to predict rating based on the book review:
 
 > This is an extremely entertaining and often insightful collection by Nobel physicist Richard Feynman drawn from slices of his life experiences. Some might believe that the telling of a physicist’s life would be droll fare for anyone other than a fellow scientist, but in this instance, nothing could be further from the truth.
 
@@ -109,7 +104,7 @@ Then you can use `classify()` to predict the rating now.
     fare for anyone other than a fellow scientist, but in this instance, nothing could be
     further from the truth.')
 
-The return `res` is a Classify object has two built-in method. `get_probability()` will return an array contains the probability of each category. The order of the return array depend on category name, in this case would be 0, 1, 2, 3, 4.
+The return `res` is a Classify object has two built-in method. `get_probability()` will return an array contains the probability of each category. The order of the return array depend on category name, in this case would be 0, 1, 2, 3, 4. We can see that there is 99.63% (9.96313288e-01) this review will be classify as 4 point.
 
     # The probability of this review had been rating as 4 points is 99.6%
 	>>> res.get_probability()
@@ -121,10 +116,10 @@ Another method `get_word_list()` return a list that contains words that Cherry u
     >>> res.get_word_list()
     [[(2, 'physicist'), (2, 'life'), (1, 'truth'), (1, 'telling'), (1, 'slices'), (1, 'scientist'), (1, 'richard'), (1, 'nobel'), (1, 'instance'), (1, 'insightful'), (1, 'feynman'), (1, 'fellow'), (1, 'fare'), (1, 'extremely'), (1, 'experiences'), (1, 'entertaining'), (1, 'droll'), (1, 'drawn'), (1, 'collection'), (1, 'believe')]]
 
-As you can see, some of the words in the review didin't show up here. There are two reasons for this 1) The training data didn't contain that word. For instance, The word `Backend` and `Engineer` never show up in training data. 2) the word is a [stop word](https://en.wikipedia.org/wiki/Stop_words). 'you', 'your' are stop words by default, you can find all stop words Cherry use at [here]().
+As you can see, some of the words in the review didin't show up here. There are two reasons for this 1) The training data didn't contain that word. For instance, The word `Backend` and `Engineer` never show up in training data. So the model don't know how to classify these words. 2) the word is a [stop word](https://en.wikipedia.org/wiki/Stop_words).
 
-#### Use your own data
-Create a folder `your_model_name `under datasets in project path
+### Use your own dataset
+Create a folder `your_model_name `under datasets in project path like this:
 
     ├── project path
     │   ├── datasets
@@ -138,7 +133,7 @@ Create a folder `your_model_name `under datasets in project path
     |   |   │     ├── file_11
     |   |   │     ├── …
 
-Train you datasets:
+Train you dataset:
 
     # By default, encoding will be utf-8,
     # You only need to run `train` at the first time
@@ -146,11 +141,11 @@ Train you datasets:
     # Classify text, `text` can be a list of text too.
     >>> res = cherry.classify('your_model_name', text='text to be classified')
 
-### Quick Start
+## Example
     
 Let's build an email classifier from sketch, cherry will use this model to predict an email is spam or not.
 
-#### Project setup
+### Project setup
 
     mkdir tutorial
     cd tutorial
@@ -168,7 +163,7 @@ Let's build an email classifier from sketch, cherry will use this model to predi
     # Create a new folder for email dataset
     mkdir -p datasets/email_tutorial
 
-#### Prepare dataset
+### Prepare dataset
 
 1. Download the datasets from [SMS Spam Collection v. 1](http://www.dt.fee.unicamp.br/~tiago/smsspamcollection/) then unzip it and put it inside `tutorial/datasets/email_tutorial` folder, now you got a file named `SMSSpamCollection.txt` which contains lots of emails.
 2. Create a folder name `ham` and `spam` inside `email_tutorial` dir.
