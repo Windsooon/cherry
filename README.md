@@ -7,7 +7,7 @@
 [![image](https://img.shields.io/pypi/l/cherry.svg)](https://pypi.python.org/pypi/cherry)
 [![image](https://img.shields.io/pypi/pyversions/cherry.svg)](https://pypi.python.org/pypi/cherry)
 
-## Cherry - Text classification with no machine learning knowledge needed
+## Cherry - Text classification in 5 minutes, no machine learning knowledge needed
 
 |  Cherry   | Windson  |
 |  ----     | ----  |
@@ -31,11 +31,11 @@
 
 ## Feature
 
-#### Text classification in five minutes
+#### Easy to use, fast and simple
 
-Even though you had never learned about machine learning. You can use Cherry to train your text classification model in 5 minutes with over 80% accuracy (check out the example models). Cherry also provides extra features for users who want to improve their model.
+Even though you had never learned about machine learning. You can use Cherry to train your text classification model in 5 minutes with over 80% accuracy. Cherry also provides extra features for users who want to improve their model.
 
-#### Easy to optimize and optimize performance
+#### Easy to debug and optimize
 
   Cherry provide [performence()](#performance) and [display()](#display) api to help you debug and improve your model.
 
@@ -50,17 +50,13 @@ Install using `pip`
     pip install cherry
     # Cherry use nltk for text tokenizer 
     pip install nltk
-    # After install nltk, You need to download punkt
+    # After install nltk, You need to download punkt for tokenizer
     >>> import nltk
     >>> nltk.download('punkt')
 
-or clone the project from github.
-
-    git clone git@github.com:Windsooon/cherry.git
-
 ## Built in model
 
-Cherry has three built in models,`newsgroups`,  `review` and `email`:
+Cherry has three built in text classification models: `newsgroups`, `review` and `email`:
 
 - [The 20 Newsgroups dataset](http://qwone.com/~jason/20Newsgroups/)
     
@@ -84,19 +80,25 @@ Cherry has three built in models,`newsgroups`,  `review` and `email`:
 
 ### Use built-in model
 
-In the [Comics & Graphic book review](https://sites.google.com/eng.ucsd.edu/ucsdbookgraph/home) datasets, every book review also has rating from 0 point to 5 points. If you want to predict rating based on the book review:
+In the [Comics & Graphic book review](https://sites.google.com/eng.ucsd.edu/ucsdbookgraph/home) datasets, each review has a corresponding rating from 1 to 5. For example, if you want to predict the rating based on this book review:
 
 > This is an extremely entertaining and often insightful collection by Nobel physicist Richard Feynman drawn from slices of his life experiences. Some might believe that the telling of a physicist’s life would be droll fare for anyone other than a fellow scientist, but in this instance, nothing could be further from the truth.
 
-After finish [Installation](#installation), in your project path run `cherry.train('review')`
+#### Train the model
+Train the model in your Python environment.
     
-    # You only need to run this line of code at the first time.
-    # This line of code will:
-    # 1. Download `review` datasets from remote server (User in China may need use VPN)
-    # 2. Train datasets using default settings ([Countvectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html) and [MultinomialNB](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html))
+    Python3
     >>> cherry.train('review')
 
-Then you can use `classify()` to predict the rating now.
+This line of code will:
+
+1. Download `review` datasets from remote server (User in China may need use VPN)
+2. Train datasets using default settings ([Countvectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html) and [MultinomialNB](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html))
+
+You only need to train the model once, and subsequent classification tasks do not need to be retrained
+
+#### Classify the review
+You can use `classify()` to predict the rating now.
 
     >>> res = cherry.classify('review', text='This is an extremely entertaining and often
     insightful collection by Nobel physicist Richard Feynman drawn from slices of his life
@@ -104,7 +106,7 @@ Then you can use `classify()` to predict the rating now.
     fare for anyone other than a fellow scientist, but in this instance, nothing could be
     further from the truth.')
 
-The return `res` is a Classify object has two built-in method. `get_probability()` will return an array contains the probability of each category. The order of the return array depend on category name, in this case would be 0, 1, 2, 3, 4. We can see that there is 99.63% (9.96313288e-01) this review will be classify as 4 point.
+The return `res` is a Classify object has two built-in method. `get_probability()` will return an array contains the probability of each category. The order of the return array depend on category name, in this case would be 0, 1, 2, 3, 4. We can see that there is 99.63% (9.96313288e-01) this review is rated 4 point.
 
     # The probability of this review had been rating as 4 points is 99.6%
 	>>> res.get_probability()
@@ -116,7 +118,11 @@ Another method `get_word_list()` return a list that contains words that Cherry u
     >>> res.get_word_list()
     [[(2, 'physicist'), (2, 'life'), (1, 'truth'), (1, 'telling'), (1, 'slices'), (1, 'scientist'), (1, 'richard'), (1, 'nobel'), (1, 'instance'), (1, 'insightful'), (1, 'feynman'), (1, 'fellow'), (1, 'fare'), (1, 'extremely'), (1, 'experiences'), (1, 'entertaining'), (1, 'droll'), (1, 'drawn'), (1, 'collection'), (1, 'believe')]]
 
-As you can see, some of the words in the review didin't show up here. There are two reasons for this 1) The training data didn't contain that word. For instance, The word `Backend` and `Engineer` never show up in training data. So the model don't know how to classify these words. 2) the word is a [stop word](https://en.wikipedia.org/wiki/Stop_words).
+Some of the words in the review didin't show up here. There are two reasons for this 1) The training data didn't contain that word. For instance, The word `Backend` and `Engineer` never show up in training data. So the model don't know how to classify these words. 2) the word is a [stop word](https://en.wikipedia.org/wiki/Stop_words).
+
+
+### How it works
+In the `cherry` folder, you can find a new folder named `datasets`. The five folders inside correspond to 1 to 5 points respectively. `cherry` uses the word frequency inside different folders to determine which word belongs to which score. When performing a classification task, `cherry` will calculate the probability of all words in the review to determine which category it belongs to.
 
 ### Use your own dataset
 Create a folder `your_model_name `under datasets in project path like this:
