@@ -5,7 +5,7 @@ Naive Bayes Classifier
 ~~~~~~~~~~~~~~~~~~~~~
 cherry is a python classifier library
 
-:copyright: (c) 2018-2020 by Windson Yang
+:copyright: (c) 2018-2022 by Windson Yang
 :license: MIT License, see LICENSE for more details.
 """
 

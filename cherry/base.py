@@ -4,7 +4,7 @@
 cherry.base
 ~~~~~~~~~~~~
 Base method for cherry
-:copyright: (c) 2018-2020 by Windson Yang
+:copyright: (c) 2018-2022 by Windson Yang
 :license: MIT License, see LICENSE for more details.
 """
 import os

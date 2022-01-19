@@ -3,7 +3,7 @@
 cherry.gridsearch
 ~~~~~~~~~~~~~~~~~~~
 This module contains the set of cheery' grid search.
-:copyright: (c) 2018-2019 by Windson Yang
+:copyright: (c) 2018-2022 by Windson Yang
 :license: MIT License, see LICENSE for more details.
 """
 

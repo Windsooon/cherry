@@ -3,7 +3,7 @@
 cherry.performance
 ~~~~~~~~~~~~
 This module implements the cherry performance.
-:copyright: (c) 2018-2019 by Windson Yang
+:copyright: (c) 2018-2022 by Windson Yang
 :license: MIT License, see LICENSE for more details.
 """
 import os
