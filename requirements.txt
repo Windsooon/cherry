@@ -1,6 +1,6 @@
 importlib-metadata==1.6.0
 joblib==0.14.1
-numpy==1.18.4
+numpy==1.22.0
 matplotlib==3.2.2
 regex==2020.5.14
 scikit-learn==0.23.1
