@@ -1,5 +1,5 @@
 importlib-metadata==1.6.0
-joblib==0.14.1
+joblib==1.2.0
 numpy==1.18.4
 matplotlib==3.2.2
 regex==2020.5.14
